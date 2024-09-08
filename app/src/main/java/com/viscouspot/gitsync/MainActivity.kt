@@ -557,7 +557,6 @@ class MainActivity : AppCompatActivity() {
                 gitRepoName.isEnabled = false
 
                 cloneRepoButton.visibility = View.VISIBLE
-                cloneRepoButton.isEnabled = true
                 cloneRepoButton.setOnClickListener {
                     CloneRepoFragment(settingsManager, gitManager, ::dirSelectionCallback).show(supportFragmentManager, getString(R.string.clone_repo))
                 }
