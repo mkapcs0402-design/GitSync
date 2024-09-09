@@ -67,7 +67,7 @@ class CloneRepoFragment(
 
         gitManager.getRepos(settingsManager.getGitAuthCredentials().second) {
             repoList.addAll(it)
-            requireActivity().runOnUiThread {
+            activity?.runOnUiThread {
                 adapter.notifyDataSetChanged()
             }
         }
