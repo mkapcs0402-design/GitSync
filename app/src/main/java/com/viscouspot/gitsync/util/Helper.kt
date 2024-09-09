@@ -16,6 +16,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
 import com.viscouspot.gitsync.R
+import com.viscouspot.gitsync.util.Logger.log
 import java.io.File
 import java.io.IOException
 import java.util.regex.Matcher
@@ -25,10 +26,27 @@ object Helper {
     fun getDirSelectionLauncher(activityResultLauncher: ActivityResultCaller, context: Context, callback: ((dirUri: Uri?) -> Unit)): ActivityResultLauncher<Uri?> {
         return activityResultLauncher.registerForActivityResult(ActivityResultContracts.OpenDocumentTree()) { uri ->
             uri?.let {
+                val uriPath = getPathFromUri(context, it)
+                val directory = File(uriPath)
+
+                if (!directory.exists() || !directory.isDirectory) {
+                    callback.invoke(null)
+                    return@let
+                }
+
                 try {
-                    val testFile = File(getPathFromUri(context, it), "test${System.currentTimeMillis()}.txt")
+                    val testFile = File(directory, "test${System.currentTimeMillis()}.txt")
                     testFile.createNewFile()
                     testFile.delete()
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                    callback.invoke(null)
+                    return@let
+                }
+
+                try {
+                    val configFile = File(directory, ".git/config")
+                    configFile.readText()
                 } catch (e: IOException) {
                     e.printStackTrace()
                     callback.invoke(null)
