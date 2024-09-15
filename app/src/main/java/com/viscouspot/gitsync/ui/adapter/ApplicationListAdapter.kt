@@ -11,6 +11,7 @@ import com.viscouspot.gitsync.R
 class ApplicationListAdapter(private val applicationList: MutableList<Drawable>) : RecyclerView.Adapter<ApplicationListAdapter.ViewHolder>() {
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val icon: ImageView
+
         init {
             icon = view.findViewById(R.id.icon)
         }
