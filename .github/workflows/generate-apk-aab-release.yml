@@ -82,8 +82,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: release-artifacts
-          paths: |
-            app/build/outputs/
+          path: app/build/outputs/
 
       # - name: Build Changelog
       #   if: ${{ steps.regex-match.outputs.match != '' }}
@@ -102,7 +101,6 @@ jobs:
       #   with:
       #     artifacts: "app/build/outputs/app-base-release.apk, app/build/outputs/app-all-files-variant-release.apk"
       #     body: ${{ steps.changelog.outputs.changelog }}
-      #     tag: ${{ github.event.head_commit.message }}
       #     name: Release ${{ github.event.head_commit.message }}
       #     token: ${{ secrets.GITHUB_TOKEN }}
      
