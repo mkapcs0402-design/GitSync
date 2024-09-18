@@ -20,6 +20,50 @@ Android mobile git client for syncing a repository between remote and a local di
     - From custom intent (advanced)
 
 ## [Documentation](Documentation.md)
+
+## Build Instructions
+
+If you just want to try the app out, feel free to use a pre-built release from the [Releases](https://github.com/ViscousPotential/GitSync/releases) page
+
+### 1. Setup 
+- Clone the project
+```bash
+  git clone https://github.com/ViscousPotential/GitSync.git
+```
+
+
+- Go to the project directory
+
+```bash
+  cd GitSync
+```
+
+- Open the project in Android Studio
+- Sync the gradle project
+
+### 2. Secrets 
+- Rename `Secrets.kt.template` to `Secrets.kt`
+- Visit `https://github.com/settings/developers`
+- Select `OAuth Apps`
+- Select `New OAuth App`
+  - Application Name: GitSync
+  - Homepage URL: `https://github.com/ViscousPotential/GitSync`
+  - Authorization callback URL: `gitsync://auth`
+  - Enable Device Flow: `leave unchecked` 
+- Fill `Secrets.kt` with the new OAuth app ID and SECRET
+
+### 3. Build & Run
+- There are two flavors of GitSync
+  - The base variant
+    - Includes all the base functionality of GitSync, but doesn't have access to some files and folders on the device
+    - Equivalent to the version available on the PlayStore
+  - The all-files variant
+    - Includes all the functionality of the base variant + an extra permission to give the app full access to the device files and folders
+    - This is useful if you already have a repository cloned on your device
+    - GitSync does not access any files outside of the directory selected in the app nor is anything stored or sent from the selected directory
+- Select a build variant (base is the default)
+- Build from within Android Studio
+
 ## Support
 
 For support, email bugs.viscouspotential@gmail.com.
