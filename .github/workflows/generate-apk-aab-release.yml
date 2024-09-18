@@ -14,21 +14,16 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-
-      - name: Setup JAVA 11
+      - name: Set Up JDK
         uses: actions/setup-java@v3
         with:
-          distribution: 'corretto'
-          java-version: 11
+          distribution: 'zulu' # See 'Supported distributions' for available options
+          java-version: '17'
+          cache: 'gradle'
 
-      - name: Cache Gradle and wrapper
-        uses: actions/cache@v2
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
-    
+      - name: Change wrapper permissions
+        run: chmod +x ./gradlew
+
     # #1     
     #   - name: Decode Keystore
     #     env:
