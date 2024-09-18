@@ -78,19 +78,31 @@ jobs:
           keyStorePassword: ${{ secrets.RELEASE_SIGNING_PASSWORD }}
           keyPassword: ${{ secrets.RELEASE_SIGNING_PASSWORD }}
       #3
-      # - name: Upload Release Build to Artifacts
-      #   uses: actions/upload-artifact@v3
+      - name: Upload Release Build to Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: release-artifacts
+          paths: |
+            app/build/outputs/
+
+      # - name: Build Changelog
+      #   if: ${{ steps.regex-match.outputs.match != '' }}
+      #   id: changelog
+      #   uses: ardalanamini/auto-changelog@v3
       #   with:
-      #     name: release-artifacts
-      #     paths: |
-      #       app/base/release/
-      #       app/all-files-variant/release/
-      # #4      
-      # - name: Create Github Release
-      #   uses: softprops/action-gh-release@v1
+      #     mention-authors: false
+      #     mention-new-contributors: false
+      #     include-compare: false
+      #     semver: false
+
+      # - name: Create Release
+      #   if: ${{ steps.regex-match.outputs.match != '' }}
+      #   id: create_release
+      #   uses: ncipollo/release-action@v1.13.0
       #   with:
-      #     generate_release_notes: true
-      #     prerelease: true
-      #     files: |
-      #       app/base/release/app-release.apk
-      #       app/all-files-variant/release/app-release.aab
+      #     artifacts: "app/build/outputs/app-base-release.apk, app/build/outputs/app-all-files-variant-release.apk"
+      #     body: ${{ steps.changelog.outputs.changelog }}
+      #     tag: ${{ github.event.head_commit.message }}
+      #     name: Release ${{ github.event.head_commit.message }}
+      #     token: ${{ secrets.GITHUB_TOKEN }}
+     
