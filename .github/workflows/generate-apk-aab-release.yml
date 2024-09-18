@@ -29,62 +29,78 @@ jobs:
             ~/.gradle/wrapper
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
     
-    #1     
-      - name: Decode Keystore
-        env:
-          ENCODED_STRING: ${{ secrets.RELEASE_KEYSTORE_BASE64 }}
-          RELEASE_KEYSTORE_PATH: ${{ secrets.RELEASE_KEYSTORE_PATH }}
+    # #1     
+    #   - name: Decode Keystore
+    #     env:
+    #       ENCODED_STRING: ${{ secrets.RELEASE_KEYSTORE_BASE64 }}
+    #       RELEASE_KEYSTORE_PATH: ${{ secrets.RELEASE_KEYSTORE_PATH }}
 
-        run: |
-          echo $ENCODED_STRING > keystore-b64.txt
-          cat keystore-b64.txt | base64 -d > $RELEASE_KEYSTORE_PATH
+    #     run: |
+    #       echo $ENCODED_STRING > keystore-b64.txt
+    #       cat keystore-b64.txt | base64 -d > $RELEASE_KEYSTORE_PATH
           
       #2
       - name: Build Release APKs
-        env:
-          RELEASE_KEYSTORE_PATH: ${{ secrets.RELEASE_KEYSTORE_PATH }}
-          RELEASE_SIGNING_ALIAS: ${{ secrets.RELEASE_SIGNING_ALIAS }}
-          RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
-          RELEASE_SIGNING_PASSWORD: ${{ secrets.RELEASE_SIGNING_PASSWORD }}
+        # env:
+        #   RELEASE_KEYSTORE_PATH: ${{ secrets.RELEASE_KEYSTORE_PATH }}
+        #   RELEASE_SIGNING_ALIAS: ${{ secrets.RELEASE_SIGNING_ALIAS }}
+        #   RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
+        #   RELEASE_SIGNING_PASSWORD: ${{ secrets.RELEASE_SIGNING_PASSWORD }}
         run: ./gradlew assembleBaseRelease
 
       - name: Build Release APKs
-        env:
-          RELEASE_KEYSTORE_PATH: ${{ secrets.RELEASE_KEYSTORE_PATH }}
-          RELEASE_SIGNING_ALIAS: ${{ secrets.RELEASE_SIGNING_ALIAS }}
-          RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
-          RELEASE_SIGNING_PASSWORD: ${{ secrets.RELEASE_SIGNING_PASSWORD }}
+        # env:
+        #   RELEASE_KEYSTORE_PATH: ${{ secrets.RELEASE_KEYSTORE_PATH }}
+        #   RELEASE_SIGNING_ALIAS: ${{ secrets.RELEASE_SIGNING_ALIAS }}
+        #   RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
+        #   RELEASE_SIGNING_PASSWORD: ${{ secrets.RELEASE_SIGNING_PASSWORD }}
         run: ./gradlew assembleAll-files-variantRelease
 
       - name: Build Release Bundles
-        env:
-          RELEASE_KEYSTORE_PATH: ${{ secrets.RELEASE_KEYSTORE_PATH }}
-          RELEASE_SIGNING_ALIAS: ${{ secrets.RELEASE_SIGNING_ALIAS }}
-          RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
-          RELEASE_SIGNING_PASSWORD: ${{ secrets.RELEASE_SIGNING_PASSWORD }}
+        # env:
+          # RELEASE_KEYSTORE_PATH: ${{ secrets.RELEASE_KEYSTORE_PATH }}
+          # RELEASE_SIGNING_ALIAS: ${{ secrets.RELEASE_SIGNING_ALIAS }}
+          # RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
+          # RELEASE_SIGNING_PASSWORD: ${{ secrets.RELEASE_SIGNING_PASSWORD }}
         run: ./gradlew bundleBaseRelease
 
       - name: Build Release Bundles
-        env:
-          RELEASE_KEYSTORE_PATH: ${{ secrets.RELEASE_KEYSTORE_PATH }}
-          RELEASE_SIGNING_ALIAS: ${{ secrets.RELEASE_SIGNING_ALIAS }}
-          RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
-          RELEASE_SIGNING_PASSWORD: ${{ secrets.RELEASE_SIGNING_PASSWORD }}
+        # env:
+          # RELEASE_KEYSTORE_PATH: ${{ secrets.RELEASE_KEYSTORE_PATH }}
+          # RELEASE_SIGNING_ALIAS: ${{ secrets.RELEASE_SIGNING_ALIAS }}
+          # RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
+          # RELEASE_SIGNING_PASSWORD: ${{ secrets.RELEASE_SIGNING_PASSWORD }}
         run: ./gradlew bundleAll-files-variantRelease
+
+      - name: Move files
+        run: |
+          mv app/base/release/app-base-release.apk app/release/app-release.apk
+          mv app/build/outputs/bundle/release/app-release.aab app/build/outputs/app-release.aab
+          
+      - name: Sign App
+        if: ${{ steps.regex-match.outputs.match != '' }}
+        id: sign_app
+        uses: ilharp/sign-android-release@v1.0.4
+        with:
+          releaseDir: app/build/outputs
+          signingKey: ${{ secrets.RELEASE_KEYSTORE_BASE64 }}
+          keyAlias: ${{ secrets.RELEASE_SIGNING_ALIAS }}
+          keyStorePassword: ${{ secrets.RELEASE_SIGNING_PASSWORD }}
+          keyPassword: ${{ secrets.RELEASE_SIGNING_PASSWORD }}
       #3
-      - name: Upload Release Build to Artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: release-artifacts
-          paths: |
-            app/base/release/
-            app/all-files-variant/release/
-      #4      
-      - name: Create Github Release
-        uses: softprops/action-gh-release@v1
-        with:
-          generate_release_notes: true
-          prerelease: true
-          files: |
-            app/base/release/app-release.apk
-            app/all-files-variant/release/app-release.aab
+      # - name: Upload Release Build to Artifacts
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: release-artifacts
+      #     paths: |
+      #       app/base/release/
+      #       app/all-files-variant/release/
+      # #4      
+      # - name: Create Github Release
+      #   uses: softprops/action-gh-release@v1
+      #   with:
+      #     generate_release_notes: true
+      #     prerelease: true
+      #     files: |
+      #       app/base/release/app-release.apk
+      #       app/all-files-variant/release/app-release.aab
