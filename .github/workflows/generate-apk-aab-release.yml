@@ -38,7 +38,6 @@ jobs:
         run: |
           echo $ENCODED_STRING > keystore-b64.txt
           cat keystore-b64.txt | base64 -d > $RELEASE_KEYSTORE_PATH
-          base64 -d keystore-b64.txt > $RELEASE_KEYSTORE_PATH
           
       #2
       - name: Build Release APKs
