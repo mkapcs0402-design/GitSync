@@ -20,15 +20,6 @@ android {
         }
     }
 
-    signingConfigs {
-        create("release")  {
-            keyAlias = "RELEASE_SIGNING_ALIAS"
-            keyPassword = "RELEASE_SIGNING_PASSWORD"
-            storeFile = file("keystore.jks")
-            storePassword = "RELEASE_SIGNING_PASSWORD"
-        }
-    }
-
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -36,7 +27,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            signingConfig = signingConfigs.getByName("release")
+            signingConfig = null
         }
     }
     compileOptions {
