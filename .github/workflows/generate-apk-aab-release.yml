@@ -9,9 +9,11 @@ on:
   
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: write
+      
     steps:
       - uses: actions/checkout@v3
       
@@ -86,23 +88,23 @@ jobs:
             app/build/outputs/*.aab
             app/build/outputs/*.apk
 
-      # - name: Build Changelog
-      #   if: ${{ steps.regex-match.outputs.match != '' }}
-      #   id: changelog
-      #   uses: ardalanamini/auto-changelog@v3
-      #   with:
-      #     mention-authors: false
-      #     mention-new-contributors: false
-      #     include-compare: false
-      #     semver: false
+      - name: Build Changelog
+        if: ${{ steps.regex-match.outputs.match != '' }}
+        id: changelog
+        uses: ardalanamini/auto-changelog@v3
+        with:
+          mention-authors: false
+          mention-new-contributors: false
+          include-compare: false
+          semver: false
 
-      # - name: Create Release
-      #   if: ${{ steps.regex-match.outputs.match != '' }}
-      #   id: create_release
-      #   uses: ncipollo/release-action@v1.13.0
-      #   with:
-      #     artifacts: "app/build/outputs/app-base-release.apk, app/build/outputs/app-all-files-variant-release.apk"
-      #     body: ${{ steps.changelog.outputs.changelog }}
-      #     name: Release ${{ github.event.head_commit.message }}
-      #     token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create Release
+        if: ${{ steps.regex-match.outputs.match != '' }}
+        id: create_release
+        uses: ncipollo/release-action@v1.13.0
+        with:
+          artifacts: "app/build/outputs/app-base-release.apk, app/build/outputs/app-all-files-variant-release.apk"
+          body: ${{ steps.changelog.outputs.changelog }}
+          name: Release ${{ github.ref_name }}
+          token: ${{ secrets.GITHUB_TOKEN }}
      
