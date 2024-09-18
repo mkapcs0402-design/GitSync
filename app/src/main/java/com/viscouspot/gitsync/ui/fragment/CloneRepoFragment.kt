@@ -19,6 +19,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
+import com.viscouspot.gitsync.BuildConfig
 import com.viscouspot.gitsync.R
 import com.viscouspot.gitsync.ui.adapter.RepoListAdapter
 import com.viscouspot.gitsync.util.GitManager
@@ -55,6 +56,7 @@ class CloneRepoFragment(
         val repoListRecycler = view.findViewById<RecyclerView>(R.id.repoList)
         val repoUrlEditText = view.findViewById<EditText>(R.id.repoUrlEditText)
         val pullButton = view.findViewById<MaterialButton>(R.id.pullButton)
+        val divider = view.findViewById<View>(R.id.divider)
         val localRepo = view.findViewById<MaterialButton>(R.id.localRepo)
         repoListRecycler.setLayoutManager(GridLayoutManager(context, 1))
 
@@ -65,7 +67,7 @@ class CloneRepoFragment(
 
         gitManager.getRepos(settingsManager.getGitAuthCredentials().second) {
             repoList.addAll(it)
-            requireActivity().runOnUiThread {
+            activity?.runOnUiThread {
                 adapter.notifyDataSetChanged()
             }
         }
@@ -88,6 +90,11 @@ class CloneRepoFragment(
 
         localRepo.setOnClickListener {
             selectLocalRepo()
+        }
+
+        if (!BuildConfig.ALL_FILES) {
+            divider.visibility = View.GONE
+            localRepo.visibility = View.GONE
         }
 
         return view

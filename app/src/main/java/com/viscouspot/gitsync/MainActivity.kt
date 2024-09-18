@@ -10,7 +10,9 @@ import android.graphics.PorterDuff
 import android.graphics.Rect
 import android.graphics.drawable.Drawable
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.provider.Settings
 import android.view.MotionEvent
 import android.view.View
@@ -21,6 +23,7 @@ import android.widget.EditText
 import android.widget.Switch
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -28,6 +31,7 @@ import androidx.appcompat.widget.SearchView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
@@ -79,6 +83,10 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var syncAppOpened: Switch
     private lateinit var syncAppClosed: Switch
+
+    private var onStoragePermissionGranted: (() -> Unit)? = null
+    private var requestLegacyStoragePermission: ActivityResultLauncher<Array<String>>? = null
+    private var requestStoragePermission: ActivityResultLauncher<Intent>? = null
 
     companion object {
         const val REFRESH = "REFRESH"
@@ -182,6 +190,55 @@ class MainActivity : AppCompatActivity() {
 
         Thread.setDefaultUncaughtExceptionHandler { paramThread, paramThrowable ->
             log(this, "Global", Exception(paramThrowable))
+        }
+
+        if (BuildConfig.ALL_FILES) {
+            requestLegacyStoragePermission = this.registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { isGrantedMap ->
+                if (isGrantedMap.values.all { it }) {
+                    onStoragePermissionGranted?.invoke()
+                }
+            }
+
+            requestStoragePermission = this.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+                val hasPermissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    Environment.isExternalStorageManager()
+                } else ContextCompat.checkSelfPermission(
+                    this,
+                    android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+                ) == PackageManager.PERMISSION_GRANTED
+
+                if (hasPermissions) {
+                    onStoragePermissionGranted?.invoke()
+                }
+            }
+
+            fun checkAndRequestStoragePermission(onGranted: (() -> Unit)? = null) {
+                val hasPermissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    Environment.isExternalStorageManager()
+                } else ContextCompat.checkSelfPermission(
+                    this,
+                    android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+                ) == PackageManager.PERMISSION_GRANTED
+
+
+                if (hasPermissions) {
+                    onGranted?.invoke()
+                    return
+                }
+
+                onStoragePermissionGranted = onGranted
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    val uri = Uri.fromParts("package", packageName, null)
+                    val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, uri)
+                    intent.data = Uri.fromParts("package", packageName, null)
+                    requestStoragePermission?.launch(intent)
+                } else {
+                    requestLegacyStoragePermission?.launch(arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE, android.Manifest.permission.READ_EXTERNAL_STORAGE))
+                }
+            }
+
+            checkAndRequestStoragePermission()
         }
 
         val bManager = LocalBroadcastManager.getInstance(this)
@@ -500,7 +557,6 @@ class MainActivity : AppCompatActivity() {
                 gitRepoName.isEnabled = false
 
                 cloneRepoButton.visibility = View.VISIBLE
-                cloneRepoButton.isEnabled = true
                 cloneRepoButton.setOnClickListener {
                     CloneRepoFragment(settingsManager, gitManager, ::dirSelectionCallback).show(supportFragmentManager, getString(R.string.clone_repo))
                 }
