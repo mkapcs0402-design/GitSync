@@ -63,9 +63,9 @@ jobs:
       - name: Move files
         run: |
           mv app/build/outputs/apk/base/release/app-base-release-unsigned.apk app/build/outputs/app-base-release.apk
-          mv app/build/outputs/bundle/base/release/app-base-release.aab app/build/outputs/app-base-release.aab
+          mv app/build/outputs/bundle/baseRelease/app-base-release.aab app/build/outputs/app-base-release.aab
           mv app/build/outputs/apk/all-files-variant/release/app-all-files-variant-release-unsigned.apk app/build/outputs/app-all-files-variant-release.apk
-          mv app/build/outputs/bundle/all-files-variant/release/app-all-files-variant-release.aab app/build/outputs/app-all-files-variant-release.aab
+          mv app/build/outputs/bundle/all-files-variantRelease/app-all-files-variant-release.aab app/build/outputs/app-all-files-variant-release.aab
           
       - name: Sign App
         if: ${{ steps.regex-match.outputs.match != '' }}
