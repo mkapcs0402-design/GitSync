@@ -82,7 +82,9 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: release-artifacts
-          path: app/build/outputs/
+          path: |
+            app/build/outputs/*.aab
+            app/build/outputs/*.apk
 
       # - name: Build Changelog
       #   if: ${{ steps.regex-match.outputs.match != '' }}
