@@ -41,41 +41,21 @@ jobs:
           
       #2
       - name: Build Release APKs
-        # env:
-        #   RELEASE_KEYSTORE_PATH: ${{ secrets.RELEASE_KEYSTORE_PATH }}
-        #   RELEASE_SIGNING_ALIAS: ${{ secrets.RELEASE_SIGNING_ALIAS }}
-        #   RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
-        #   RELEASE_SIGNING_PASSWORD: ${{ secrets.RELEASE_SIGNING_PASSWORD }}
-        run: ./gradlew assembleBaseRelease
-
-      - name: Build Release APKs
-        # env:
-        #   RELEASE_KEYSTORE_PATH: ${{ secrets.RELEASE_KEYSTORE_PATH }}
-        #   RELEASE_SIGNING_ALIAS: ${{ secrets.RELEASE_SIGNING_ALIAS }}
-        #   RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
-        #   RELEASE_SIGNING_PASSWORD: ${{ secrets.RELEASE_SIGNING_PASSWORD }}
-        run: ./gradlew assembleAll-files-variantRelease
+        run: |
+          bash ./gradlew assembleBaseRelease
+          bash ./gradlew assembleAll-files-variantRelease
 
       - name: Build Release Bundles
-        # env:
-          # RELEASE_KEYSTORE_PATH: ${{ secrets.RELEASE_KEYSTORE_PATH }}
-          # RELEASE_SIGNING_ALIAS: ${{ secrets.RELEASE_SIGNING_ALIAS }}
-          # RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
-          # RELEASE_SIGNING_PASSWORD: ${{ secrets.RELEASE_SIGNING_PASSWORD }}
-        run: ./gradlew bundleBaseRelease
-
-      - name: Build Release Bundles
-        # env:
-          # RELEASE_KEYSTORE_PATH: ${{ secrets.RELEASE_KEYSTORE_PATH }}
-          # RELEASE_SIGNING_ALIAS: ${{ secrets.RELEASE_SIGNING_ALIAS }}
-          # RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
-          # RELEASE_SIGNING_PASSWORD: ${{ secrets.RELEASE_SIGNING_PASSWORD }}
-        run: ./gradlew bundleAll-files-variantRelease
+        run: |
+          bash ./gradlew bundleBaseRelease
+          bash ./gradlew bundleAll-files-variantRelease
 
       - name: Move files
         run: |
-          mv app/base/release/app-base-release.apk app/release/app-release.apk
-          mv app/build/outputs/bundle/release/app-release.aab app/build/outputs/app-release.aab
+          mv app/base/release/app-base-release.apk app/release/app-base-release.apk
+          mv app/base/release/app-base-release.aab app/release/app-base-release.aab
+          mv app/all-files-variant/release/app-all-files-variant-release.apk app/release/app-all-files-variant-release.apk
+          mv app/all-files-variant/release/app-all-files-variant-release.aab app/release/app-all-files-variant-release.aab
           
       - name: Sign App
         if: ${{ steps.regex-match.outputs.match != '' }}
