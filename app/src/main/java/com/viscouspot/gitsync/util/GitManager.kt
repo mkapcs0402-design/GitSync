@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Looper
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.github.syari.kgit.KGit
@@ -20,10 +21,13 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
+import org.eclipse.jgit.api.RebaseCommand
+import org.eclipse.jgit.api.RebaseResult
 import org.eclipse.jgit.diff.DiffFormatter
 import org.eclipse.jgit.internal.storage.file.FileRepository
 import org.eclipse.jgit.revwalk.RevSort
 import org.eclipse.jgit.revwalk.RevWalk
+import org.eclipse.jgit.transport.RemoteRefUpdate
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider
 import org.eclipse.jgit.util.io.DisabledOutputStream
 import org.json.JSONArray
@@ -102,15 +106,19 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
         })
     }
 
-    fun getRepos(authToken: String, callback: (repos: List<Pair<String, String>>) -> Unit) {
-        val reposRequest: Request = Request.Builder()
-            .url("https://api.github.com/user/repos")
-            .addHeader("Accept", "application/json")
-            .addHeader("Authorization", "token $authToken")
-            .build()
-
+    fun getRepos(authToken: String, updateCallback: (repos: List<Pair<String, String>>) -> Unit, nextPageCallback: (nextPage: (() -> Unit)?) -> Unit){
         log("GetRepos", "Getting User Repos")
-        client.newCall(reposRequest).enqueue(object: Callback {
+        getReposRequest(authToken, "https://api.github.com/user/repos", updateCallback, nextPageCallback)
+    }
+
+    private fun getReposRequest(authToken: String, url: String, updateCallback: (repos: List<Pair<String, String>>) -> Unit, nextPageCallback: (nextPage: (() -> Unit)?) -> Unit) {
+        client.newCall(
+            Request.Builder()
+                .url(url)
+                .addHeader("Accept", "application/json")
+                .addHeader("Authorization", "token $authToken")
+                .build()
+        ).enqueue(object: Callback {
             override fun onFailure(call: Call, e: IOException) {
                 log(context, "GetRepos", e)
             }
@@ -121,6 +129,26 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
                 val jsonArray = JSONArray(response.body?.string())
                 val repoMap: MutableList<Pair<String, String>> = mutableListOf()
 
+                Log.d("testset///", response.headers["link"].toString())
+                val link = response.headers["link"] ?: ""
+
+                if (link != "") {
+                    val regex = "<(.*?)>; rel=\"next\"".toRegex()
+
+                    val match = regex.find(link)
+                    val result = match?.groups?.get(1)?.value
+
+                    Log.d("testset///", result.toString())
+                    val nextLink = result ?: ""
+                    if (nextLink != "") {
+                        nextPageCallback {
+                            getReposRequest(authToken, nextLink, updateCallback, nextPageCallback)
+                        }
+                    } else {
+                        nextPageCallback(null)
+                    }
+                }
+
                 for (i in 0..<jsonArray.length()) {
                     val obj = jsonArray.getJSONObject(i)
                     val name = obj.getString("name")
@@ -128,7 +156,7 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
                     repoMap.add(Pair(name, cloneUrl))
                 }
 
-                callback.invoke(repoMap)
+                updateCallback.invoke(repoMap)
             }
         })
     }
@@ -207,6 +235,7 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
 
             logStatus(git)
             val status = git.status()
+
             if (status.uncommittedChanges.isNotEmpty() || status.untracked.isNotEmpty()) {
                 onSync.invoke()
                 log("PushToRepo", "Adding Files to Stage")
@@ -228,18 +257,41 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
                     message = "Last Sync: ${currentDateTime.format(formatter)} (Mobile)"
                 }
 
-                log("PushToRepo", "Pushing changes")
-                git.push {
-                    setCredentialsProvider(UsernamePasswordCredentialsProvider(username, token))
-                    remote = repoUrl
-                }
-
-                if (Looper.myLooper() == null) {
-                    Looper.prepare()
-                }
-
                 returnResult = true
             }
+
+            log("PushToRepo", "Pushing changes")
+            for (pushResult in git.push {
+                setCredentialsProvider(UsernamePasswordCredentialsProvider(username, token))
+                remote = repoUrl
+            }) {
+                for (remoteUpdate in pushResult.remoteUpdates) {
+//                    if (remoteUpdate.trackingRefUpdate )
+                    when (remoteUpdate.status) {
+                        RemoteRefUpdate.Status.REJECTED_NONFASTFORWARD -> {
+                            log("PushToRepo", "Attempting rebase on REJECTED_NONFASTFORWARD")
+                            val rebaseResult = git.rebase {
+                                setUpstream("origin/master")
+                                // TODO: compliance for main + master
+                            }
+
+                            if (rebaseResult.status != RebaseResult.Status.OK) {
+                                git.rebase {
+                                    setOperation(RebaseCommand.Operation.ABORT)
+                                }
+                                throw Error("Remote is further ahead than local and we could not automatically rebase for you!")
+                            }
+                            break
+                        }
+                        else -> {}
+                    }
+                }
+            }
+
+            if (Looper.myLooper() == null) {
+                Looper.prepare()
+            }
+
             logStatus(git)
 
             log("PushToRepo", "Closing repository")

@@ -17,6 +17,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
 import com.viscouspot.gitsync.BuildConfig
@@ -34,7 +35,11 @@ class CloneRepoFragment(
 ): DialogFragment(R.layout.clone_repo_fragment) {
     private val repoList = mutableListOf<Pair<String, String>>()
     private var repoUrl = ""
+    private var loadNextRepos: (() -> Unit)? = {}
     private var callback: ((dirUri: Uri?) -> Unit) = {dirUri: Uri? -> dirSelectionCallback(dirUri)}
+    private lateinit var adapter: RepoListAdapter
+    private lateinit var repoListRecycler: RecyclerView
+    private var loadingRepos = false
 
     private lateinit var dirSelectionLauncher: ActivityResultLauncher<Uri?>
 
@@ -53,23 +58,21 @@ class CloneRepoFragment(
     ): View {
         val view = inflater.inflate(R.layout.clone_repo_fragment, container, false)
 
-        val repoListRecycler = view.findViewById<RecyclerView>(R.id.repoList)
+        repoListRecycler = view.findViewById(R.id.repoList)
         val repoUrlEditText = view.findViewById<EditText>(R.id.repoUrlEditText)
         val pullButton = view.findViewById<MaterialButton>(R.id.pullButton)
         val divider = view.findViewById<View>(R.id.divider)
         val localRepo = view.findViewById<MaterialButton>(R.id.localRepo)
         repoListRecycler.setLayoutManager(GridLayoutManager(context, 1))
 
-        val adapter = RepoListAdapter(repoList) {
+        adapter = RepoListAdapter(repoList) {
             repoUrl = it.second
             selectLocalDir()
         }
 
-        gitManager.getRepos(settingsManager.getGitAuthCredentials().second) {
-            repoList.addAll(it)
-            activity?.runOnUiThread {
-                adapter.notifyDataSetChanged()
-            }
+        setLoadingRepos(true)
+        gitManager.getRepos(settingsManager.getGitAuthCredentials().second, ::addRepos) {
+            loadNextRepos = it
         }
 
         repoUrlEditText.doOnTextChanged { _, _, _, _ ->
@@ -87,6 +90,18 @@ class CloneRepoFragment(
         }
 
         repoListRecycler.setAdapter(adapter)
+        repoListRecycler.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                val linearLayoutManager = recyclerView.layoutManager as LinearLayoutManager?
+                if (!loadingRepos) {
+                    if (linearLayoutManager != null && linearLayoutManager.findLastCompletelyVisibleItemPosition() == repoList.size - 1) {
+                        setLoadingRepos(true)
+                        loadNextRepos?.invoke()
+                    }
+                }
+            }
+        })
 
         localRepo.setOnClickListener {
             selectLocalRepo()
@@ -98,6 +113,36 @@ class CloneRepoFragment(
         }
 
         return view
+    }
+
+    private fun setLoadingRepos(loading: Boolean) {
+        if (loading && loadNextRepos != null) {
+            repoList.add(Pair("Loading...", ""))
+            activity?.runOnUiThread {
+                adapter.notifyItemInserted(repoList.size - 1)
+                repoListRecycler.scrollToPosition(repoList.size - 1)
+            }
+
+        } else {
+            val loadingIndex = repoList.indexOf(Pair("Loading...", ""))
+            if (loadingIndex > -1) {
+                repoList.removeAt(loadingIndex)
+                activity?.runOnUiThread {
+                adapter.notifyItemRemoved(loadingIndex)
+                }
+            }
+        }
+        loadingRepos = loading
+    }
+
+    private fun addRepos(repos: List<Pair<String, String>>) {
+        val prevEnd = repoList.size - 1
+        setLoadingRepos(false)
+        repoList.addAll(repos)
+        activity?.runOnUiThread {
+            adapter.notifyItemRangeInserted(prevEnd, repos.size)
+            repoListRecycler.scrollToPosition(prevEnd)
+        }
     }
 
     private fun localRepoCallback(dirUri: Uri?){
