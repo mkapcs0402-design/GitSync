@@ -85,8 +85,10 @@ jobs:
         with:
           name: release-artifacts
           path: |
-            app/build/outputs/*.aab
-            app/build/outputs/*.apk
+            ${{ steps.sign_app.signedReleaseFile0 }}
+            ${{ steps.sign_app.signedReleaseFile1 }}
+            ${{ steps.sign_app.signedReleaseFile2 }}
+            ${{ steps.sign_app.signedReleaseFile3 }}
 
       - name: Build Changelog
         if: ${{ steps.regex-match.outputs.match != '' }}
