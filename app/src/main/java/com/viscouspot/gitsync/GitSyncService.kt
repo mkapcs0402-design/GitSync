@@ -122,8 +122,8 @@ class GitSyncService : Service() {
         val job = CoroutineScope(Dispatchers.Default).launch {
             val authCredentials = settingsManager.getGitAuthCredentials()
 
-            val gitDirUri = settingsManager.getGitDirUri()
-            val gitDirPath = Helper.getPathFromUri(applicationContext, gitDirUri!!)
+            val gitDirUri = settingsManager.getGitDirUri() ?: return@launch
+            val gitDirPath = Helper.getPathFromUri(applicationContext, gitDirUri)
             val file = File("${gitDirPath}/.git/config")
 
             if (gitDirUri == null || !file.exists()) {
