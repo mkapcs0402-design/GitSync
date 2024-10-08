@@ -46,7 +46,10 @@ object Helper {
 
                 try {
                     val configFile = File(directory, ".git/config")
-                    configFile.readText()
+                    // TODO: Potentially change to check read of any file in dir. May be blocked by being unable to read files in a repo without access
+                    if (configFile.exists()) {
+                        configFile.readText()
+                    }
                 } catch (e: IOException) {
                     e.printStackTrace()
                     callback.invoke(null)
