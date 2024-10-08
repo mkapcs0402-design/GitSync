@@ -603,6 +603,7 @@ class MainActivity : AppCompatActivity() {
                 gitAuthButton.icon = getDrawable(R.drawable.circle_check)
                 gitAuthButton.setIconTintResource(R.color.auth_green)
 
+                selectFileButton.isEnabled = true
                 cloneRepoButton.isEnabled = true
 
                 return@runOnUiThread
@@ -611,6 +612,7 @@ class MainActivity : AppCompatActivity() {
             gitAuthButton.icon = getDrawable(R.drawable.circle_xmark)
             gitAuthButton.setIconTintResource(R.color.auth_red)
 
+            selectFileButton.isEnabled = false
             cloneRepoButton.isEnabled = false
         }
     }
