@@ -70,7 +70,6 @@ jobs:
           mv app/build/outputs/bundle/all-files-variantRelease/app-all-files-variant-release.aab app/build/outputs/app-all-files-variant-release.aab
           
       - name: Sign App
-        if: ${{ steps.regex-match.outputs.match != '' }}
         id: sign_app
         uses: ilharp/sign-android-release@v1.0.4
         with:
