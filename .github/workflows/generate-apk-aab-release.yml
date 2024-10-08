@@ -32,26 +32,16 @@ jobs:
       - name: Set Up JDK
         uses: actions/setup-java@v3
         with:
-          distribution: 'zulu' # See 'Supported distributions' for available options
+          distribution: 'zulu'
           java-version: '17'
           cache: 'gradle'
 
       - name: Change wrapper permissions
         run: chmod +x ./gradlew
 
-    # #1     
-    #   - name: Decode Keystore
-    #     env:
-    #       ENCODED_STRING: ${{ secrets.RELEASE_KEYSTORE_BASE64 }}
-    #       RELEASE_KEYSTORE_PATH: ${{ secrets.RELEASE_KEYSTORE_PATH }}
-
-    #     run: |
-    #       echo $ENCODED_STRING > keystore-b64.txt
-    #       cat keystore-b64.txt | base64 -d > $RELEASE_KEYSTORE_PATH
       - name: Make gradlew executable
         run: chmod +x ./gradlew
         
-      #2
       - name: Build Release APKs
         run: |
           bash ./gradlew assembleBaseRelease
@@ -67,7 +57,6 @@ jobs:
           mv app/build/outputs/apk/base/release/app-base-release-unsigned.apk app/build/outputs/app-base-release.apk
           mv app/build/outputs/bundle/baseRelease/app-base-release.aab app/build/outputs/app-base-release.aab
           mv app/build/outputs/apk/all-files-variant/release/app-all-files-variant-release-unsigned.apk app/build/outputs/app-all-files-variant-release.apk
-          mv app/build/outputs/bundle/all-files-variantRelease/app-all-files-variant-release.aab app/build/outputs/app-all-files-variant-release.aab
           
       - name: Sign App
         id: sign_app
@@ -78,17 +67,15 @@ jobs:
           keyAlias: ${{ secrets.RELEASE_SIGNING_ALIAS }}
           keyStorePassword: ${{ secrets.RELEASE_SIGNING_PASSWORD }}
           keyPassword: ${{ secrets.RELEASE_SIGNING_PASSWORD }}
-      #3
+
       - name: Upload Release Build to Artifacts
         uses: actions/upload-artifact@v3
         with:
           name: release-artifacts
           path: |
-            app/build/outputs/*.aab
             app/build/outputs/*.apk
 
       - name: Build Changelog
-        if: ${{ steps.regex-match.outputs.match != '' }}
         id: changelog
         uses: ardalanamini/auto-changelog@v3
         with:
@@ -98,7 +85,6 @@ jobs:
           semver: false
 
       - name: Create Release
-        if: ${{ steps.regex-match.outputs.match != '' }}
         id: create_release
         uses: ncipollo/release-action@v1.13.0
         with:
@@ -107,3 +93,13 @@ jobs:
           name: Release ${{ github.ref_name }}
           token: ${{ secrets.GITHUB_TOKEN }}
      
+
+      - name: Create Playstore Release
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
+          packageName: com.viscouspot.gitsync
+          releaseName: ${{ github.ref_name }}
+          releaseFiles: app/build/outputs/app-base-release.aab
+          track: alpha
+          status: draft
