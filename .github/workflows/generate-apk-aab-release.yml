@@ -59,21 +59,28 @@ jobs:
           
       - name: Sign App
         id: sign_app
-        uses: r0adkll/sign-android-release@v1
+        uses: ilharp/sign-android-release@v1
         with:
-          releaseDirectory: app/build/outputs
-          signingKeyBase64: ${{ secrets.RELEASE_KEYSTORE_BASE64 }}
-          alias: ${{ secrets.RELEASE_SIGNING_ALIAS }}
+          releaseDir: app/build/outputs
+          signingKey: ${{ secrets.RELEASE_KEYSTORE_BASE64 }}
+          keyAlias: ${{ secrets.RELEASE_SIGNING_ALIAS }}
           keyStorePassword: ${{ secrets.RELEASE_SIGNING_PASSWORD }}
           keyPassword: ${{ secrets.RELEASE_SIGNING_PASSWORD }}
+
+      
+      - uses: jungwinter/split@v2
+        id: signed_files
+        with:
+          msg: ${{ steps.sign_app.outputs.signedFiles }}
+          separator: ':'
 
       - name: Upload Release Build to Artifacts
         uses: actions/upload-artifact@v3
         with:
           name: release-artifacts
           path: |
-            ${{ steps.sign_app.signedReleaseFile0 }}
-            ${{ steps.sign_app.signedReleaseFile2 }}
+            ${{ steps.signed_files.outputs._0 }}
+            ${{ steps.signed_files.outputs._2 }}
 
 
       - name: Build Changelog
@@ -89,7 +96,7 @@ jobs:
         id: create_release
         uses: ncipollo/release-action@v1.13.0
         with:
-          artifacts: "${{ steps.sign_app.signedReleaseFile0 }}, ${{ steps.sign_app.signedReleaseFile2 }}"
+          artifacts: "${{ steps.signed_files.outputs._0 }}, ${{ steps.signed_files.outputs._2 }}"
           body: ${{ steps.changelog.outputs.changelog }}
           name: Release ${{ github.ref_name }}
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -101,6 +108,6 @@ jobs:
           serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
           packageName: com.viscouspot.gitsync
           releaseName: ${{ github.ref_name }}
-          releaseFiles: ${{ steps.sign_app.signedReleaseFile1 }}
+          releaseFiles: ${{ steps.signed_files.outputs._1 }}
           track: qa
           status: draft
