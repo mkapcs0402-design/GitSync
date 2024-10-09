@@ -112,7 +112,7 @@ jobs:
         id: create_release
         uses: ncipollo/release-action@v1.13.0
         with:
-          artifacts: "${{ signed_file_path_0.outputs.value }}, ${{ signed_file_path_2.outputs.value }}"
+          artifacts: "${{ steps.signed_file_path_0.outputs.value }}, ${{ steps.signed_file_path_2.outputs.value }}"
           body: ${{ steps.changelog.outputs.changelog }}
           name: Release ${{ github.ref_name }}
           token: ${{ secrets.GITHUB_TOKEN }}
