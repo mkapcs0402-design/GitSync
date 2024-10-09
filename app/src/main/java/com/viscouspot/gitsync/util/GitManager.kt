@@ -129,7 +129,6 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
                 val jsonArray = JSONArray(response.body?.string())
                 val repoMap: MutableList<Pair<String, String>> = mutableListOf()
 
-                Log.d("testset///", response.headers["link"].toString())
                 val link = response.headers["link"] ?: ""
 
                 if (link != "") {
@@ -138,7 +137,6 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
                     val match = regex.find(link)
                     val result = match?.groups?.get(1)?.value
 
-                    Log.d("testset///", result.toString())
                     val nextLink = result ?: ""
                     if (nextLink != "") {
                         nextPageCallback {
