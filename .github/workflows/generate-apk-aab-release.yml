@@ -91,12 +91,28 @@ jobs:
           mention-new-contributors: false
           include-compare: false
           semver: false
+          
+      - name: Find and Replace
+        uses: mad9000/actions-find-and-replace-string@5
+        id: signed_file_path_0
+        with:
+            source: ${{ steps.signed_files.outputs._0 }} 
+            find: '/github/workspace/' 
+            replace: ''   
+            
+      - name: Find and Replace
+        uses: mad9000/actions-find-and-replace-string@5
+        id: signed_file_path_2
+        with:
+            source: ${{ steps.signed_files.outputs._2 }} 
+            find: '/github/workspace/' 
+            replace: ''  
 
       - name: Create Release
         id: create_release
         uses: ncipollo/release-action@v1.13.0
         with:
-          artifacts: "${{ steps.signed_files.outputs._0.replace('/github/workspace/', '') }}, ${{ steps.signed_files.outputs._2.replace('/github/workspace/', '') }}"
+          artifacts: "${{ signed_file_path_0.outputs.value }}, ${{ signed_file_path_2.outputs.value }}"
           body: ${{ steps.changelog.outputs.changelog }}
           name: Release ${{ github.ref_name }}
           token: ${{ secrets.GITHUB_TOKEN }}
