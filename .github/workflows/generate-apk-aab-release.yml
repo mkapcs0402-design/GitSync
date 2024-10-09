@@ -68,7 +68,8 @@ jobs:
           keyPassword: ${{ secrets.RELEASE_SIGNING_PASSWORD }}
 
       
-      - uses: jungwinter/split@v2
+      - name: Split
+        uses: jungwinter/split@v2
         id: signed_files
         with:
           msg: ${{ steps.sign_app.outputs.signedFiles }}
