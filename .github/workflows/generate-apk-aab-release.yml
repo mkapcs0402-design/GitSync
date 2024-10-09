@@ -96,7 +96,7 @@ jobs:
         id: create_release
         uses: ncipollo/release-action@v1.13.0
         with:
-          artifacts: "${{ steps.signed_files.outputs._0 }}, ${{ steps.signed_files.outputs._2 }}"
+          artifacts: "${{ steps.signed_files.outputs._0.replace('/github/workspace/', '') }}, ${{ steps.signed_files.outputs._2.replace('/github/workspace/', '') }}"
           body: ${{ steps.changelog.outputs.changelog }}
           name: Release ${{ github.ref_name }}
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -109,5 +109,5 @@ jobs:
           packageName: com.viscouspot.gitsync
           releaseName: ${{ github.ref_name }}
           releaseFiles: ${{ steps.signed_files.outputs._1 }}
-          track: qa
+          track: internal
           status: draft
