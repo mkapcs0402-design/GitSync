@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Looper
-import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.github.syari.kgit.KGit
@@ -25,6 +24,7 @@ import org.eclipse.jgit.api.RebaseCommand
 import org.eclipse.jgit.api.RebaseResult
 import org.eclipse.jgit.diff.DiffFormatter
 import org.eclipse.jgit.internal.storage.file.FileRepository
+import org.eclipse.jgit.lib.BatchingProgressMonitor
 import org.eclipse.jgit.revwalk.RevSort
 import org.eclipse.jgit.revwalk.RevWalk
 import org.eclipse.jgit.transport.RemoteRefUpdate
@@ -34,6 +34,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
 import java.io.IOException
+import java.time.Duration
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.UUID
@@ -159,12 +160,39 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
         })
     }
 
-    fun cloneRepository(repoUrl: String, userStorageUri: Uri, username: String, token: String, callback: () -> Unit) {
+    fun cloneRepository(repoUrl: String, userStorageUri: Uri, username: String, token: String, progressCallback: (progress: Int) -> Unit, callback: () -> Unit) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 log("CloneRepo", "Cloning Repo")
+
+                val monitor = object : BatchingProgressMonitor() {
+                    override fun onUpdate(taskName: String?, workCurr: Int, duration: Duration?) {}
+
+                    override fun onUpdate(
+                        taskName: String?,
+                        workCurr: Int,
+                        workTotal: Int,
+                        percentDone: Int,
+                        duration: Duration?
+                    ) {
+                        progressCallback(percentDone)
+                    }
+
+                    override fun onEndTask(taskName: String?, workCurr: Int, duration: Duration?) {
+                    }
+
+                    override fun onEndTask(
+                        taskName: String?,
+                        workCurr: Int,
+                        workTotal: Int,
+                        percentDone: Int,
+                        duration: Duration?
+                    ) {}
+                }
+
                 KGit.cloneRepository {
                     setURI(repoUrl)
+                    setProgressMonitor(monitor)
                     setDirectory(File(Helper.getPathFromUri(context, userStorageUri)))
                     setCredentialsProvider(UsernamePasswordCredentialsProvider(username, token))
                 }
