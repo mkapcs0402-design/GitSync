@@ -40,6 +40,13 @@ object Logger {
         addToLast5Logs(type, message)
     }
 
+
+    fun log(message: String) {
+        val type = "TEST"
+        Log.d("///Git Sync//$type", message)
+        addToLast5Logs(type, message)
+    }
+
     private fun addToLast5Logs(type: String, message: String) {
         last5Logs.add(Pair(type, message))
         if (last5Logs.size > 5) {
