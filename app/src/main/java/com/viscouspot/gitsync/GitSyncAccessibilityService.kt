@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.view.accessibility.AccessibilityEvent
 import android.view.inputmethod.InputMethodManager
+import com.viscouspot.gitsync.util.LogType
 import com.viscouspot.gitsync.util.Logger.log
 import com.viscouspot.gitsync.util.SettingsManager
 
@@ -30,7 +31,7 @@ class GitSyncAccessibilityService: AccessibilityService() {
             when (it.eventType) {
                 AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED -> {
                     if (appOpen && !packageNames.contains(event.packageName) && !enabledInputMethods.contains(event.packageName)) {
-                        log("AccessibilityService", "Application Closed")
+                        log(LogType.AccessibilityService, "Application Closed")
                         if (settingsManager.getSyncOnAppClosed()) {
                             sync()
                         }
@@ -38,7 +39,7 @@ class GitSyncAccessibilityService: AccessibilityService() {
                     }
 
                     if (!appOpen && packageNames.contains(event.packageName)) {
-                        log("AccessibilityService", "Application Opened")
+                        log(LogType.AccessibilityService, "Application Opened")
                         if (settingsManager.getSyncOnAppOpened()) {
                             sync()
                         }

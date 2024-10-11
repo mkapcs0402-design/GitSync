@@ -18,14 +18,30 @@ import java.time.Instant
 import java.time.format.DateTimeFormatter
 import kotlin.random.Random
 import androidx.core.app.NotificationCompat
-import kotlin.system.exitProcess
 import android.app.NotificationChannel
 import android.app.NotificationManager
 
-object Logger {
-    private val last5Logs = mutableListOf<Pair<String, String>>()
+enum class LogType(val type: String) {
+    TEST("TEST"),
+    Global("Global"),
+    ToServiceCommand("ToServiceCommand"),
+    AccessibilityService("AccessibilityService"),
 
-    fun log(context: Context, type: String, e: Exception) {
+    Sync("Sync"),
+    GithubAuthCredentials("GithubAuthCredentials"),
+    GetRepos("GetRepos"),
+    CloneRepo("CloneRepo"),
+    PullFromRepo("PullFromRepo"),
+    PushToRepo("PushToRepo"),
+    GitStatus("GitStatus"),
+    RecentCommits("RecentCommits"),
+    GithubOAuthFlow("GithubOAuthFlow"),
+}
+
+object Logger {
+    private val last5Logs = mutableListOf<Pair<LogType, String>>()
+
+    fun log(context: Context, type: LogType, e: Exception) {
         val sw = StringWriter()
         val pw = PrintWriter(sw)
         e.printStackTrace(pw)
@@ -35,19 +51,17 @@ object Logger {
         sendBugReportNotification(context)
     }
 
-    fun log(type: String, message: String) {
-        Log.d("///Git Sync//$type", message)
+    fun log(type: LogType, message: String) {
+        Log.d("///Git Sync//${type.type}", message)
         addToLast5Logs(type, message)
     }
-
 
     fun log(message: String) {
-        val type = "TEST"
-        Log.d("///Git Sync//$type", message)
-        addToLast5Logs(type, message)
+        Log.d("///Git Sync//${LogType.TEST.type}", message)
+        addToLast5Logs(LogType.TEST, message)
     }
 
-    private fun addToLast5Logs(type: String, message: String) {
+    private fun addToLast5Logs(type: LogType, message: String) {
         last5Logs.add(Pair(type, message))
         if (last5Logs.size > 5) {
             last5Logs.removeAt(0)

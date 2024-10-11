@@ -48,11 +48,11 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
         val fullAuthUrl = "$GITHUB_AUTH_URL?client_id=${Secrets.GIT_CLIENT_ID}&scope=$GIT_SCOPE&state=${UUID.randomUUID()}"
 
         if (activity == null) {
-            log("GithubFlow", "Activity Not Found")
+            log(LogType.GithubOAuthFlow, "Activity Not Found")
             return
         }
 
-        log("GithubFlow", "Launching Flow")
+        log(LogType.GithubOAuthFlow, "Launching Flow")
         activity.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(fullAuthUrl)).apply {
             addCategory(Intent.CATEGORY_BROWSABLE)
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -68,11 +68,11 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
 
         client.newCall(authTokenRequest).enqueue(object: Callback {
             override fun onFailure(call: Call, e: IOException) {
-                log(context, "GithubAuthCredentials", e)
+                log(context, LogType.GithubAuthCredentials, e)
             }
 
             override fun onResponse(call: Call, response: Response) {
-                log("GithubAuthCredentials", "Auth Token Obtained")
+                log(LogType.GithubAuthCredentials, "Auth Token Obtained")
                 val authToken = JSONObject(response.body?.string() ?: "").getString("access_token")
 
                 getGithubProfile(authToken, {
@@ -89,10 +89,10 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
             .addHeader("Authorization", "token $authToken")
             .build()
 
-        log("GithubAuthCredentials", "Getting User Profile")
+        log(LogType.GithubAuthCredentials, "Getting User Profile")
         client.newCall(profileRequest).enqueue(object: Callback {
             override fun onFailure(call: Call, e: IOException) {
-                log(context, "GithubAuthCredentials", e)
+                log(context, LogType.GithubAuthCredentials, e)
                 failureCallback.invoke()
             }
 
@@ -100,7 +100,7 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
                 val json = JSONObject(response.body?.string())
                 val username = json.getString("login")
 
-                log("GithubAuthCredentials", "Username Retrieved")
+                log(LogType.GithubAuthCredentials, "Username Retrieved")
                 successCallback.invoke(username)
             }
 
@@ -108,7 +108,7 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
     }
 
     fun getRepos(authToken: String, updateCallback: (repos: List<Pair<String, String>>) -> Unit, nextPageCallback: (nextPage: (() -> Unit)?) -> Unit){
-        log("GetRepos", "Getting User Repos")
+        log(LogType.GetRepos, "Getting User Repos")
         getReposRequest(authToken, "https://api.github.com/user/repos", updateCallback, nextPageCallback)
     }
 
@@ -121,11 +121,11 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
                 .build()
         ).enqueue(object: Callback {
             override fun onFailure(call: Call, e: IOException) {
-                log(context, "GetRepos", e)
+                log(context, LogType.GetRepos, e)
             }
 
             override fun onResponse(call: Call, response: Response) {
-                log("GetRepos", "Repos Received")
+                log(LogType.GetRepos, "Repos Received")
 
                 val jsonArray = JSONArray(response.body?.string())
                 val repoMap: MutableList<Pair<String, String>> = mutableListOf()
@@ -163,7 +163,7 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
     fun cloneRepository(repoUrl: String, userStorageUri: Uri, username: String, token: String, taskCallback: (action: String) -> Unit, progressCallback: (progress: Int) -> Unit, callback: () -> Unit) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                log("CloneRepo", "Cloning Repo")
+                log(LogType.CloneRepo, "Cloning Repo")
 
                 val monitor = object : BatchingProgressMonitor() {
                     override fun onUpdate(taskName: String?, workCurr: Int, duration: Duration?) {}
@@ -198,16 +198,16 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
                     setCredentialsProvider(UsernamePasswordCredentialsProvider(username, token))
                 }
 
-                log("CloneRepo", "Repository cloned successfully")
+                log(LogType.CloneRepo, "Repository cloned successfully")
                 withContext(Dispatchers.Main) {
                     Toast.makeText(context, "Repository cloned successfully", Toast.LENGTH_SHORT).show()
                 }
 
                 callback.invoke()
             } catch (e: Exception) {
-                log(context, "CloneRepo", e)
+                log(context, LogType.CloneRepo, e)
 
-                log("CloneRepo", "Repository clone failed")
+                log(LogType.CloneRepo, "Repository clone failed")
                 withContext(Dispatchers.Main) {
                     Toast.makeText(context, "Failed to clone repository", Toast.LENGTH_SHORT).show()
                 }
@@ -218,18 +218,18 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
     fun pullRepository(userStorageUri: Uri, username: String, token: String, onSync: () -> Unit): Boolean? {
         try {
             var returnResult: Boolean? = false
-            log("PullFromRepo", "Getting local directory")
+            log(LogType.PullFromRepo, "Getting local directory")
             val repo = FileRepository("${Helper.getPathFromUri(context, userStorageUri)}/.git")
             val git = KGit(repo)
             val cp = UsernamePasswordCredentialsProvider(username, token)
 
-            log("PullFromRepo", "Fetching changes")
+            log(LogType.PullFromRepo, "Fetching changes")
             val fetchResult = git.fetch {
                 setCredentialsProvider(cp)
             }
 
             if (!fetchResult.trackingRefUpdates.isEmpty()) {
-                log("PullFromRepo", "Pulling changes")
+                log(LogType.PullFromRepo, "Pulling changes")
                 onSync.invoke()
                 val result = git.pull {
                     setCredentialsProvider(cp)
@@ -242,12 +242,12 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
                 }
             }
 
-            log("PullFromRepo", "Closing repository")
+            log(LogType.PullFromRepo, "Closing repository")
             closeRepo(repo)
 
             return returnResult
         } catch (e: Exception) {
-            log(context, "PullFromRepo", e)
+            log(context, LogType.PullFromRepo, e)
         }
         return null
     }
@@ -255,7 +255,7 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
     fun pushAllToRepository(repoUrl: String, userStorageUri: Uri, username: String, token: String, onSync: () -> Unit): Boolean? {
         try {
             var returnResult = false
-            log("PushToRepo", "Getting local directory")
+            log(LogType.PushToRepo, "Getting local directory")
 
             val repo = FileRepository("${Helper.getPathFromUri(context, userStorageUri)}/.git")
             val git = KGit(repo)
@@ -265,7 +265,7 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
 
             if (status.uncommittedChanges.isNotEmpty() || status.untracked.isNotEmpty()) {
                 onSync.invoke()
-                log("PushToRepo", "Adding Files to Stage")
+                log(LogType.PushToRepo, "Adding Files to Stage")
                 git.add {
                     addFilepattern(".")
                 }
@@ -274,11 +274,11 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
                     isUpdate = true
                 }
 
-                log("PushToRepo", "Getting current time")
+                log(LogType.PushToRepo, "Getting current time")
                 val currentDateTime = LocalDateTime.now()
                 val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
 
-                log("PushToRepo", "Committing changes")
+                log(LogType.PushToRepo, "Committing changes")
                 git.commit {
                     setCommitter(username, "")
                     message = "Last Sync: ${currentDateTime.format(formatter)} (Mobile)"
@@ -287,7 +287,7 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
                 returnResult = true
             }
 
-            log("PushToRepo", "Pushing changes")
+            log(LogType.PushToRepo, "Pushing changes")
             for (pushResult in git.push {
                 setCredentialsProvider(UsernamePasswordCredentialsProvider(username, token))
                 remote = repoUrl
@@ -295,7 +295,7 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
                 for (remoteUpdate in pushResult.remoteUpdates) {
                     when (remoteUpdate.status) {
                         RemoteRefUpdate.Status.REJECTED_NONFASTFORWARD -> {
-                            log("PushToRepo", "Attempting rebase on REJECTED_NONFASTFORWARD")
+                            log(LogType.PushToRepo, "Attempting rebase on REJECTED_NONFASTFORWARD")
                             val rebaseResult = git.rebase {
                                 setUpstream("origin/master")
                                 // TODO: compliance for main + master
@@ -320,40 +320,46 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
 
             logStatus(git)
 
-            log("PushToRepo", "Closing repository")
+            log(LogType.PushToRepo, "Closing repository")
             closeRepo(repo)
 
             return returnResult
         } catch (e: Exception) {
-            log(context, "PushToRepo", e)
+            log(context, LogType.PushToRepo, e)
         }
         return null
     }
 
     private fun logStatus(git: KGit) {
         val status = git.status()
-        log("GitStatus.HasUncommittedChanges", status.hasUncommittedChanges().toString())
-        log("GitStatus.Missing", status.missing.toString())
-        log("GitStatus.Modified", status.modified.toString())
-        log("GitStatus.Removed", status.removed.toString())
-        log("GitStatus.IgnoredNotInIndex", status.ignoredNotInIndex.toString())
-        log("GitStatus.Changed", status.changed.toString())
-        log("GitStatus.Untracked", status.untracked.toString())
-        log("GitStatus.Added", status.added.toString())
-        log("GitStatus.Conflicting", status.conflicting.toString())
-        log("GitStatus.UncommittedChanges", status.uncommittedChanges.toString())
+        log(LogType.GitStatus, """
+            HasUncommittedChanges: ${status.hasUncommittedChanges()}
+            Missing: ${status.missing}
+            Modified: ${status.modified}
+            Removed: ${status.removed}
+            IgnoredNotInIndex: ${status.ignoredNotInIndex}
+            Changed: ${status.changed}
+            Untracked: ${status.untracked}
+            Added: ${status.added}
+            Conflicting: ${status.conflicting}
+            UncommittedChanges: ${status.uncommittedChanges}
+        """.trimIndent())
     }
 
     fun getRecentCommits(gitDirPath: String): List<Commit> {
         try {
             if (!File("$gitDirPath/.git").exists()) return listOf()
 
+            log(LogType.RecentCommits, ".git folder found")
+            
             val repo = FileRepository("$gitDirPath/.git")
             val revWalk = RevWalk(repo)
 
             val headRef = repo.fullBranch ?: repo.findRef("HEAD")?.target?.name
             val head = repo.resolve(headRef)
             revWalk.markStart(revWalk.parseCommit(head))
+            log(LogType.RecentCommits, "HEAD parsed")
+            
             revWalk.sort(RevSort.COMMIT_TIME_DESC)
 
             val commits = mutableListOf<Commit>()
@@ -391,12 +397,13 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
                 count++
             }
 
+            log(LogType.RecentCommits, "Recent commits retrieved")
             revWalk.dispose()
             closeRepo(repo)
 
             return commits
         } catch (e: java.lang.Exception) {
-            log(context, "RecentCommits", e)
+            log(context, LogType.RecentCommits, e)
         }
         return listOf()
     }

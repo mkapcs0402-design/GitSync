@@ -16,6 +16,7 @@ import androidx.core.app.NotificationCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.viscouspot.gitsync.util.GitManager
 import com.viscouspot.gitsync.util.Helper
+import com.viscouspot.gitsync.util.LogType
 import com.viscouspot.gitsync.util.Logger.log
 import com.viscouspot.gitsync.util.SettingsManager
 import kotlinx.coroutines.CoroutineScope
@@ -50,15 +51,15 @@ class GitSyncService : Service() {
 
         when (intent.action) {
             FORCE_SYNC -> {
-                log("ToServiceCommand", "Force Sync")
+                log(LogType.ToServiceCommand, "Force Sync")
                 debouncedSync(forced = true)
             }
             APPLICATION_SYNC -> {
-                log("ToServiceCommand", "AccessibilityService Sync")
+                log(LogType.ToServiceCommand, "AccessibilityService Sync")
                 debouncedSync()
             }
             INTENT_SYNC -> {
-                log("ToServiceCommand", "Intent Sync")
+                log(LogType.ToServiceCommand, "Intent Sync")
                 debouncedSync()
             }
         }
@@ -107,7 +108,7 @@ class GitSyncService : Service() {
         } else {
             if (isSyncing) {
                 isScheduled = true
-                log("Sync", "Sync Scheduled")
+                log(LogType.Sync, "Sync Scheduled")
                 return
             } else {
                 sync(forced)
@@ -116,7 +117,7 @@ class GitSyncService : Service() {
     }
 
     private fun sync(forced: Boolean = false) {
-        log("Sync", "Start Sync")
+        log(LogType.Sync, "Start Sync")
         isSyncing = true
 
         val job = CoroutineScope(Dispatchers.Default).launch {
@@ -128,7 +129,7 @@ class GitSyncService : Service() {
 
             if (gitDirUri == null || !file.exists()) {
                 withContext(Dispatchers.Main) {
-                    log("Sync", "Repository Not Found")
+                    log(LogType.Sync, "Repository Not Found")
                     Toast.makeText(
                         applicationContext,
                         "Repository not found!",
@@ -144,7 +145,7 @@ class GitSyncService : Service() {
             var gitConfigUrlResult = gitConfigUrlRegex.find(fileContents)
             val repoUrl = gitConfigUrlResult?.groups?.get(1)?.value ?: run {
                 withContext(Dispatchers.Main) {
-                    log("Sync", "Invalid Repository URL")
+                    log(LogType.Sync, "Invalid Repository URL")
                     Toast.makeText(
                         applicationContext,
                         getString(R.string.invalid_repository_url),
@@ -156,7 +157,7 @@ class GitSyncService : Service() {
 
             var synced = false
 
-            log("Sync", "Start Pull Repo")
+            log(LogType.Sync, "Start Pull Repo")
             val pullResult = gitManager.pullRepository(
                 gitDirUri,
                 authCredentials.first,
@@ -168,19 +169,19 @@ class GitSyncService : Service() {
 
             when (pullResult) {
                 null -> {
-                    log("Sync", "Pull Repo Failed")
+                    log(LogType.Sync, "Pull Repo Failed")
                     return@launch
                 }
 
-                true -> log("Sync", "Pull Complete")
-                false -> log("Sync", "Pull Not Required")
+                true -> log(LogType.Sync, "Pull Complete")
+                false -> log(LogType.Sync, "Pull Not Required")
             }
 
             while (File(gitDirPath, ".git/index.lock").exists()) {
                 delay(1000)
             }
 
-            log("Sync", "Start Push Repo")
+            log(LogType.Sync, "Start Push Repo")
             val pushResult = gitManager.pushAllToRepository(
                 repoUrl,
                 gitDirUri,
@@ -194,12 +195,12 @@ class GitSyncService : Service() {
 
             when (pushResult) {
                 null -> {
-                    log("Sync", "Push Repo Failed")
+                    log(LogType.Sync, "Push Repo Failed")
                     return@launch
                 }
 
-                true -> log("Sync", "Push Complete")
-                false -> log("Sync", "Push Not Required")
+                true -> log(LogType.Sync, "Push Complete")
+                false -> log(LogType.Sync, "Push Not Required")
             }
 
             while (File(gitDirPath, ".git/index.lock").exists()) {
@@ -224,12 +225,12 @@ class GitSyncService : Service() {
         }
 
         job.invokeOnCompletion {
-            log("Sync", "Sync Complete")
+            log(LogType.Sync, "Sync Complete")
             isSyncing = false
             if (isScheduled) {
                 CoroutineScope(Dispatchers.Default).launch {
                     delay(debouncePeriod)
-                    log("Sync", "Scheduled Sync Starting")
+                    log(LogType.Sync, "Scheduled Sync Starting")
                     isScheduled = false
                     sync()
                 }

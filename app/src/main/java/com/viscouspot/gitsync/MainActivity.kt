@@ -43,6 +43,7 @@ import com.viscouspot.gitsync.ui.adapter.RecentCommitsAdapter
 import com.viscouspot.gitsync.ui.fragment.CloneRepoFragment
 import com.viscouspot.gitsync.util.GitManager
 import com.viscouspot.gitsync.util.Helper
+import com.viscouspot.gitsync.util.LogType
 import com.viscouspot.gitsync.util.Logger.log
 import com.viscouspot.gitsync.util.SettingsManager
 import com.viscouspot.gitsync.util.rightDrawable
@@ -146,10 +147,10 @@ class MainActivity : AppCompatActivity() {
 
         if (code == null || state == null ) return
 
-        log("GithubFlow", "Flow Ended")
+        log(LogType.GithubOAuthFlow, "Flow Ended")
 
         gitManager.getGithubAuthCredentials(code, state) { username, authToken ->
-            log("GithubAuthCredentials", "Username and Token Received")
+            log(LogType.GithubAuthCredentials, "Username and Token Received")
 
             settingsManager.setGitAuthCredentials(username, authToken)
             refreshAuthButton()
@@ -189,7 +190,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.main_activity)
 
         Thread.setDefaultUncaughtExceptionHandler { paramThread, paramThrowable ->
-            log(this, "Global", Exception(paramThrowable))
+            log(this, LogType.Global, Exception(paramThrowable))
         }
 
         if (BuildConfig.ALL_FILES) {
