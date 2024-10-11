@@ -33,8 +33,6 @@ object Logger {
         addToLast5Logs(type, "Error: $sw")
 
         sendBugReportNotification(context)
-
-        exitProcess(0)
     }
 
     fun log(type: String, message: String) {

@@ -305,7 +305,7 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
                                 git.rebase {
                                     setOperation(RebaseCommand.Operation.ABORT)
                                 }
-                                throw Error("Remote is further ahead than local and we could not automatically rebase for you!")
+                                throw Exception("Remote is further ahead than local and we could not automatically rebase for you!")
                             }
                             break
                         }
