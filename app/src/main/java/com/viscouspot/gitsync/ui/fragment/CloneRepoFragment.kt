@@ -164,13 +164,14 @@ class CloneRepoFragment(
         val authCredentials = settingsManager.getGitAuthCredentials()
 
         val cloneDialog = ProgressDialog(requireContext()).apply {
-            setTitle("Cloning repository...")
-            setMessage("This may take a while depending on the size of your repo")
+            setTitle(getString(R.string.cloning_repository))
+            setMessage(getString(R.string.clone_message))
             max = 100
             setProgressStyle(ProgressDialog.STYLE_HORIZONTAL)
             show()
         }
         gitManager.cloneRepository(repoUrl, dirUri, authCredentials.first, authCredentials.second,
+            { task -> activity?.runOnUiThread { cloneDialog.setMessage("${getString(R.string.clone_message)}$task") } },
             { progress -> cloneDialog.progress = progress}) {
             cloneDialog.dismiss()
 

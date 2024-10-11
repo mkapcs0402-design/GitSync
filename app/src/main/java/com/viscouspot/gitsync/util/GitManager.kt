@@ -160,7 +160,7 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
         })
     }
 
-    fun cloneRepository(repoUrl: String, userStorageUri: Uri, username: String, token: String, progressCallback: (progress: Int) -> Unit, callback: () -> Unit) {
+    fun cloneRepository(repoUrl: String, userStorageUri: Uri, username: String, token: String, taskCallback: (action: String) -> Unit, progressCallback: (progress: Int) -> Unit, callback: () -> Unit) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 log("CloneRepo", "Cloning Repo")
@@ -175,6 +175,7 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
                         percentDone: Int,
                         duration: Duration?
                     ) {
+                        taskCallback(taskName ?: "")
                         progressCallback(percentDone)
                     }
 

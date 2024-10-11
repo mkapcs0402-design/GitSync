@@ -35,4 +35,6 @@
 
     <string name="docs_link">https://github.com/ViscousPotential/GitSync/blob/master/Documentation.md</string>
     <string name="search_hint">Search...</string>
+    <string name="cloning_repository">Cloning repository...</string>
+    <string name="clone_message">\nThis may take a while depending on the size of your repo\n\n</string>
 </resources>
