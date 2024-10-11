@@ -292,7 +292,6 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
                 remote = repoUrl
             }) {
                 for (remoteUpdate in pushResult.remoteUpdates) {
-//                    if (remoteUpdate.trackingRefUpdate )
                     when (remoteUpdate.status) {
                         RemoteRefUpdate.Status.REJECTED_NONFASTFORWARD -> {
                             log("PushToRepo", "Attempting rebase on REJECTED_NONFASTFORWARD")
