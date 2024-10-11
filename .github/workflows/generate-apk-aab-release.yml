@@ -66,6 +66,7 @@ jobs:
           keyAlias: ${{ secrets.RELEASE_SIGNING_ALIAS }}
           keyStorePassword: ${{ secrets.RELEASE_SIGNING_PASSWORD }}
           keyPassword: ${{ secrets.RELEASE_SIGNING_PASSWORD }}
+          buildToolsVersion: 34.0.0
 
       
       - name: Split
