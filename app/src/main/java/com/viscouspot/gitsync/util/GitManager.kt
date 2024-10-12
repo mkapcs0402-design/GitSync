@@ -297,8 +297,7 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
                         RemoteRefUpdate.Status.REJECTED_NONFASTFORWARD -> {
                             log(LogType.PushToRepo, "Attempting rebase on REJECTED_NONFASTFORWARD")
                             val rebaseResult = git.rebase {
-                                setUpstream("origin/master")
-                                // TODO: compliance for main + master
+                                setUpstream((repo.fullBranch ?: repo.findRef("HEAD")?.target?.name)!!)
                             }
 
                             if (rebaseResult.status != RebaseResult.Status.OK) {
