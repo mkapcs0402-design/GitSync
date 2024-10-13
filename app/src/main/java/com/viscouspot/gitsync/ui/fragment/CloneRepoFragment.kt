@@ -12,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.Window
 import android.widget.EditText
+import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AlertDialog
 import androidx.core.widget.doOnTextChanged
@@ -25,6 +26,8 @@ import com.viscouspot.gitsync.R
 import com.viscouspot.gitsync.ui.adapter.RepoListAdapter
 import com.viscouspot.gitsync.util.GitManager
 import com.viscouspot.gitsync.util.Helper
+import com.viscouspot.gitsync.util.LogType
+import com.viscouspot.gitsync.util.Logger.log
 import com.viscouspot.gitsync.util.SettingsManager
 import com.viscouspot.gitsync.util.rightDrawable
 
@@ -172,12 +175,26 @@ class CloneRepoFragment(
         }
         gitManager.cloneRepository(repoUrl, dirUri, authCredentials.first, authCredentials.second,
             { task -> activity?.runOnUiThread { cloneDialog.setMessage("${getString(R.string.clone_message)}$task") } },
-            { progress -> cloneDialog.progress = progress}) {
-            cloneDialog.dismiss()
-
-            dirSelectionCallback.invoke(dirUri)
-            dismiss()
-        }
+            { progress -> cloneDialog.progress = progress},
+            { error ->
+                log(LogType.CloneRepo, error)
+                requireActivity().runOnUiThread {
+                    Toast.makeText(context, getString(R.string.clone_failed), Toast.LENGTH_SHORT).show()
+                    cloneDialog.dismiss()
+                    val message = if (getString(R.string.clone_failed) == error) "" else error
+                    AlertDialog.Builder(requireContext(), R.style.AlertDialogTheme)
+                        .setTitle(getString(R.string.clone_failed))
+                        .setMessage(message)
+                        .setPositiveButton(android.R.string.ok) { _, _ ->
+                        }
+                        .show()
+                }
+            },
+            {
+                cloneDialog.dismiss()
+                dirSelectionCallback.invoke(dirUri)
+                dismiss()
+            })
     }
 
     private fun selectLocalDir() {

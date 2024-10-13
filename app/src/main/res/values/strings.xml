@@ -37,4 +37,7 @@
     <string name="search_hint">Search...</string>
     <string name="cloning_repository">Cloning repository...</string>
     <string name="clone_message">\nThis may take a while depending on the size of your repo\n\n</string>
+    <string name="out_of_memory">Application ran out of memory!</string>
+    <string name="invalid_remote">Invalid remote!</string>
+    <string name="clone_failed">Failed to clone repository!</string>
 </resources>

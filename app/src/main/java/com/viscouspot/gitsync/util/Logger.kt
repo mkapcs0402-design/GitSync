@@ -41,7 +41,7 @@ enum class LogType(val type: String) {
 object Logger {
     private val last5Logs = mutableListOf<Pair<LogType, String>>()
 
-    fun log(context: Context, type: LogType, e: Exception) {
+    fun log(context: Context, type: LogType, e: Throwable) {
         val sw = StringWriter()
         val pw = PrintWriter(sw)
         e.printStackTrace(pw)

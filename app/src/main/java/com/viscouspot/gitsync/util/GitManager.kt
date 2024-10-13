@@ -7,6 +7,7 @@ import android.os.Looper
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.github.syari.kgit.KGit
+import com.viscouspot.gitsync.R
 import com.viscouspot.gitsync.Secrets
 import com.viscouspot.gitsync.ui.adapter.Commit
 import com.viscouspot.gitsync.util.Logger.log
@@ -22,7 +23,12 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import org.eclipse.jgit.api.RebaseCommand
 import org.eclipse.jgit.api.RebaseResult
+import org.eclipse.jgit.api.errors.GitAPIException
+import org.eclipse.jgit.api.errors.InvalidRemoteException
+import org.eclipse.jgit.api.errors.JGitInternalException
+import org.eclipse.jgit.api.errors.TransportException
 import org.eclipse.jgit.diff.DiffFormatter
+import org.eclipse.jgit.errors.NotSupportedException
 import org.eclipse.jgit.internal.storage.file.FileRepository
 import org.eclipse.jgit.lib.BatchingProgressMonitor
 import org.eclipse.jgit.revwalk.RevSort
@@ -160,7 +166,7 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
         })
     }
 
-    fun cloneRepository(repoUrl: String, userStorageUri: Uri, username: String, token: String, taskCallback: (action: String) -> Unit, progressCallback: (progress: Int) -> Unit, callback: () -> Unit) {
+    fun cloneRepository(repoUrl: String, userStorageUri: Uri, username: String, token: String, taskCallback: (action: String) -> Unit, progressCallback: (progress: Int) -> Unit, failureCallback: (error: String) -> Unit, successCallback: () -> Unit) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 log(LogType.CloneRepo, "Cloning Repo")
@@ -203,14 +209,31 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
                     Toast.makeText(context, "Repository cloned successfully", Toast.LENGTH_SHORT).show()
                 }
 
-                callback.invoke()
-            } catch (e: Exception) {
-                log(context, LogType.CloneRepo, e)
-
-                log(LogType.CloneRepo, "Repository clone failed")
-                withContext(Dispatchers.Main) {
-                    Toast.makeText(context, "Failed to clone repository", Toast.LENGTH_SHORT).show()
+                successCallback.invoke()
+            } catch (e: InvalidRemoteException) {
+                failureCallback(context.getString(R.string.invalid_remote))
+                return@launch
+            } catch (e: TransportException) {
+                failureCallback(e.localizedMessage ?: context.getString(R.string.clone_failed))
+                return@launch
+            } catch (e: GitAPIException) {
+                failureCallback(context.getString(R.string.clone_failed))
+                return@launch
+            }
+            catch (e: JGitInternalException) {
+                if (e.cause is NotSupportedException) {
+                    failureCallback(context.getString(R.string.invalid_remote))
+                } else {
+                    failureCallback(e.localizedMessage ?: context.getString(R.string.clone_failed))
                 }
+                return@launch
+            } catch (e: OutOfMemoryError) {
+                failureCallback(context.getString(R.string.out_of_memory))
+                return@launch
+            } catch (e: Throwable) {
+                failureCallback(context.getString(R.string.clone_failed))
+
+                log(context, LogType.CloneRepo, e)
             }
         }
     }
