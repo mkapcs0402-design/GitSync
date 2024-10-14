@@ -74,7 +74,7 @@ class CloneRepoFragment(
         }
 
         setLoadingRepos(true)
-        gitManager.getRepos(settingsManager.getGitAuthCredentials().second, ::addRepos) {
+        gitManager.getGithubRepos(settingsManager.getGitAuthCredentials().second, ::addRepos) {
             loadNextRepos = it
         }
 

@@ -81,14 +81,14 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
                 log(LogType.GithubAuthCredentials, "Auth Token Obtained")
                 val authToken = JSONObject(response.body?.string() ?: "").getString("access_token")
 
-                getGithubProfile(authToken, {
+                getGithubUsername(authToken) {
                     setCallback.invoke(it, authToken)
-                }, { })
+                }
             }
         })
     }
 
-    fun getGithubProfile(authToken: String, successCallback: (username: String) -> Unit, failureCallback: () -> Unit) {
+    fun getGithubUsername(authToken: String, successCallback: (username: String) -> Unit) {
         val profileRequest: Request = Request.Builder()
             .url("https://api.github.com/user")
             .addHeader("Accept", "application/json")
@@ -99,7 +99,6 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
         client.newCall(profileRequest).enqueue(object: Callback {
             override fun onFailure(call: Call, e: IOException) {
                 log(context, LogType.GithubAuthCredentials, e)
-                failureCallback.invoke()
             }
 
             override fun onResponse(call: Call, response: Response) {
@@ -113,12 +112,12 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
         })
     }
 
-    fun getRepos(authToken: String, updateCallback: (repos: List<Pair<String, String>>) -> Unit, nextPageCallback: (nextPage: (() -> Unit)?) -> Unit){
+    fun getGithubRepos(authToken: String, updateCallback: (repos: List<Pair<String, String>>) -> Unit, nextPageCallback: (nextPage: (() -> Unit)?) -> Unit){
         log(LogType.GetRepos, "Getting User Repos")
-        getReposRequest(authToken, "https://api.github.com/user/repos", updateCallback, nextPageCallback)
+        getGithubReposRequest(authToken, "https://api.github.com/user/repos", updateCallback, nextPageCallback)
     }
 
-    private fun getReposRequest(authToken: String, url: String, updateCallback: (repos: List<Pair<String, String>>) -> Unit, nextPageCallback: (nextPage: (() -> Unit)?) -> Unit) {
+    private fun getGithubReposRequest(authToken: String, url: String, updateCallback: (repos: List<Pair<String, String>>) -> Unit, nextPageCallback: (nextPage: (() -> Unit)?) -> Unit) {
         client.newCall(
             Request.Builder()
                 .url(url)
@@ -147,7 +146,7 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
                     val nextLink = result ?: ""
                     if (nextLink != "") {
                         nextPageCallback {
-                            getReposRequest(authToken, nextLink, updateCallback, nextPageCallback)
+                            getGithubReposRequest(authToken, nextLink, updateCallback, nextPageCallback)
                         }
                     } else {
                         nextPageCallback(null)
