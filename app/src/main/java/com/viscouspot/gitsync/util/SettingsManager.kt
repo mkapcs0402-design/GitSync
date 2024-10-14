@@ -24,8 +24,26 @@ class SettingsManager internal constructor(context: Context) {
         }
     }
 
+    fun resetFirstTime() {
+        with(settingsSharedPref.edit()) {
+            putBoolean("isFirstTime", true)
+            apply()
+        }
+    }
+
+    fun isFirstTime(): Boolean {
+        return settingsSharedPref.getBoolean("isFirstTime", true)
+    }
+
+    fun setHadFirstTime() {
+        with(settingsSharedPref.edit()) {
+            putBoolean("isFirstTime", false)
+            apply()
+        }
+    }
+
     fun getSyncMessageEnabled(): Boolean {
-        return settingsSharedPref.getBoolean("syncMessageEnabled", true)
+        return settingsSharedPref.getBoolean("syncMessageEnabled", false)
     }
 
     fun setSyncMessageEnabled(enabled: Boolean) {
