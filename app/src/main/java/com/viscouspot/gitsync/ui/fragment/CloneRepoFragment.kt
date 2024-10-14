@@ -170,6 +170,7 @@ class CloneRepoFragment(
             setTitle(getString(R.string.cloning_repository))
             setMessage(getString(R.string.clone_message))
             max = 100
+            setCancelable(false)
             setProgressStyle(ProgressDialog.STYLE_HORIZONTAL)
             show()
         }
