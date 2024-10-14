@@ -280,6 +280,7 @@ class MainActivity : AppCompatActivity() {
                 .setMessage("Please authenticate with Github and continue on to clone your repo!")
                 .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
                     dialog.dismiss()
+                    settingsManager.setHadFirstTime()
                     gitManager.launchGithubOAuthFlow()
                 }
                 .setNegativeButton(
