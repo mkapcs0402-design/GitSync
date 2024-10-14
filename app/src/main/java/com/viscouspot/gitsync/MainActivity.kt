@@ -14,6 +14,9 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.Settings
+import android.text.Html
+import android.text.method.LinkMovementMethod
+import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
@@ -205,52 +208,29 @@ class MainActivity : AppCompatActivity() {
             log(this, LogType.Global, Exception(paramThrowable))
         }
 
-        if (BuildConfig.ALL_FILES) {
-            requestLegacyStoragePermission = this.registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { isGrantedMap ->
-                if (isGrantedMap.values.all { it }) {
-                    onStoragePermissionGranted?.invoke()
-                }
+        settingsManager = SettingsManager(this)
+        settingsManager.runMigrations()
+
+        requestLegacyStoragePermission = this.registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { isGrantedMap ->
+            if (isGrantedMap.values.all { it }) {
+                onStoragePermissionGranted?.invoke()
             }
+        }
 
-            requestStoragePermission = this.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-                val hasPermissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                    Environment.isExternalStorageManager()
-                } else ContextCompat.checkSelfPermission(
-                    this,
-                    android.Manifest.permission.WRITE_EXTERNAL_STORAGE
-                ) == PackageManager.PERMISSION_GRANTED
+        requestStoragePermission = this.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            val hasPermissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                Environment.isExternalStorageManager()
+            } else ContextCompat.checkSelfPermission(
+                this,
+                android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+            ) == PackageManager.PERMISSION_GRANTED
 
-                if (hasPermissions) {
-                    onStoragePermissionGranted?.invoke()
-                }
+            if (hasPermissions) {
+                onStoragePermissionGranted?.invoke()
             }
+        }
 
-            fun checkAndRequestStoragePermission(onGranted: (() -> Unit)? = null) {
-                val hasPermissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                    Environment.isExternalStorageManager()
-                } else ContextCompat.checkSelfPermission(
-                    this,
-                    android.Manifest.permission.WRITE_EXTERNAL_STORAGE
-                ) == PackageManager.PERMISSION_GRANTED
-
-
-                if (hasPermissions) {
-                    onGranted?.invoke()
-                    return
-                }
-
-                onStoragePermissionGranted = onGranted
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                    val uri = Uri.fromParts("package", packageName, null)
-                    val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, uri)
-                    intent.data = Uri.fromParts("package", packageName, null)
-                    requestStoragePermission?.launch(intent)
-                } else {
-                    requestLegacyStoragePermission?.launch(arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE, android.Manifest.permission.READ_EXTERNAL_STORAGE))
-                }
-            }
-
+        if (BuildConfig.ALL_FILES && !settingsManager.isFirstTime()) {
             checkAndRequestStoragePermission()
         }
 
@@ -260,9 +240,6 @@ class MainActivity : AppCompatActivity() {
         bManager.registerReceiver(broadcastReceiver, intentFilter)
 
         window.statusBarColor = getColor(R.color.app_bg)
-
-        settingsManager = SettingsManager(this)
-        settingsManager.runMigrations()
 
         gitManager = GitManager(this, this)
 
@@ -296,6 +273,121 @@ class MainActivity : AppCompatActivity() {
 
         applicationObserverMin.applyTo(applicationObserverPanel)
 
+        if (settingsManager.isFirstTime()) {
+            val authDialogBuilder = AlertDialog.Builder(this, R.style.AlertDialogTheme)
+                .setCancelable(false)
+                .setTitle("Authenticate with Github.com")
+                .setMessage("Please authenticate with Github and continue on to clone your repo!")
+                .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
+                    dialog.dismiss()
+                    gitManager.launchGithubOAuthFlow()
+                }
+                .setNegativeButton(
+                    "Skip"
+                ) { dialog, _ ->
+                    dialog.dismiss()
+                }
+
+            val almostThereDialogLink = TextView(this).apply {
+                movementMethod = LinkMovementMethod.getInstance()
+                gravity = Gravity.END
+                setPadding(
+                    0,
+                    0,
+                    resources.getDimension(R.dimen.space_md).toInt(),
+                    0
+                )
+                text = Html.fromHtml(
+                    "<a href=\"https://github.com/ViscousPotential/GitSync/blob/master/Documentation.md\">DOCUMENTATION</a>",
+                    0
+                )
+            }
+
+            val almostThereDialogBuilder = AlertDialog.Builder(this, R.style.AlertDialogTheme)
+                .setCancelable(false)
+                .setTitle("Almost there!")
+                .setView(almostThereDialogLink)
+                .setMessage("\nSoon, we'll authenticate with GitHub.com and clone your repo to your device, preparing it for syncing.\n\nOnce that's set, there are several ways to trigger a sync:\n\n  • The GitSync quick tile\n  • The in-app \"Sync Now\" button\n  • Application Observer for auto-sync\n  • A custom intent (advanced)\n")
+                .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
+                    dialog.dismiss()
+                    authDialogBuilder.create().show()
+                }
+                .setNegativeButton(
+                    getString(android.R.string.cancel)
+                ) { dialog, _ ->
+                    dialog.dismiss()
+                }
+
+            val enableAllFilesDialogBuilder = AlertDialog.Builder(this, R.style.AlertDialogTheme)
+                .setCancelable(false)
+                .setTitle("Enable \"All Files Access\"")
+                .setMessage("\nYou can use GitSync without granting \"All files access\" permissions, but we recommend enabling it for the best experience.\n\nThe app uses \"All files access\" for syncing your repository more consistently to a less limited range of directories on the device.\n")
+                .setPositiveButton(getString(android.R.string.ok)) { _, _ -> }
+                .setNegativeButton(
+                    "Skip"
+                ) { dialog, _ ->
+                    dialog.dismiss()
+                    almostThereDialogBuilder.create().show()
+                }.create().apply {
+                    setOnShowListener {
+                        getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+                            checkAndRequestStoragePermission {
+                                dismiss()
+                                almostThereDialogBuilder.create().show()
+                            }
+                            this.getButton(AlertDialog.BUTTON_POSITIVE).text = "Done"
+                        }
+                    }
+                }
+
+            val enableNotificationsDialogBuilder = AlertDialog.Builder(this, R.style.AlertDialogTheme)
+                .setCancelable(false)
+                .setTitle("Enable Notifications")
+                .setMessage("\nYou can use GitSync without granting notification permissions, but we recommend enabling them for the best experience.\n\nThe app uses notifications for \n  • popup sync messages\n  • bug reports\n")
+                .setPositiveButton(getString(android.R.string.ok)) { _, _ -> }
+                .setNegativeButton(
+                    "Skip"
+                ) { dialog, _ ->
+                    dialog.dismiss()
+                    if (BuildConfig.ALL_FILES) {
+                        enableAllFilesDialogBuilder.show()
+                    } else {
+                        almostThereDialogBuilder.create().show()
+                    }
+                }.create().apply {
+                    setOnShowListener {
+                        getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+                            checkAndRequestNotificationPermission {
+                                dismiss()
+                                if (BuildConfig.ALL_FILES) {
+                                    enableAllFilesDialogBuilder.show()
+                                } else {
+                                    almostThereDialogBuilder.create().show()
+                                }
+                            }
+                            this.getButton(AlertDialog.BUTTON_POSITIVE).text = "Done"
+                        }
+                    }
+                }
+
+            val welcomeDialogBuilder = AlertDialog.Builder(this, R.style.AlertDialogTheme)
+                .setCancelable(false)
+                .setTitle("Welcome!")
+                .setMessage("\nIt looks like this is your first time here.\n\nWould you like to go through a quick setup to get started?\n")
+                .setPositiveButton("Yes, let's go") { dialog, which ->
+                    dialog.dismiss()
+                    enableNotificationsDialogBuilder.show()
+                }
+                .setNegativeButton(
+                    "Skip for now"
+                ) { dialog, _ ->
+                    dialog.dismiss()
+                }
+
+            welcomeDialogBuilder
+                .create()
+                .show()
+        }
         refreshAll()
 
         recentCommitsRecycler.adapter = recentCommitsAdapter
@@ -344,8 +436,12 @@ class MainActivity : AppCompatActivity() {
         applicationObserverSwitch.setOnCheckedChangeListener { _, isChecked ->
             (if (isChecked) applicationObserverMax else applicationObserverMin).applyTo(applicationObserverPanel)
             if (isChecked) {
+                applicationObserverSwitch.setCompoundDrawablesWithIntrinsicBounds(null, null, ContextCompat.getDrawable(this, R.drawable.angle_up), null)
                 if (!checkAccessibilityPermission()) {
                     applicationObserverSwitch.isChecked = false
+                    syncAppOpened.isChecked = false
+                    syncAppClosed.isChecked = false
+                    applicationObserverSwitch.setCompoundDrawablesWithIntrinsicBounds(null, null, ContextCompat.getDrawable(this, R.drawable.angle_down), null)
                     applicationObserverMin.applyTo(applicationObserverPanel)
                     displayProminentDisclosure()
                 } else {
@@ -353,9 +449,8 @@ class MainActivity : AppCompatActivity() {
                     refreshSelectedApplications()
                 }
             } else {
+                applicationObserverSwitch.setCompoundDrawablesWithIntrinsicBounds(null, null, ContextCompat.getDrawable(this, R.drawable.angle_down), null)
                 settingsManager.setApplicationObserverEnabled(false)
-                syncAppOpened.isChecked = false
-                syncAppClosed.isChecked = false
             }
         }
 
@@ -492,6 +587,16 @@ class MainActivity : AppCompatActivity() {
 
     private fun refreshSelectedApplications() {
         runOnUiThread {
+            if (settingsManager.getApplicationPackages().isEmpty()) {
+                syncAppOpened.isEnabled = false
+                syncAppOpened.isChecked = false
+                syncAppClosed.isEnabled = false
+                syncAppClosed.isChecked = false
+            } else {
+                syncAppOpened.isEnabled = true
+                syncAppClosed.isEnabled = true
+            }
+
             val packageNames = settingsManager.getApplicationPackages()
             if (packageNames.isNotEmpty()) {
                 when (packageNames.size) {
@@ -524,8 +629,8 @@ class MainActivity : AppCompatActivity() {
                 }
             } else {
                 selectApplication.text = getString(R.string.application_not_set)
-                selectApplication.setIconResource(R.drawable.circle_xmark)
-                selectApplication.setIconTintResource(R.color.auth_red)
+                selectApplication.setIconResource(R.drawable.circle_plus)
+                selectApplication.setIconTintResource(R.color.textSecondary)
                 selectApplication.iconTintMode = PorterDuff.Mode.SRC_IN
 
                 applicationRecycler.visibility = View.GONE
@@ -671,5 +776,31 @@ class MainActivity : AppCompatActivity() {
 
         requestedPermission = true
         requestNotificationPermission.launch(intent)
+    }
+
+    private fun checkAndRequestStoragePermission(onGranted: (() -> Unit)? = null) {
+        val hasPermissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            Environment.isExternalStorageManager()
+        } else ContextCompat.checkSelfPermission(
+            this,
+            android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+        ) == PackageManager.PERMISSION_GRANTED
+
+
+        if (hasPermissions) {
+            onGranted?.invoke()
+            return
+        }
+
+        onStoragePermissionGranted = onGranted
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val uri = Uri.fromParts("package", packageName, null)
+            val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, uri)
+            intent.data = Uri.fromParts("package", packageName, null)
+            requestStoragePermission?.launch(intent)
+        } else {
+            requestLegacyStoragePermission?.launch(arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE, android.Manifest.permission.READ_EXTERNAL_STORAGE))
+        }
     }
 }
