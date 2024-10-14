@@ -442,6 +442,7 @@ class MainActivity : AppCompatActivity() {
 
         recyclerView.adapter = adapter
         dialog.show()
+        searchView.requestFocus()
     }
 
     private fun refreshAll() {
