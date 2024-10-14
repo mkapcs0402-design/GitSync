@@ -89,6 +89,8 @@ class MainActivity : AppCompatActivity() {
     private var requestLegacyStoragePermission: ActivityResultLauncher<Array<String>>? = null
     private var requestStoragePermission: ActivityResultLauncher<Intent>? = null
 
+    private var requestedPermission = false
+
     companion object {
         const val REFRESH = "REFRESH"
     }
@@ -181,6 +183,16 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+
+        if (requestedPermission) {
+            if (NotificationManagerCompat.from(this).areNotificationsEnabled()) {
+                settingsManager.setSyncMessageEnabled(true)
+            }
+            if (checkAccessibilityPermission()) {
+                settingsManager.setApplicationObserverEnabled(true)
+            }
+            requestedPermission = false
+        }
 
         refreshAll()
     }
@@ -643,6 +655,7 @@ class MainActivity : AppCompatActivity() {
         val openSettings = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
         openSettings.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_NO_HISTORY)
         startActivity(openSettings)
+        requestedPermission = true
         Toast.makeText(this, getString(R.string.enable_accessibility_service), Toast.LENGTH_SHORT).show()
     }
 
@@ -655,6 +668,7 @@ class MainActivity : AppCompatActivity() {
         val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
         intent.putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
 
+        requestedPermission = true
         requestNotificationPermission.launch(intent)
     }
 }
