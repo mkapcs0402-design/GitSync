@@ -110,7 +110,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun dirSelectionCallback(dirUri: Uri?) {
         if (dirUri == null) {
-            Toast.makeText(this, "Inaccessible! Please select a different directory.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.inaccessible_directory_message), Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -160,7 +160,7 @@ class MainActivity : AppCompatActivity() {
             settingsManager.setGitAuthCredentials(username, authToken)
             refreshAuthButton()
 
-            CloneRepoFragment(settingsManager, gitManager, ::dirSelectionCallback).show(supportFragmentManager, "Select a repository")
+            CloneRepoFragment(settingsManager, gitManager, ::dirSelectionCallback).show(supportFragmentManager, getString(R.string.clone_repo_title))
         }
     }
 
@@ -245,7 +245,7 @@ class MainActivity : AppCompatActivity() {
 
         recentCommitsRecycler = findViewById(R.id.recentCommitsRecycler)
 
-        recentCommitsAdapter = RecentCommitsAdapter(recentCommits)
+        recentCommitsAdapter = RecentCommitsAdapter(this, recentCommits)
 
         forceSyncButton = findViewById(R.id.forceSyncButton)
         syncMessageButton = findViewById(R.id.syncMessageButton)
@@ -276,15 +276,15 @@ class MainActivity : AppCompatActivity() {
         if (settingsManager.isFirstTime()) {
             val authDialogBuilder = AlertDialog.Builder(this, R.style.AlertDialogTheme)
                 .setCancelable(false)
-                .setTitle("Authenticate with Github.com")
-                .setMessage("Please authenticate with Github and continue on to clone your repo!")
+                .setTitle(getString(R.string.auth_dialog_title))
+                .setMessage(getString(R.string.auth_dialog_message))
                 .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
                     dialog.dismiss()
                     settingsManager.setHadFirstTime()
                     gitManager.launchGithubOAuthFlow()
                 }
                 .setNegativeButton(
-                    "Skip"
+                    getString(R.string.skip)
                 ) { dialog, _ ->
                     dialog.dismiss()
                     settingsManager.setHadFirstTime()
@@ -300,16 +300,16 @@ class MainActivity : AppCompatActivity() {
                     0
                 )
                 text = Html.fromHtml(
-                    "<a href=\"https://github.com/ViscousPotential/GitSync/blob/master/Documentation.md\">DOCUMENTATION</a>",
+                    getString(R.string.documentation_html_link).format(getString(R.string.docs_link)),
                     0
                 )
             }
 
             val almostThereDialogBuilder = AlertDialog.Builder(this, R.style.AlertDialogTheme)
                 .setCancelable(false)
-                .setTitle("Almost there!")
+                .setTitle(getString(R.string.almost_there_dialog_title))
                 .setView(almostThereDialogLink)
-                .setMessage("\nSoon, we'll authenticate with GitHub.com and clone your repo to your device, preparing it for syncing.\n\nOnce that's set, there are several ways to trigger a sync:\n\n  • The GitSync quick tile\n  • The in-app \"Sync Now\" button\n  • Application Observer for auto-sync\n  • A custom intent (advanced)\n")
+                .setMessage(getString(R.string.almost_there_dialog_message))
                 .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
                     dialog.dismiss()
                     authDialogBuilder.create().show()
@@ -322,11 +322,11 @@ class MainActivity : AppCompatActivity() {
 
             val enableAllFilesDialogBuilder = AlertDialog.Builder(this, R.style.AlertDialogTheme)
                 .setCancelable(false)
-                .setTitle("Enable \"All Files Access\"")
-                .setMessage("\nYou can use GitSync without granting \"All files access\" permissions, but we recommend enabling it for the best experience.\n\nThe app uses \"All files access\" for syncing your repository more consistently to a less limited range of directories on the device.\n")
+                .setTitle(getString(R.string.all_files_access_dialog_title))
+                .setMessage(getString(R.string.all_files_access_dialog_message))
                 .setPositiveButton(getString(android.R.string.ok)) { _, _ -> }
                 .setNegativeButton(
-                    "Skip"
+                    getString(R.string.skip)
                 ) { dialog, _ ->
                     dialog.dismiss()
                     almostThereDialogBuilder.create().show()
@@ -337,18 +337,18 @@ class MainActivity : AppCompatActivity() {
                                 dismiss()
                                 almostThereDialogBuilder.create().show()
                             }
-                            this.getButton(AlertDialog.BUTTON_POSITIVE).text = "Done"
+                            this.getButton(AlertDialog.BUTTON_POSITIVE).text = getString(R.string.done)
                         }
                     }
                 }
 
             val enableNotificationsDialogBuilder = AlertDialog.Builder(this, R.style.AlertDialogTheme)
                 .setCancelable(false)
-                .setTitle("Enable Notifications")
-                .setMessage("\nYou can use GitSync without granting notification permissions, but we recommend enabling them for the best experience.\n\nThe app uses notifications for \n  • popup sync messages\n  • bug reports\n")
+                .setTitle(getString(R.string.notification_dialog_title))
+                .setMessage(getString(R.string.notification_dialog_message))
                 .setPositiveButton(getString(android.R.string.ok)) { _, _ -> }
                 .setNegativeButton(
-                    "Skip"
+                    getString(R.string.skip)
                 ) { dialog, _ ->
                     dialog.dismiss()
                     if (BuildConfig.ALL_FILES) {
@@ -367,21 +367,22 @@ class MainActivity : AppCompatActivity() {
                                     almostThereDialogBuilder.create().show()
                                 }
                             }
-                            this.getButton(AlertDialog.BUTTON_POSITIVE).text = "Done"
+                            this.getButton(AlertDialog.BUTTON_POSITIVE).text =
+                                getString(R.string.done)
                         }
                     }
                 }
 
             val welcomeDialogBuilder = AlertDialog.Builder(this, R.style.AlertDialogTheme)
                 .setCancelable(false)
-                .setTitle("Welcome!")
-                .setMessage("\nIt looks like this is your first time here.\n\nWould you like to go through a quick setup to get started?\n")
-                .setPositiveButton("Yes, let's go") { dialog, which ->
+                .setTitle(getString(R.string.welcome))
+                .setMessage(getString(R.string.welcome_message))
+                .setPositiveButton(getString(R.string.welcome_positive)) { dialog, _ ->
                     dialog.dismiss()
                     enableNotificationsDialogBuilder.show()
                 }
                 .setNegativeButton(
-                    "Skip for now"
+                    getString(R.string.welcome_negative)
                 ) { dialog, _ ->
                     dialog.dismiss()
                 }
@@ -618,8 +619,7 @@ class MainActivity : AppCompatActivity() {
                     }
 
                     else -> {
-                        selectApplication.text =
-                            "${getString(R.string.multiple_application_selected)} (${if (packageNames.size < 5) packageNames.size else "4+"})"
+                        selectApplication.text = getString(R.string.multiple_application_selected).format(if (packageNames.size < 5) packageNames.size else getString(R.string.lg_3_apps_selected_text))
                         selectApplication.icon = null
 
                         applicationRecycler.visibility = View.VISIBLE
@@ -750,8 +750,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun displayProminentDisclosure() {
         AlertDialog.Builder(this, R.style.AlertDialogTheme)
-            .setTitle("Accessibility Service Disclosure")
-            .setMessage("To enhance your experience,\nGitSync uses Android’s Accessibility Service to detect when apps are opened or closed.\n\nThis helps us provide tailored features without storing or sharing any data.")
+            .setTitle(getString(R.string.accessibility_service_disclosure_title))
+            .setMessage(getString(R.string.accessibility_service_disclosure_message))
             .setPositiveButton(android.R.string.ok) { _, _ ->
                 requestAccessibilityPermission()
             }

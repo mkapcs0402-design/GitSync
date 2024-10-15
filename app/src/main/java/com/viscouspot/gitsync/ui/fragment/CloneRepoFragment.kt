@@ -200,8 +200,8 @@ class CloneRepoFragment(
 
     private fun selectLocalDir() {
         AlertDialog.Builder(requireContext(), R.style.AlertDialogTheme)
-            .setTitle("Select a folder to clone into")
-            .setPositiveButton("select") { _, _ ->
+            .setTitle(getString(R.string.select_clone_directory))
+            .setPositiveButton(getString(R.string.select)) { _, _ ->
                 callback = ::localDirCallback
                 dirSelectionLauncher.launch(null)
             }

@@ -106,7 +106,7 @@ class GitSyncService : Service() {
     }
 
     private fun debouncedSync(forced: Boolean = false) {
-        if (!Helper.isNetworkAvailable(this, "Network unavailable!\nGitSync will retry when reconnected")) {
+        if (!Helper.isNetworkAvailable(this, getString(R.string.network_unavailable))) {
             val constraints: Constraints = Constraints.Builder()
                 .setRequiredNetworkType(NetworkType.CONNECTED)
                 .build()
@@ -136,16 +136,16 @@ class GitSyncService : Service() {
         val job = CoroutineScope(Dispatchers.Default).launch {
             val authCredentials = settingsManager.getGitAuthCredentials()
 
-            val gitDirUri = settingsManager.getGitDirUri() ?: return@launch
-            val gitDirPath = Helper.getPathFromUri(applicationContext, gitDirUri)
-            val file = File("${gitDirPath}/.git/config")
+            val gitDirUri = settingsManager.getGitDirUri()
+            val gitDirPath = if (gitDirUri != null) Helper.getPathFromUri(applicationContext, gitDirUri) else null
+            val file = if (gitDirPath != null) File("${gitDirPath}/.git/config") else null
 
-            if (gitDirUri == null || !file.exists()) {
+            if (gitDirUri == null || gitDirPath == null || file?.exists() != true) {
                 withContext(Dispatchers.Main) {
                     log(LogType.Sync, "Repository Not Found")
                     Toast.makeText(
                         applicationContext,
-                        "Repository not found!",
+                        getString(R.string.repository_not_found),
                         Toast.LENGTH_SHORT
                     ).show()
                 }

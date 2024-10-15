@@ -11,13 +11,8 @@ import com.viscouspot.gitsync.R
 
 class ApplicationGridAdapter(private val packageManager: PackageManager, private val packageNames: MutableList<String>, private val selectedPackageNames: MutableList<String>) : RecyclerView.Adapter<ApplicationGridAdapter.ViewHolder>() {
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val applicationItem: MaterialButton
-        val check: ImageView
-
-        init {
-            applicationItem = view.findViewById(R.id.applicationItem)
-            check = view.findViewById(R.id.check)
-        }
+        val applicationItem: MaterialButton = view.findViewById(R.id.applicationItem)
+        val check: ImageView = view.findViewById(R.id.check)
     }
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): ViewHolder {

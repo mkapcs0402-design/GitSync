@@ -10,13 +10,8 @@ import com.viscouspot.gitsync.R
 
 class RepoListAdapter(private val repoList: MutableList<Pair<String, String>>, private val onSelect: (selection: Pair<String, String>) -> Unit) : RecyclerView.Adapter<RepoListAdapter.ViewHolder>() {
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val container: ConstraintLayout
-        val repoName: TextView
-
-        init {
-            container = view.findViewById(R.id.container)
-            repoName = view.findViewById(R.id.repoName)
-        }
+        val container: ConstraintLayout = view.findViewById(R.id.container)
+        val repoName: TextView = view.findViewById(R.id.repoName)
     }
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): ViewHolder {
