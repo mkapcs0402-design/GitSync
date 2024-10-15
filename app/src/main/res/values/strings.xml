@@ -6,7 +6,7 @@
 
     <string name="auth">AUTH</string>
     <string name="git_repo_url_hint">https://github.com/xyz.git</string>
-    <string name="git_dir_path_hint">/storage/emulated/0/...</string>
+    <string name="git_dir_path_hint">/storage/emulated/0/…</string>
 
     <string name="enable_application_observer">Auto Sync Settings</string>
     <string name="enable_accessibility_service">Please enable the Git Sync Accessibility Service!</string>
@@ -22,7 +22,7 @@
     <string name="clone_repo">Clone remote repository</string>
     <string name="invalid_repository_url">Invalid repository URL!</string>
 
-    <string name="sync_start_pull">Syncing changes...</string>
+    <string name="sync_start_pull">Syncing changes…</string>
     <string name="sync_start_push">Syncing local changes…</string>
     <string name="sync_not_required">Sync not required!</string>
     <string name="sync_complete">Sync complete!</string>
@@ -77,5 +77,5 @@
     <string name="invalid_remote">Invalid remote!</string>
     <string name="clone_failed">Failed to clone repository!</string>
     <string name="inaccessible_directory_message">Inaccessible! Please select a different directory.</string>
-    <string name="respository_not_found">No repo found…</string>
+    <string name="repo_not_found">No repo found…</string>
 </resources>

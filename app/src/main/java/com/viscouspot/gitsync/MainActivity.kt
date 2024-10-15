@@ -674,7 +674,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             if (repoName == "") {
-                gitRepoName.setText(getString(R.string.respository_not_found))
+                gitRepoName.setText(getString(R.string.repo_not_found))
                 gitRepoName.isEnabled = false
 
                 cloneRepoButton.visibility = View.VISIBLE
