@@ -66,6 +66,9 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
     }
 
     fun getGithubAuthCredentials(code: String, state: String, setCallback: (username: String, authToken: String) -> Unit) {
+        if (!Helper.isNetworkAvailable(context)) {
+            return
+        }
         val authTokenRequest: Request = Request.Builder()
             .url("https://github.com/login/oauth/access_token?client_id=${Secrets.GIT_CLIENT_ID}&client_secret=${Secrets.GIT_CLIENT_SECRET}&code=$code&state=$state")
             .post("".toRequestBody())
@@ -89,6 +92,9 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
     }
 
     fun getGithubUsername(authToken: String, successCallback: (username: String) -> Unit) {
+        if (!Helper.isNetworkAvailable(context)) {
+            return
+        }
         val profileRequest: Request = Request.Builder()
             .url("https://api.github.com/user")
             .addHeader("Accept", "application/json")
@@ -118,6 +124,9 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
     }
 
     private fun getGithubReposRequest(authToken: String, url: String, updateCallback: (repos: List<Pair<String, String>>) -> Unit, nextPageCallback: (nextPage: (() -> Unit)?) -> Unit) {
+        if (!Helper.isNetworkAvailable(context)) {
+            return
+        }
         client.newCall(
             Request.Builder()
                 .url(url)
@@ -166,6 +175,9 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
     }
 
     fun cloneRepository(repoUrl: String, userStorageUri: Uri, username: String, token: String, taskCallback: (action: String) -> Unit, progressCallback: (progress: Int) -> Unit, failureCallback: (error: String) -> Unit, successCallback: () -> Unit) {
+        if (!Helper.isNetworkAvailable(context)) {
+            return
+        }
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 log(LogType.CloneRepo, "Cloning Repo")
@@ -238,6 +250,9 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
     }
 
     fun pullRepository(userStorageUri: Uri, username: String, token: String, onSync: () -> Unit): Boolean? {
+        if (!Helper.isNetworkAvailable(context)) {
+            return false
+        }
         try {
             var returnResult: Boolean? = false
             log(LogType.PullFromRepo, "Getting local directory")
@@ -275,6 +290,9 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
     }
 
     fun pushAllToRepository(repoUrl: String, userStorageUri: Uri, username: String, token: String, onSync: () -> Unit): Boolean? {
+        if (!Helper.isNetworkAvailable(context)) {
+            return false
+        }
         try {
             var returnResult = false
             log(LogType.PushToRepo, "Getting local directory")

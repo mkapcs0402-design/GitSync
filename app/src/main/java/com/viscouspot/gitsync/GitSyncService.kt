@@ -1,12 +1,11 @@
 package com.viscouspot.gitsync
 
 import android.app.ActivityManager
-import android.app.Service
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
+import android.app.Service
 import android.content.Intent
-import android.os.Build
 import android.os.FileObserver
 import android.os.Handler
 import android.os.IBinder
@@ -14,10 +13,16 @@ import android.os.Looper
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.work.Constraints
+import androidx.work.ExistingWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequest
+import androidx.work.WorkManager
 import com.viscouspot.gitsync.util.GitManager
 import com.viscouspot.gitsync.util.Helper
 import com.viscouspot.gitsync.util.LogType
 import com.viscouspot.gitsync.util.Logger.log
+import com.viscouspot.gitsync.util.NetworkWorker
 import com.viscouspot.gitsync.util.SettingsManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -77,17 +82,15 @@ class GitSyncService : Service() {
     }
 
     private fun startForegroundService() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                NOTIFICATION_CHANNEL_ID,
-                NOTIFICATION_CHANNEL_NAME,
-                NotificationManager.IMPORTANCE_MIN
-            )
-            val manager = this.getSystemService(
-                NotificationManager::class.java
-            )
-            manager?.createNotificationChannel(channel)
-        }
+        val channel = NotificationChannel(
+            NOTIFICATION_CHANNEL_ID,
+            NOTIFICATION_CHANNEL_NAME,
+            NotificationManager.IMPORTANCE_MIN
+        )
+        val manager = this.getSystemService(
+            NotificationManager::class.java
+        )
+        manager?.createNotificationChannel(channel)
 
         val buttonIntent = Intent(this, GitSyncService::class.java).apply {
             action = FORCE_SYNC
@@ -103,6 +106,16 @@ class GitSyncService : Service() {
     }
 
     private fun debouncedSync(forced: Boolean = false) {
+        if (!Helper.isNetworkAvailable(this, "Network unavailable!\nGitSync will retry when reconnected")) {
+            val constraints: Constraints = Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .build()
+            val workRequest = OneTimeWorkRequest.Builder(NetworkWorker::class.java)
+                .setConstraints(constraints).build()
+
+            WorkManager.getInstance(this).enqueueUniqueWork("networkScheduledSync", ExistingWorkPolicy.KEEP, workRequest)
+            return
+        }
         if (isScheduled) {
             return
         } else {
