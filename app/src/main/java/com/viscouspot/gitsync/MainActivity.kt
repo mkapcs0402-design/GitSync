@@ -287,6 +287,7 @@ class MainActivity : AppCompatActivity() {
                     "Skip"
                 ) { dialog, _ ->
                     dialog.dismiss()
+                    settingsManager.setHadFirstTime()
                 }
 
             val almostThereDialogLink = TextView(this).apply {
