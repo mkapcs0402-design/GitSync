@@ -106,9 +106,7 @@ class GitSyncService : Service() {
     }
 
     private fun debouncedSync(forced: Boolean = false) {
-        if (!Helper.isNetworkAvailable(this)) {
-            Toast.makeText(this, "Network unavailable!\nGitSync will retry when reconnected", Toast.LENGTH_SHORT).show()
-
+        if (!Helper.isNetworkAvailable(this, "Network unavailable!\nGitSync will retry when reconnected")) {
             val constraints: Constraints = Constraints.Builder()
                 .setRequiredNetworkType(NetworkType.CONNECTED)
                 .build()
