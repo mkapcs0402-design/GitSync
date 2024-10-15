@@ -4,6 +4,8 @@ import android.content.ContentUris
 import android.content.Context
 import android.content.Intent
 import android.database.Cursor
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
@@ -16,13 +18,25 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
 import com.viscouspot.gitsync.R
-import com.viscouspot.gitsync.util.Logger.log
 import java.io.File
 import java.io.IOException
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 object Helper {
+    fun isNetworkAvailable(context: Context): Boolean {
+        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val nw = connectivityManager.activeNetwork ?: return false
+        val actNw = connectivityManager.getNetworkCapabilities(nw) ?: return false
+        return when {
+            actNw.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
+            actNw.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
+            actNw.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> true
+            actNw.hasTransport(NetworkCapabilities.TRANSPORT_BLUETOOTH) -> true
+            else -> false
+        }
+    }
+
     fun getDirSelectionLauncher(activityResultLauncher: ActivityResultCaller, context: Context, callback: ((dirUri: Uri?) -> Unit)): ActivityResultLauncher<Uri?> {
         return activityResultLauncher.registerForActivityResult(ActivityResultContracts.OpenDocumentTree()) { uri ->
             uri?.let {
