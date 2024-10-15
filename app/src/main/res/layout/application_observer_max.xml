@@ -87,9 +87,9 @@
         android:orientation="horizontal"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toBottomOf="@id/selectApplication"
-        app:layout_constraintDimensionRatio="4.5:1"
         app:layout_constraintStart_toEndOf="@id/selectApplication"
         app:layout_constraintTop_toTopOf="@id/selectApplication"
+        app:layout_constraintEnd_toEndOf="parent"
         android:visibility="gone"
         tools:itemCount="4"
         tools:listitem="@layout/application_recycler_item" />
