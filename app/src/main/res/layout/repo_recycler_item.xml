@@ -8,10 +8,10 @@
     android:background="@drawable/input_bg_md"
     android:backgroundTint="@color/card_secondary_bg"
     android:orientation="vertical"
-    android:paddingVertical="8dp"
+    android:paddingVertical="@dimen/space_md"
     android:id="@+id/container"
-    android:layout_marginBottom="16dp"
-    android:paddingHorizontal="16dp"
+    android:layout_marginBottom="@dimen/space_md"
+    android:paddingHorizontal="@dimen/space_md"
     android:theme="@style/Theme.MaterialComponents">
 
     <TextView
