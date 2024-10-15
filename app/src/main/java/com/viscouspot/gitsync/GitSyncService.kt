@@ -77,17 +77,15 @@ class GitSyncService : Service() {
     }
 
     private fun startForegroundService() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                NOTIFICATION_CHANNEL_ID,
-                NOTIFICATION_CHANNEL_NAME,
-                NotificationManager.IMPORTANCE_MIN
-            )
-            val manager = this.getSystemService(
-                NotificationManager::class.java
-            )
-            manager?.createNotificationChannel(channel)
-        }
+        val channel = NotificationChannel(
+            NOTIFICATION_CHANNEL_ID,
+            NOTIFICATION_CHANNEL_NAME,
+            NotificationManager.IMPORTANCE_MIN
+        )
+        val manager = this.getSystemService(
+            NotificationManager::class.java
+        )
+        manager?.createNotificationChannel(channel)
 
         val buttonIntent = Intent(this, GitSyncService::class.java).apply {
             action = FORCE_SYNC
