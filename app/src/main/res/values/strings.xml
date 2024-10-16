@@ -78,4 +78,10 @@
     <string name="clone_failed">Failed to clone repository!</string>
     <string name="inaccessible_directory_message">Inaccessible! Please select a different directory.</string>
     <string name="repo_not_found">No repo found…</string>
+    <string name="auto_rebase_failed_exception">Remote is further ahead than local and we could not automatically rebase for you, as it would cause non fast-forward update.</string>
+    <string name="non_existing_exception">Remote ref didn\'t exist.</string>
+    <string name="rejected_nodelete_exception">Remote ref update was rejected, because remote side doesn\'t support/allow deleting refs.</string>
+    <string name="rejected_exception">Remote ref update was rejected.</string>
+    <string name="rejection_with_reason_exception">Remote ref update was rejected because %s.</string>
+    <string name="remote_changed_exception">Remote ref update was rejected, because old object id on remote repository wasn\'t the same as defined expected old object.</string>
 </resources>

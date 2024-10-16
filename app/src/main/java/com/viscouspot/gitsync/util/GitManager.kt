@@ -31,6 +31,7 @@ import org.eclipse.jgit.diff.DiffFormatter
 import org.eclipse.jgit.errors.NotSupportedException
 import org.eclipse.jgit.internal.storage.file.FileRepository
 import org.eclipse.jgit.lib.BatchingProgressMonitor
+import org.eclipse.jgit.lib.StoredConfig
 import org.eclipse.jgit.revwalk.RevSort
 import org.eclipse.jgit.revwalk.RevWalk
 import org.eclipse.jgit.transport.RemoteRefUpdate
@@ -249,7 +250,7 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
         }
     }
 
-    fun pullRepository(userStorageUri: Uri, username: String, token: String, onSync: () -> Unit): Boolean? {
+    fun downloadChanges(userStorageUri: Uri, username: String, token: String, onSync: () -> Unit): Boolean? {
         if (!Helper.isNetworkAvailable(context)) {
             return false
         }
@@ -272,10 +273,10 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
                     setCredentialsProvider(cp)
                     remote = "origin"
                 }
-                if (result.isSuccessful()) {
-                    returnResult = true
+                returnResult = if (result.isSuccessful()) {
+                    true
                 } else {
-                    returnResult = null
+                    null
                 }
             }
 
@@ -289,7 +290,7 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
         return null
     }
 
-    fun pushAllToRepository(repoUrl: String, userStorageUri: Uri, username: String, token: String, onSync: () -> Unit): Boolean? {
+    fun uploadChanges(repoUrl: String, userStorageUri: Uri, username: String, token: String, onSync: () -> Unit): Boolean? {
         if (!Helper.isNetworkAvailable(context)) {
             return false
         }
@@ -319,8 +320,14 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
                 val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
 
                 log(LogType.PushToRepo, "Committing changes")
+                val config: StoredConfig = git.repository.config
+                val committerEmail = config.getString("user", null, "email")
+                var committerName = config.getString("user", null, "name")
+                if (committerName == null || committerName.equals("")) {
+                    committerName = username
+                }
                 git.commit {
-                    setCommitter(username, "")
+                    setCommitter(committerName, committerEmail ?: "")
                     message = "Last Sync: ${currentDateTime.format(formatter)} (Mobile)"
                 }
 
@@ -344,9 +351,24 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
                                 git.rebase {
                                     setOperation(RebaseCommand.Operation.ABORT)
                                 }
-                                throw Exception("Remote is further ahead than local and we could not automatically rebase for you!")
+                                throw Exception(context.getString(R.string.auto_rebase_failed_exception))
                             }
                             break
+                        }
+                        RemoteRefUpdate.Status.NON_EXISTING -> {
+                            throw Exception(context.getString(R.string.non_existing_exception))
+                        }
+                        RemoteRefUpdate.Status.REJECTED_NODELETE -> {
+                            throw Exception(context.getString(R.string.rejected_nodelete_exception))
+                        }
+                        RemoteRefUpdate.Status.REJECTED_OTHER_REASON -> {
+                            val reason = remoteUpdate.message
+                            throw Exception(if (reason == null || reason == "") context.getString(R.string.rejected_exception) else context.getString(
+                                R.string.rejection_with_reason_exception
+                            ).format(reason))
+                        }
+                        RemoteRefUpdate.Status.REJECTED_REMOTE_CHANGED -> {
+                            throw Exception(context.getString(R.string.remote_changed_exception))
                         }
                         else -> {}
                     }
@@ -363,7 +385,7 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
             closeRepo(repo)
 
             return returnResult
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             log(context, LogType.PushToRepo, e)
         }
         return null

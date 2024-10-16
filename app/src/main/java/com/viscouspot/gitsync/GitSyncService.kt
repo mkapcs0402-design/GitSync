@@ -171,7 +171,7 @@ class GitSyncService : Service() {
             var synced = false
 
             log(LogType.Sync, "Start Pull Repo")
-            val pullResult = gitManager.pullRepository(
+            val pullResult = gitManager.downloadChanges(
                 gitDirUri,
                 authCredentials.first,
                 authCredentials.second
@@ -195,7 +195,7 @@ class GitSyncService : Service() {
             }
 
             log(LogType.Sync, "Start Push Repo")
-            val pushResult = gitManager.pushAllToRepository(
+            val pushResult = gitManager.uploadChanges(
                 repoUrl,
                 gitDirUri,
                 authCredentials.first,
