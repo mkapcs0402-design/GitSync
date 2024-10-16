@@ -19,6 +19,18 @@ Android mobile git client for syncing a repository between remote and a local di
     - When app opened or closed
     - From custom intent (advanced)
 
+## Variants
+
+There are two variants of GitSync available for the most recent releases.
+- Base variant 
+  - `app-all-files-variant-release-signed.apk`
+- All files variant
+  - `app-base-release-signed.apk`
+
+The main difference between these versions is the use of "All files access" permission.
+
+We recommend using the "All files variant" for the best experience, as it will allow you to use a larger range of folders with the app.
+
 ## [Documentation](Documentation.md)
 
 ## Build Instructions
