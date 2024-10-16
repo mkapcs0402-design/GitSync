@@ -157,6 +157,7 @@ class MainActivity : AppCompatActivity() {
         gitManager.getGithubAuthCredentials(code, state) { username, authToken ->
             log(LogType.GithubAuthCredentials, "Username and Token Received")
 
+            settingsManager.setHadFirstTime()
             settingsManager.setGitAuthCredentials(username, authToken)
             refreshAuthButton()
 
@@ -280,7 +281,6 @@ class MainActivity : AppCompatActivity() {
                 .setMessage(getString(R.string.auth_dialog_message))
                 .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
                     dialog.dismiss()
-                    settingsManager.setHadFirstTime()
                     gitManager.launchGithubOAuthFlow()
                 }
                 .setNegativeButton(
