@@ -72,7 +72,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var gitAuthButton: MaterialButton
 
     private lateinit var gitDirPath: EditText
-    private lateinit var selectFileButton: MaterialButton
+    private lateinit var deselectDirButton: MaterialButton
+    private lateinit var selectDirButton: MaterialButton
+
 
     private lateinit var viewDocs: MaterialButton
 
@@ -116,12 +118,9 @@ class MainActivity : AppCompatActivity() {
 
         settingsManager.setGitDirUri(dirUri.toString())
 
-        updateGitDirPath(dirUri)
-        refreshGitRepo()
-    }
 
-    private fun updateGitDirPath(dirUri: Uri) {
         gitDirPath.setText(Helper.getPathFromUri(this, dirUri))
+        refreshGitRepo()
     }
 
     private val requestNotificationPermission = this.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { }
@@ -256,7 +255,8 @@ class MainActivity : AppCompatActivity() {
         gitAuthButton = findViewById(R.id.gitAuthButton)
 
         gitDirPath = findViewById(R.id.gitDirPath)
-        selectFileButton = findViewById(R.id.selectFileButton)
+        deselectDirButton = findViewById(R.id.deselectDirButton)
+        selectDirButton = findViewById(R.id.selectDirButton)
 
         viewDocs = findViewById(R.id.viewDocs)
 
@@ -430,7 +430,14 @@ class MainActivity : AppCompatActivity() {
 
         gitDirPath.isEnabled = false
 
-        selectFileButton.setOnClickListener {
+        deselectDirButton.setOnClickListener {
+            settingsManager.setGitDirUri("")
+
+            gitDirPath.setText("")
+            refreshGitRepo()
+        }
+
+        selectDirButton.setOnClickListener {
             dirSelectionLauncher.launch(null)
         }
 
@@ -678,6 +685,7 @@ class MainActivity : AppCompatActivity() {
                 gitRepoName.isEnabled = false
 
                 cloneRepoButton.visibility = View.VISIBLE
+                deselectDirButton.visibility = View.GONE
                 cloneRepoButton.setOnClickListener {
                     CloneRepoFragment(settingsManager, gitManager, ::dirSelectionCallback).show(supportFragmentManager, getString(R.string.clone_repo))
                 }
@@ -711,6 +719,7 @@ class MainActivity : AppCompatActivity() {
                 (4 * resources.displayMetrics.density + 0.5f).toInt()
 
             cloneRepoButton.visibility = View.GONE
+            deselectDirButton.visibility = View.VISIBLE
 
             applicationObserverSwitch.isEnabled = true
 
@@ -724,7 +733,7 @@ class MainActivity : AppCompatActivity() {
                 gitAuthButton.icon = getDrawable(R.drawable.circle_check)
                 gitAuthButton.setIconTintResource(R.color.auth_green)
 
-                selectFileButton.isEnabled = true
+                selectDirButton.isEnabled = true
                 cloneRepoButton.isEnabled = true
 
                 return@runOnUiThread
@@ -733,7 +742,7 @@ class MainActivity : AppCompatActivity() {
             gitAuthButton.icon = getDrawable(R.drawable.circle_xmark)
             gitAuthButton.setIconTintResource(R.color.auth_red)
 
-            selectFileButton.isEnabled = false
+            selectDirButton.isEnabled = false
             cloneRepoButton.isEnabled = false
         }
     }
