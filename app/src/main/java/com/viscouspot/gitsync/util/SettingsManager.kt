@@ -4,8 +4,9 @@ import android.content.Context
 import android.net.Uri
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
+import com.viscouspot.gitsync.R
 
-class SettingsManager internal constructor(context: Context) {
+class SettingsManager internal constructor(private val context: Context) {
     private val masterKey = MasterKey.Builder(context, MasterKey.DEFAULT_MASTER_KEY_ALIAS)
         .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
         .build()
@@ -38,6 +39,17 @@ class SettingsManager internal constructor(context: Context) {
     fun setHadFirstTime() {
         with(settingsSharedPref.edit()) {
             putBoolean("isFirstTime", false)
+            apply()
+        }
+    }
+
+    fun getSyncMessage(): String {
+        return settingsSharedPref.getString("syncOnAppClosed", null) ?: context.getString(R.string.sync_message)
+    }
+
+    fun setSyncMessage(syncMessage: String) {
+        with(settingsSharedPref.edit()) {
+            putString("syncMessage", syncMessage)
             apply()
         }
     }

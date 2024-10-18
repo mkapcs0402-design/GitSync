@@ -198,6 +198,7 @@ class GitSyncService : Service() {
             val pushResult = gitManager.uploadChanges(
                 repoUrl,
                 gitDirUri,
+                settingsManager.getSyncMessage(),
                 authCredentials.first,
                 authCredentials.second
             ) {

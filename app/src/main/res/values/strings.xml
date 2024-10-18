@@ -72,6 +72,8 @@
     <string name="additions">%s ++</string>
     <string name="deletions" tools:ignore="TypographyDashes">%s --</string>
 
+    <string name="sync_message">Last Sync: %s (Mobile)</string>
+
     <string name="network_unavailable">Network unavailable!\nGitSync will retry when reconnected</string>
     <string name="out_of_memory">Application ran out of memory!</string>
     <string name="invalid_remote">Invalid remote!</string>
