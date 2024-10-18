@@ -44,7 +44,7 @@ class SettingsManager internal constructor(private val context: Context) {
     }
 
     fun getSyncMessage(): String {
-        return settingsSharedPref.getString("syncOnAppClosed", null) ?: context.getString(R.string.sync_message)
+        return settingsSharedPref.getString("syncMessage", null) ?: context.getString(R.string.sync_message)
     }
 
     fun setSyncMessage(syncMessage: String) {

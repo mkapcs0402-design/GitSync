@@ -86,10 +86,34 @@
                 app:iconGravity="end"
                 app:iconSize="@dimen/text_size_lg"
                 app:iconTint="@color/textPrimary"
-                app:layout_constraintEnd_toStartOf="@id/syncMessageButton"
+                app:layout_constraintEnd_toStartOf="@id/settingsButton"
                 app:layout_constraintHorizontal_chainStyle="packed"
                 app:layout_constraintTop_toBottomOf="@id/emptyCommitsView"
                 app:layout_constraintStart_toStartOf="parent"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/settingsButton"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_gravity="start"
+                android:backgroundTint="@color/card_bg"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:layout_marginEnd="@dimen/space_sm"
+                app:icon="@drawable/gear"
+                android:contentDescription="settings button"
+                app:iconGravity="textEnd"
+                app:iconPadding="0dp"
+                app:backgroundTint="@null"
+                android:background="@drawable/input_bg_sm"
+                app:iconSize="@dimen/text_size_lg"
+                app:iconTint="@color/textPrimary"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:clipToOutline="true"
+                app:layout_constraintBottom_toBottomOf="@+id/forceSyncButton"
+                app:layout_constraintDimensionRatio="w,1:1"
+                app:layout_constraintEnd_toStartOf="@id/syncMessageButton"
+                app:layout_constraintTop_toTopOf="@+id/forceSyncButton"  />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/syncMessageButton"

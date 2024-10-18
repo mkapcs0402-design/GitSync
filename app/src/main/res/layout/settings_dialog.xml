@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@drawable/input_bg_md"
+    android:backgroundTint="@color/card_bg"
+    android:padding="@dimen/space_md"
+    android:layout_margin="@dimen/space_lg"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/settings"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/text_size_lg"
+        android:textColor="@color/textPrimary"
+        android:textAllCaps="true"
+        android:textAlignment="center"
+        android:textStyle="bold"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:text="@string/settings"/>
+
+    <TextView
+        android:id="@+id/syncMessageLabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/text_size_md"
+        android:textColor="@color/textPrimary"
+        android:layout_marginStart="@dimen/space_xs"
+        android:layout_marginTop="@dimen/space_md"
+        android:textAllCaps="true"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@+id/settings"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:text="@string/sync_message_label"/>
+
+    <TextView
+        android:id="@+id/syncMessageDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/text_size_sm"
+        android:textColor="@color/textSecondary"
+        android:layout_marginStart="@dimen/space_sm"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@+id/syncMessageLabel"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:text="@string/sync_message_description"/>
+
+    <EditText
+        style="@style/SingleLineEditText"
+        android:id="@+id/syncMessageInput"
+        android:background="@drawable/input_bg_left"
+        android:backgroundTint="@color/card_secondary_bg"
+        android:hint="@string/git_dir_path_hint"
+        android:paddingHorizontal="@dimen/space_sm"
+        android:paddingVertical="@dimen/space_sm"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/text_size_md"
+        android:layout_marginTop="@dimen/space_sm"
+        android:textColor="@color/textPrimary"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@+id/syncMessageDescription"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:text=""/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
