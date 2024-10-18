@@ -43,8 +43,9 @@
     <string name="welcome">Welcome!</string>
     <string name="welcome_message">\nIt looks like this is your first time here.\n\nWould you like to go through a quick setup to get started?\n</string>
 
-    <string name="welcome_positive">Yes, let\'s go</string>
-    <string name="welcome_negative">Skip for now</string>
+    <string name="welcome_positive">Let\'s go</string>
+    <string name="welcome_neutral">Skip</string>
+    <string name="welcome_negative">I\'m familiar</string>
     <string name="skip">Skip</string>
     <string name="done">Done</string>
 

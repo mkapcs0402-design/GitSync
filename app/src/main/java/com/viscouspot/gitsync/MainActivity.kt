@@ -381,9 +381,15 @@ class MainActivity : AppCompatActivity() {
                     dialog.dismiss()
                     enableNotificationsDialogBuilder.show()
                 }
+                .setNeutralButton(
+                    getString(R.string.welcome_neutral)
+                ) { dialog, _ ->
+                    dialog.dismiss()
+                }
                 .setNegativeButton(
                     getString(R.string.welcome_negative)
                 ) { dialog, _ ->
+                    settingsManager.setHadFirstTime()
                     dialog.dismiss()
                 }
 
