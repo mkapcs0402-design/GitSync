@@ -73,6 +73,8 @@
     <string name="additions">%s ++</string>
     <string name="deletions" tools:ignore="TypographyDashes">%s --</string>
 
+    <string name="sync_message">Last Sync: %s (Mobile)</string>
+
     <string name="network_unavailable">Network unavailable!\nGitSync will retry when reconnected</string>
     <string name="out_of_memory">Application ran out of memory!</string>
     <string name="invalid_remote">Invalid remote!</string>
@@ -85,4 +87,7 @@
     <string name="rejected_exception">Remote ref update was rejected.</string>
     <string name="rejection_with_reason_exception">Remote ref update was rejected because %s.</string>
     <string name="remote_changed_exception">Remote ref update was rejected, because old object id on remote repository wasn\'t the same as defined expected old object.</string>
+    <string name="settings">Settings</string>
+    <string name="sync_message_label">Sync Message</string>
+    <string name="sync_message_description">(use %s for the date and time)</string>
 </resources>

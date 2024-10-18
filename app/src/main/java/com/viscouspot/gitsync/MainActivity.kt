@@ -6,9 +6,12 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.graphics.PorterDuff
 import android.graphics.Rect
+import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
+import android.graphics.drawable.InsetDrawable
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -35,6 +38,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
+import androidx.core.widget.doOnTextChanged
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
@@ -65,6 +69,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var recentCommitsAdapter: RecentCommitsAdapter
 
     private lateinit var forceSyncButton: MaterialButton
+    private lateinit var settingsButton: MaterialButton
     private lateinit var syncMessageButton: MaterialButton
 
     private lateinit var gitRepoName: EditText
@@ -248,6 +253,7 @@ class MainActivity : AppCompatActivity() {
         recentCommitsAdapter = RecentCommitsAdapter(this, recentCommits)
 
         forceSyncButton = findViewById(R.id.forceSyncButton)
+        settingsButton = findViewById(R.id.settingsButton)
         syncMessageButton = findViewById(R.id.syncMessageButton)
 
         gitRepoName = findViewById(R.id.gitRepoName)
@@ -413,6 +419,10 @@ class MainActivity : AppCompatActivity() {
             startService(forceSyncIntent)
         }
 
+        settingsButton.setOnClickListener {
+            openSettingsDialog()
+        }
+
         syncMessageButton.setOnClickListener {
             val syncMessageEnabled = settingsManager.getSyncMessageEnabled()
 
@@ -485,6 +495,32 @@ class MainActivity : AppCompatActivity() {
         viewDocs.setOnClickListener {
             val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.docs_link)))
             startActivity(browserIntent)
+        }
+    }
+
+    private fun openSettingsDialog() {
+        val builder = AlertDialog.Builder(this, R.style.AlertDialogMinTheme)
+        val inflater = layoutInflater
+        val dialogView: View = inflater.inflate(R.layout.settings_dialog, null)
+
+        setupSyncMessageSettings(dialogView)
+
+        builder.setView(dialogView)
+
+        val dialog = builder.create()
+        val back = ColorDrawable(Color.TRANSPARENT)
+        val inset = InsetDrawable(back, resources.getDimensionPixelOffset(R.dimen.space_lg))
+        dialog.window!!.setBackgroundDrawable(inset)
+        dialog.show()
+    }
+
+    private fun setupSyncMessageSettings(view: View) {
+        val syncMessageInput = view.findViewById<EditText>(R.id.syncMessageInput)
+        log("test")
+        syncMessageInput.setText(settingsManager.getSyncMessage())
+        syncMessageInput.doOnTextChanged { text, _, _, _ ->
+            settingsManager.setSyncMessage(text.toString())
+            log(text.toString())
         }
     }
 

@@ -290,7 +290,7 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
         return null
     }
 
-    fun uploadChanges(repoUrl: String, userStorageUri: Uri, username: String, token: String, onSync: () -> Unit): Boolean? {
+    fun uploadChanges(repoUrl: String, userStorageUri: Uri, syncMessage: String, username: String, token: String, onSync: () -> Unit): Boolean? {
         if (!Helper.isNetworkAvailable(context)) {
             return false
         }
@@ -328,7 +328,7 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
                 }
                 git.commit {
                     setCommitter(committerName, committerEmail ?: "")
-                    message = "Last Sync: ${currentDateTime.format(formatter)} (Mobile)"
+                    message = syncMessage.format(currentDateTime.format(formatter))
                 }
 
                 returnResult = true
