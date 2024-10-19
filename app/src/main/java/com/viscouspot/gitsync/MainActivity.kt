@@ -18,7 +18,9 @@ import android.os.Bundle
 import android.os.Environment
 import android.provider.Settings
 import android.text.Html
+import android.text.Spannable
 import android.text.method.LinkMovementMethod
+import android.text.style.ForegroundColorSpan
 import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
@@ -518,10 +520,19 @@ class MainActivity : AppCompatActivity() {
         val syncMessageInput = view.findViewById<EditText>(R.id.syncMessageInput)
         log("test")
         syncMessageInput.setText(settingsManager.getSyncMessage())
+        highlightStringInFormat(syncMessageInput)
         syncMessageInput.doOnTextChanged { text, _, _, _ ->
             settingsManager.setSyncMessage(text.toString())
             log(text.toString())
+            highlightStringInFormat(syncMessageInput)
         }
+    }
+
+    private fun highlightStringInFormat(syncMessageInput: EditText) {
+        val start = syncMessageInput.text.indexOf("%s")
+        if (start == -1) return
+
+        syncMessageInput.getText().setSpan(ForegroundColorSpan(getColor(R.color.additions)), start, start + 2, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
     }
 
     private fun getDeviceApps(): List<String> {
