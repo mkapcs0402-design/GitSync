@@ -55,7 +55,7 @@
         android:id="@+id/syncMessageInput"
         android:background="@drawable/input_bg_left"
         android:backgroundTint="@color/card_secondary_bg"
-        android:hint="@string/git_dir_path_hint"
+        android:hint="@string/sync_message"
         android:paddingHorizontal="@dimen/space_md"
         android:paddingVertical="@dimen/space_md"
         android:layout_width="match_parent"

@@ -518,12 +518,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupSyncMessageSettings(view: View) {
         val syncMessageInput = view.findViewById<EditText>(R.id.syncMessageInput)
-        log("test")
         syncMessageInput.setText(settingsManager.getSyncMessage())
         highlightStringInFormat(syncMessageInput)
         syncMessageInput.doOnTextChanged { text, _, _, _ ->
             settingsManager.setSyncMessage(text.toString())
-            log(text.toString())
             highlightStringInFormat(syncMessageInput)
         }
     }
