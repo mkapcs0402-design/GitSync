@@ -40,6 +40,7 @@ import org.eclipse.jgit.util.io.DisabledOutputStream
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
+import java.io.FileWriter
 import java.io.IOException
 import java.time.Duration
 import java.time.LocalDateTime
@@ -467,6 +468,26 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
             log(context, LogType.RecentCommits, e)
         }
         return listOf()
+    }
+
+    fun readGitignore(gitDirPath: String): String {
+        if (!File("$gitDirPath/.gitignore").exists()) return ""
+
+        val gitignoreFile = File(gitDirPath, ".gitignore")
+        return gitignoreFile.readText()
+    }
+
+    fun writeGitignore(gitDirPath: String, gitignoreString: String) {
+        if (!File("$gitDirPath/.gitignore").exists()) return
+
+        val gitignoreFile = File(gitDirPath, ".gitignore")
+        try {
+            FileWriter(gitignoreFile, false).use { writer ->
+                writer.write(gitignoreString)
+            }
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
     }
 
     private fun closeRepo(repo: FileRepository) {
