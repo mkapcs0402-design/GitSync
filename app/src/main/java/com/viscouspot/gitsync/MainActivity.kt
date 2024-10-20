@@ -28,6 +28,7 @@ import android.view.ViewGroup
 import android.view.accessibility.AccessibilityManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import android.widget.HorizontalScrollView
 import android.widget.Switch
 import android.widget.TextView
 import android.widget.Toast
@@ -506,6 +507,7 @@ class MainActivity : AppCompatActivity() {
         val dialogView: View = inflater.inflate(R.layout.settings_dialog, null)
 
         setupSyncMessageSettings(dialogView)
+        setupGitignoreSettings(dialogView)
 
         builder.setView(dialogView)
 
@@ -518,13 +520,25 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupSyncMessageSettings(view: View) {
         val syncMessageInput = view.findViewById<EditText>(R.id.syncMessageInput)
-        log("test")
         syncMessageInput.setText(settingsManager.getSyncMessage())
         highlightStringInFormat(syncMessageInput)
         syncMessageInput.doOnTextChanged { text, _, _, _ ->
             settingsManager.setSyncMessage(text.toString())
-            log(text.toString())
             highlightStringInFormat(syncMessageInput)
+        }
+    }
+
+    private fun setupGitignoreSettings(view: View) {
+        val gitignoreInputWrapper = view.findViewById<HorizontalScrollView>(R.id.gitignoreInputWrapper)
+        val gitignoreInput = view.findViewById<EditText>(R.id.gitignoreInput)
+        gitignoreInput.setText(gitManager.readGitignore(gitDirPath.text.toString()))
+        gitignoreInput.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                gitignoreInputWrapper.post { gitignoreInputWrapper.scrollTo(0, 0) }
+            }
+        }
+        gitignoreInput.doOnTextChanged { text, _, _, _ ->
+            gitManager.writeGitignore(gitDirPath.text.toString(), text.toString())
         }
     }
 
@@ -745,6 +759,7 @@ class MainActivity : AppCompatActivity() {
 
                 applicationObserverSwitch.isChecked = false
                 applicationObserverSwitch.isEnabled = false
+                settingsButton.isEnabled = false
 
                 if (gitDirPath.text.isEmpty()) {
                     gitRepoName.rightDrawable(null)
@@ -766,6 +781,7 @@ class MainActivity : AppCompatActivity() {
 
             gitRepoName.setText(repoName)
             gitRepoName.isEnabled = true
+            settingsButton.isEnabled = true
             gitRepoName.rightDrawable(R.drawable.circle_check)
             gitRepoName.compoundDrawableTintList = getColorStateList(R.color.auth_green)
             gitRepoName.compoundDrawablePadding =
