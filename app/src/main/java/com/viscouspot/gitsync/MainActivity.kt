@@ -281,8 +281,6 @@ class MainActivity : AppCompatActivity() {
         applicationObserverMax = ConstraintSet().apply { clone(applicationContext, R.layout.application_observer_max) }
         applicationObserverMin = ConstraintSet().apply { clone(applicationContext, R.layout.application_observer_min) }
 
-        applicationObserverMin.applyTo(applicationObserverPanel)
-
         if (settingsManager.isFirstTime()) {
             val authDialogBuilder = AlertDialog.Builder(this, R.style.AlertDialogTheme)
                 .setCancelable(false)
@@ -460,7 +458,7 @@ class MainActivity : AppCompatActivity() {
             dirSelectionLauncher.launch(null)
         }
 
-        (if (checkAccessibilityPermission()) applicationObserverMax else applicationObserverMin).applyTo(applicationObserverPanel)
+        (if (settingsManager.getApplicationObserverEnabled()) applicationObserverMax else applicationObserverMin).applyTo(applicationObserverPanel)
         updateApplicationObserverSwitch()
 
         applicationObserverSwitch.setOnCheckedChangeListener { _, isChecked ->
@@ -502,7 +500,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun updateApplicationObserverSwitch(upDown: Boolean = checkAccessibilityPermission()) {
+    private fun updateApplicationObserverSwitch(upDown: Boolean = settingsManager.getApplicationObserverEnabled()) {
         applicationObserverSwitch.setCompoundDrawablesWithIntrinsicBounds(null, null, ContextCompat.getDrawable(this, if (upDown) R.drawable.angle_up else R.drawable.angle_down)
             ?.apply {
                 setTint(getColor(if (checkAccessibilityPermission()) R.color.auth_green else R.color.textSecondary))
