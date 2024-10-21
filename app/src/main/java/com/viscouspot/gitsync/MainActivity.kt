@@ -460,17 +460,18 @@ class MainActivity : AppCompatActivity() {
             dirSelectionLauncher.launch(null)
         }
 
-        applicationObserverMin.applyTo(applicationObserverPanel)
+        (if (checkAccessibilityPermission()) applicationObserverMax else applicationObserverMin).applyTo(applicationObserverPanel)
+        updateApplicationObserverSwitch()
 
         applicationObserverSwitch.setOnCheckedChangeListener { _, isChecked ->
             (if (isChecked) applicationObserverMax else applicationObserverMin).applyTo(applicationObserverPanel)
             if (isChecked) {
-                applicationObserverSwitch.setCompoundDrawablesWithIntrinsicBounds(null, null, ContextCompat.getDrawable(this, R.drawable.angle_up), null)
+                updateApplicationObserverSwitch(true)
                 if (!checkAccessibilityPermission()) {
                     applicationObserverSwitch.isChecked = false
                     syncAppOpened.isChecked = false
                     syncAppClosed.isChecked = false
-                    applicationObserverSwitch.setCompoundDrawablesWithIntrinsicBounds(null, null, ContextCompat.getDrawable(this, R.drawable.angle_down), null)
+                    updateApplicationObserverSwitch(false)
                     applicationObserverMin.applyTo(applicationObserverPanel)
                     displayProminentDisclosure()
                 } else {
@@ -478,7 +479,7 @@ class MainActivity : AppCompatActivity() {
                     refreshSelectedApplications()
                 }
             } else {
-                applicationObserverSwitch.setCompoundDrawablesWithIntrinsicBounds(null, null, ContextCompat.getDrawable(this, R.drawable.angle_down), null)
+                updateApplicationObserverSwitch(false)
                 settingsManager.setApplicationObserverEnabled(false)
             }
         }
@@ -499,6 +500,13 @@ class MainActivity : AppCompatActivity() {
             val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.docs_link)))
             startActivity(browserIntent)
         }
+    }
+
+    private fun updateApplicationObserverSwitch(upDown: Boolean = checkAccessibilityPermission()) {
+        applicationObserverSwitch.setCompoundDrawablesWithIntrinsicBounds(null, null, ContextCompat.getDrawable(this, if (upDown) R.drawable.angle_up else R.drawable.angle_down)
+            ?.apply {
+                setTint(getColor(if (checkAccessibilityPermission()) R.color.auth_green else R.color.textSecondary))
+            }, null)
     }
 
     private fun openSettingsDialog() {
@@ -655,6 +663,7 @@ class MainActivity : AppCompatActivity() {
                 applicationObserverPanel
             )
 
+            updateApplicationObserverSwitch()
             refreshSelectedApplications()
 
             syncAppOpened.isChecked = settingsManager.getSyncOnAppOpened()
