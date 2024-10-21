@@ -22,7 +22,6 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import org.eclipse.jgit.api.RebaseCommand
-import org.eclipse.jgit.api.RebaseResult
 import org.eclipse.jgit.api.errors.GitAPIException
 import org.eclipse.jgit.api.errors.InvalidRemoteException
 import org.eclipse.jgit.api.errors.JGitInternalException
@@ -31,6 +30,7 @@ import org.eclipse.jgit.diff.DiffFormatter
 import org.eclipse.jgit.errors.NotSupportedException
 import org.eclipse.jgit.internal.storage.file.FileRepository
 import org.eclipse.jgit.lib.BatchingProgressMonitor
+import org.eclipse.jgit.lib.BranchTrackingStatus
 import org.eclipse.jgit.lib.StoredConfig
 import org.eclipse.jgit.revwalk.RevSort
 import org.eclipse.jgit.revwalk.RevWalk
@@ -344,11 +344,14 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
                     when (remoteUpdate.status) {
                         RemoteRefUpdate.Status.REJECTED_NONFASTFORWARD -> {
                             log(LogType.PushToRepo, "Attempting rebase on REJECTED_NONFASTFORWARD")
+                            logStatus(git)
+                            val trackingStatus = BranchTrackingStatus.of(git.repository, git.repository.branch)
+                                ?: throw Exception(context.getString(R.string.auto_rebase_failed_exception))
                             val rebaseResult = git.rebase {
-                                setUpstream((repo.fullBranch ?: repo.findRef("HEAD")?.target?.name)!!)
+                                setUpstream(trackingStatus.remoteTrackingBranch)
                             }
 
-                            if (rebaseResult.status != RebaseResult.Status.OK) {
+                            if (!rebaseResult.status.isSuccessful) {
                                 git.rebase {
                                     setOperation(RebaseCommand.Operation.ABORT)
                                 }
