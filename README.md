@@ -3,13 +3,13 @@
 <a href="https://buymeacoffee.com/viscouspotential" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
 
 Android mobile git client for syncing a repository between remote and a local directory
-
-![Screenshot](https://i.postimg.cc/qR59qYfm/Screenshot-20240828-183827-Git-Sync.png)
+![Screenshot](https://github.com/user-attachments/assets/17459f6b-1216-4740-8cef-99233ccd8fe8)
 ## Features
 
 - Authenticate with Github.com
 - Clone remote repository
 - Sync repository
+    - **NEW - Resolve merge conflicts**
     - Fetch changes
     - Pull changes
     - Commit new changes
@@ -18,6 +18,9 @@ Android mobile git client for syncing a repository between remote and a local di
     - From quick tile
     - When app opened or closed
     - From custom intent (advanced)
+- Settings
+    - Customise sync message
+    - Edit .gitignore file
 
 ## Variants
 
@@ -31,7 +34,9 @@ The main difference between these versions is the use of "All files access" perm
 
 We recommend using the "All files variant" for the best experience, as it will allow you to use a larger range of folders with the app.
 
-## [Documentation](Documentation.md)
+## Documentation
+
+### [Documentation](Documentation.md)
 
 ## Build Instructions
 
