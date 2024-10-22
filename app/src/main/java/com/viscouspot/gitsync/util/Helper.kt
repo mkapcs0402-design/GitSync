@@ -69,6 +69,7 @@ object Helper {
             .setContentTitle("<Merge Conflict> Tap to fix")
             .setContentText("There is an irreconcilable difference between the local and remote changes")
             .setContentIntent(buttonPendingIntent)
+            .setAutoCancel(true)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
 
         with(NotificationManagerCompat.from(context)) {

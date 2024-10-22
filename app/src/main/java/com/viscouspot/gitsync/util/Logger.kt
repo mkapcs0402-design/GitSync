@@ -87,6 +87,7 @@ object Logger {
             .setContentTitle(context.getString(R.string.report_bug))
             .setContentText(last5Logs.last().second.substringBefore("\n"))
             .setContentIntent(buttonPendingIntent)
+            .setAutoCancel(true)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
 
         with(NotificationManagerCompat.from(context)) {
