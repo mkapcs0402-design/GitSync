@@ -452,6 +452,9 @@ class MainActivity : AppCompatActivity() {
 
             gitDirPath.setText("")
             refreshGitRepo()
+            val recentCommitsSize = recentCommits.size
+            recentCommits.clear()
+            recentCommitsAdapter.notifyItemRangeRemoved(0, recentCommitsSize)
         }
 
         selectDirButton.setOnClickListener {
