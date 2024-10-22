@@ -83,7 +83,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var deselectDirButton: MaterialButton
     private lateinit var selectDirButton: MaterialButton
 
-
     private lateinit var viewDocs: MaterialButton
 
     private lateinit var applicationObserverPanel: ConstraintLayout
@@ -716,7 +715,7 @@ class MainActivity : AppCompatActivity() {
             } else {
                 selectApplication.text = getString(R.string.application_not_set)
                 selectApplication.setIconResource(R.drawable.circle_plus)
-                selectApplication.setIconTintResource(R.color.textSecondary)
+                selectApplication.setIconTintResource(R.color.textPrimary)
                 selectApplication.iconTintMode = PorterDuff.Mode.SRC_IN
 
                 applicationRecycler.visibility = View.GONE
