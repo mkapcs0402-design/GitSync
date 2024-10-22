@@ -87,8 +87,23 @@
     <string name="rejected_exception">Remote ref update was rejected.</string>
     <string name="rejection_with_reason_exception">Remote ref update was rejected because %s.</string>
     <string name="remote_changed_exception">Remote ref update was rejected, because old object id on remote repository wasn\'t the same as defined expected old object.</string>
+
     <string name="settings">Settings</string>
     <string name="sync_message_label">Sync Message</string>
     <string name="sync_message_description">use %s for the date and time</string>
+
+    <string name="merge_conflict_item_title">MERGE CONFLICT</string>
+    <string name="merge_conflict_item_message">There is a merge conflict! Tap to resolve</string>
+
+    <string name="conflict_start"><![CDATA[<<<<<<<]]></string>
+    <string name="conflict_separator">=======</string>
+    <string name="conflict_end"><![CDATA[>>>>>>>]]></string>
+
+    <string name="gitignore_path">.gitignore</string>
+    <string name="git_path">.git</string>
     <string name="git_config_path">.git/config</string>
+    <string name="git_lock_path">.git/index.lock</string>
+    <string name="git_merge_head_path">.git/MERGE_HEAD</string>
+    <string name="git_merge_msg_path">.git/MERGE_MSG</string>
+    <string name="merging_exception_message">MERGING</string>
 </resources>

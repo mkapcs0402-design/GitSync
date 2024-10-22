@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_marginVertical="@dimen/space_sm"
+    android:layout_height="wrap_content">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/space_sm"
+            android:text="Keep changes"
+            android:textAllCaps="true"
+            android:textColor="@color/textPrimary"
+            android:textSize="@dimen/space_sm"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="@id/local"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/local"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_xxs"
+            android:layout_marginEnd="@dimen/space_xxs"
+            android:background="@drawable/input_bg_sm"
+            android:backgroundTint="@color/additions"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:minHeight="1dp"
+            android:padding="0dp"
+            android:paddingHorizontal="@dimen/space_xs"
+            android:paddingVertical="@dimen/space_xxs"
+            android:text="local"
+            android:textColor="@color/card_secondary_bg"
+            android:textSize="@dimen/text_size_sm"
+            app:backgroundTint="@null"
+            app:layout_constraintEnd_toStartOf="@id/both"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/label" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/both"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginEnd="@dimen/space_xxs"
+            android:background="@drawable/input_bg_sm"
+            android:backgroundTint="@color/textSecondary"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:padding="0dp"
+            android:text="both"
+            android:textColor="@color/card_secondary_bg"
+            android:textSize="@dimen/text_size_sm"
+            app:backgroundTint="@null"
+            app:layout_constraintBottom_toBottomOf="@id/local"
+            app:layout_constraintEnd_toStartOf="@id/remote"
+            app:layout_constraintStart_toEndOf="@id/local"
+            app:layout_constraintTop_toTopOf="@id/local" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/remote"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@drawable/input_bg_sm"
+            android:backgroundTint="@color/deletions"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:padding="0dp"
+            android:text="remote"
+            android:textColor="@color/card_secondary_bg"
+            android:textSize="@dimen/text_size_sm"
+            app:backgroundTint="@null"
+            app:layout_constraintBottom_toBottomOf="@id/local"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/both"
+            app:layout_constraintTop_toTopOf="@id/local" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <TextView
+        app:layout_constraintTop_toBottomOf="@id/container"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="@dimen/space_xxxs"
+        app:layout_constraintEnd_toStartOf="@id/lineLocal"
+        android:id="@+id/lineNumberLocal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/text_size_md"
+        android:textStyle="bold"
+        android:textColor="@color/textSecondary"
+        android:text="1" />
+
+    <TextView
+        app:layout_constraintTop_toTopOf="@id/lineNumberLocal"
+        app:layout_constraintStart_toEndOf="@+id/lineNumberLocal"
+        android:id="@+id/lineLocal"
+        android:layout_marginStart="@dimen/space_sm"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/text_size_md"
+        android:textStyle="bold"
+        android:textColor="@color/additions"
+        android:text="test" />
+
+    <TextView
+        app:layout_constraintTop_toBottomOf="@id/lineLocal"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="@dimen/space_xxxs"
+        app:layout_constraintEnd_toStartOf="@id/lineRemote"
+        app:layout_constraintBottom_toBottomOf="@id/lineRemote"
+        android:id="@+id/lineNumberRemote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/text_size_md"
+        android:textStyle="bold"
+        android:textColor="@color/textSecondary"
+        android:text="2" />
+
+    <TextView
+        app:layout_constraintTop_toTopOf="@id/lineNumberRemote"
+        app:layout_constraintStart_toEndOf="@+id/lineNumberRemote"
+        android:id="@+id/lineRemote"
+        android:layout_marginStart="@dimen/space_sm"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/text_size_md"
+        android:textStyle="bold"
+        android:textColor="@color/deletions"
+        android:text="test 123" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

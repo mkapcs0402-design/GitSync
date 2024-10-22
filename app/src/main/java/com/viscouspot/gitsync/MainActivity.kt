@@ -1,11 +1,13 @@
 package com.viscouspot.gitsync
 
 import android.accessibilityservice.AccessibilityServiceInfo
+import android.app.Dialog
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.PorterDuff
 import android.graphics.Rect
@@ -16,6 +18,8 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
+import android.os.Handler
+import android.os.Looper
 import android.provider.Settings
 import android.text.Html
 import android.text.Spannable
@@ -27,6 +31,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.accessibility.AccessibilityManager
 import android.view.inputmethod.InputMethodManager
+import android.webkit.MimeTypeMap
 import android.widget.EditText
 import android.widget.HorizontalScrollView
 import android.widget.Switch
@@ -41,6 +46,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.core.widget.doOnTextChanged
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.RecyclerView
@@ -49,6 +55,7 @@ import com.viscouspot.gitsync.ui.RecyclerViewEmptySupport
 import com.viscouspot.gitsync.ui.adapter.ApplicationGridAdapter
 import com.viscouspot.gitsync.ui.adapter.ApplicationListAdapter
 import com.viscouspot.gitsync.ui.adapter.Commit
+import com.viscouspot.gitsync.ui.adapter.ConflictEditorAdapter
 import com.viscouspot.gitsync.ui.adapter.RecentCommitsAdapter
 import com.viscouspot.gitsync.ui.fragment.CloneRepoFragment
 import com.viscouspot.gitsync.util.GitManager
@@ -57,8 +64,16 @@ import com.viscouspot.gitsync.util.LogType
 import com.viscouspot.gitsync.util.Logger.log
 import com.viscouspot.gitsync.util.SettingsManager
 import com.viscouspot.gitsync.util.rightDrawable
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import java.io.BufferedReader
 import java.io.File
+import java.io.FileInputStream
+import java.io.InputStreamReader
 import java.util.Locale
+import kotlin.math.max
+import kotlin.math.min
 
 class MainActivity : AppCompatActivity() {
     private lateinit var applicationObserverMax: ConstraintSet
@@ -70,6 +85,8 @@ class MainActivity : AppCompatActivity() {
     private val recentCommits: MutableList<Commit> = mutableListOf()
     private lateinit var recentCommitsRecycler: RecyclerViewEmptySupport
     private lateinit var recentCommitsAdapter: RecentCommitsAdapter
+
+    private var mergeConflictDialog: Dialog? = null
 
     private lateinit var forceSyncButton: MaterialButton
     private lateinit var settingsButton: MaterialButton
@@ -103,14 +120,15 @@ class MainActivity : AppCompatActivity() {
 
     private var requestedPermission = false
 
+
     companion object {
         const val REFRESH = "REFRESH"
     }
 
     private val broadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            if (intent.action == REFRESH) {
-                refreshRecentCommits()
+            when (intent.action) {
+                REFRESH -> refreshRecentCommits()
             }
         }
     }
@@ -205,13 +223,17 @@ class MainActivity : AppCompatActivity() {
         }
 
         refreshAll()
+
+        if (gitManager.getConflicting(settingsManager.getGitDirUri()).isNotEmpty()) {
+            openMergeConflictDialog()
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main_activity)
 
-        Thread.setDefaultUncaughtExceptionHandler { paramThread, paramThrowable ->
+        Thread.setDefaultUncaughtExceptionHandler { _, paramThrowable ->
             log(this, LogType.Global, Exception(paramThrowable))
         }
 
@@ -252,7 +274,7 @@ class MainActivity : AppCompatActivity() {
 
         recentCommitsRecycler = findViewById(R.id.recentCommitsRecycler)
 
-        recentCommitsAdapter = RecentCommitsAdapter(this, recentCommits)
+        recentCommitsAdapter = RecentCommitsAdapter(this, recentCommits, ::openMergeConflictDialog)
 
         forceSyncButton = findViewById(R.id.forceSyncButton)
         settingsButton = findViewById(R.id.settingsButton)
@@ -502,6 +524,218 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun openMergeConflictDialog() {
+        mergeConflictDialog?.dismiss()
+
+        val conflicts = gitManager.getConflicting(settingsManager.getGitDirUri())
+        if (conflicts.isEmpty()) return
+
+        log(conflicts.toString())
+
+        val builder = AlertDialog.Builder(this, R.style.AlertDialogMinTheme)
+        val inflater = layoutInflater
+        val dialogView: View = inflater.inflate(R.layout.merge_conflict_dialog, null)
+
+        builder.setView(dialogView)
+
+        mergeConflictDialog = builder.create()
+
+        val conflictEditor = dialogView.findViewById<HorizontalScrollView>(R.id.conflictEditor)
+        val conflictEditorInput = dialogView.findViewById<RecyclerView>(R.id.conflictEditorInput)
+        val fileName = dialogView.findViewById<MaterialButton>(R.id.fileName)
+        val filePrev = dialogView.findViewById<MaterialButton>(R.id.filePrev)
+        val fileNext = dialogView.findViewById<MaterialButton>(R.id.fileNext)
+        val merge = dialogView.findViewById<MaterialButton>(R.id.merge)
+        val abortMerge = dialogView.findViewById<MaterialButton>(R.id.abortMerge)
+
+        val conflictSections = mutableListOf<String>()
+        var lineCount = 0
+
+        conflictEditorInput.adapter = ConflictEditorAdapter(this, conflictSections, conflictEditor, lineCount) {
+            if (conflictSections.isEmpty() || conflictSections.firstOrNull { it.contains(getString(R.string.conflict_start)) } == null) {
+                merge.isEnabled = true
+                merge.backgroundTintList = ColorStateList.valueOf(getColor(R.color.auth_green))
+                merge.setTextColor(getColor(R.color.card_secondary_bg))
+            } else {
+                merge.isEnabled = false
+                merge.backgroundTintList = ColorStateList.valueOf(getColor(R.color.card_secondary_bg))
+                merge.setTextColor(getColor(R.color.textSecondary))
+            }
+        }
+
+        val inset = InsetDrawable(ColorDrawable(Color.TRANSPARENT), resources.getDimensionPixelOffset(R.dimen.space_lg))
+        mergeConflictDialog?.window!!.setBackgroundDrawable(inset)
+        mergeConflictDialog?.show()
+
+        var conflictIndex = 0
+
+
+        fileName.setOnClickListener {
+            val file = File("${Helper.getPathFromUri(this, settingsManager.getGitDirUri()!!)}/${conflicts.elementAt(conflictIndex)}")
+
+            if (file.exists()) {
+                val intent = Intent(Intent.ACTION_VIEW)
+                val fileUri: Uri = FileProvider.getUriForFile(this, "${this.packageName}.fileprovider", file)
+                val mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(file.extension) ?: "text/plain"
+
+                intent.setDataAndType(fileUri, mimeType)
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+
+                this.startActivity(Intent.createChooser(intent, "Open file with"))
+            }
+
+        }
+
+        filePrev.setOnClickListener {
+            conflictIndex = max(conflictIndex - 1, 0)
+            refreshMergeConflictDialog(conflicts, conflictIndex, merge, fileName, filePrev, fileNext, conflictEditorInput, conflictSections)
+        }
+
+        fileNext.setOnClickListener {
+            conflictIndex = min(conflictIndex + 1, conflicts.size - 1)
+            refreshMergeConflictDialog(conflicts, conflictIndex, merge, fileName, filePrev, fileNext, conflictEditorInput, conflictSections)
+        }
+
+        merge.post {
+            refreshMergeConflictDialog(conflicts, conflictIndex, merge, fileName, filePrev, fileNext, conflictEditorInput, conflictSections)
+        }
+
+        merge.setOnClickListener{
+            File("${Helper.getPathFromUri(this, settingsManager.getGitDirUri()!!)}/${conflicts.elementAt(conflictIndex)}").bufferedWriter().use { writer ->
+                conflictSections.forEach { line ->
+                    writer.write(line)
+                    writer.newLine()
+                }
+            }
+
+            if (conflicts.size > 1) {
+                conflicts.removeAt(conflictIndex)
+                conflictIndex = min(conflictIndex, conflicts.size - 1)
+                refreshMergeConflictDialog(conflicts, conflictIndex, merge, fileName, filePrev, fileNext, conflictEditorInput, conflictSections)
+                return@setOnClickListener
+            }
+
+            CoroutineScope(Dispatchers.Default).launch {
+                val authCredentials = settingsManager.getGitAuthCredentials()
+                if (settingsManager.getGitDirUri() == null || authCredentials.first == "" || authCredentials.second == "") return@launch
+
+                val pushResult = gitManager.uploadChanges(
+                    settingsManager.getGitDirUri()!!,
+                    settingsManager.getSyncMessage(),
+                    authCredentials.first,
+                    authCredentials.second
+                ) {
+                    Handler(Looper.getMainLooper()).post {
+                        Toast.makeText(
+                            applicationContext,
+                            "Resolving merge...",
+                            Toast.LENGTH_SHORT
+                        )
+                            .show()
+                    }
+                }
+
+                when (pushResult) {
+                    null -> {
+                        log(LogType.Sync, "Merge Failed")
+                        return@launch
+                    }
+
+                    true -> log(LogType.Sync, "Merge Complete")
+                    false -> log(LogType.Sync, "Merge Not Required")
+                }
+
+                refreshRecentCommits()
+
+                val forceSyncIntent = Intent(this@MainActivity, GitSyncService::class.java)
+                forceSyncIntent.setAction(GitSyncService.FORCE_SYNC)
+                startService(forceSyncIntent)
+
+                mergeConflictDialog?.dismiss()
+            }
+        }
+
+        abortMerge.setOnClickListener {
+            gitManager.abortMerge(settingsManager.getGitDirUri())
+            mergeConflictDialog?.dismiss()
+            refreshRecentCommits()
+        }
+    }
+
+    private fun refreshMergeConflictDialog(conflicts: MutableList<String>, conflictIndex: Int, merge: MaterialButton, fileName: MaterialButton, filePrev: MaterialButton, fileNext: MaterialButton, conflictEditorInput: RecyclerView, conflictSections: MutableList<String>) {
+        filePrev.isEnabled = conflictIndex > 0
+        fileNext.isEnabled = conflictIndex < conflicts.size - 1
+
+        fileName.text = conflicts.elementAt(conflictIndex).substringAfterLast("/")
+
+        val file = File("${Helper.getPathFromUri(this, settingsManager.getGitDirUri()!!)}/${conflicts.elementAt(conflictIndex)}")
+
+        if (conflictSections.isNotEmpty()) {
+            val conflictSectionsSize = conflictSections.size
+            conflictSections.clear()
+            conflictEditorInput.adapter?.notifyItemRangeRemoved(0, conflictSectionsSize)
+        }
+
+        if (file.exists()) {
+            val conflictBuilder = StringBuilder()
+            var inConflict = false
+            var lineCount = 0
+
+            BufferedReader(InputStreamReader(FileInputStream(file))).use { reader ->
+                var line: String?
+                while (reader.readLine().also { line = it } != null) {
+                    lineCount += 1
+                    when {
+                        inConflict -> {
+                            conflictBuilder.append(line).append("\n")
+                        }
+                        line!!.startsWith(getString(R.string.conflict_start)) -> {
+                            if (conflictBuilder.isNotEmpty()) {
+                                conflictSections.add(conflictBuilder.toString().trim())
+                                conflictEditorInput.adapter?.notifyItemInserted(conflictSections.size)
+                                conflictBuilder.clear()
+                            }
+                            inConflict = true
+                            conflictBuilder.append(line).append("\n")
+                        }
+                        line!!.startsWith(getString(R.string.conflict_end)) -> {
+                            conflictBuilder.append(line)
+                            conflictSections.add(conflictBuilder.toString().trim())
+                            conflictEditorInput.adapter?.notifyItemInserted(conflictSections.size)
+                            conflictBuilder.clear()
+                            inConflict = false
+                        }
+                        else -> {
+                            conflictSections.add(line!!.trim())
+                            conflictEditorInput.adapter?.notifyItemInserted(conflictSections.size)
+                        }
+                    }
+                }
+
+                if (conflictBuilder.isNotEmpty()) {
+                    conflictSections.add(conflictBuilder.toString().trim())
+                    conflictEditorInput.adapter?.notifyItemInserted(conflictSections.size)
+                }
+            }
+
+
+            log(conflictSections.toString())
+        } else {
+            conflictSections.add("File not found.")
+            conflictEditorInput.adapter?.notifyItemInserted(conflictSections.size)
+        }
+
+        if (conflictSections.firstOrNull { it.contains("\n") || it.contains("File not found.") } == null) {
+            merge.isEnabled = true
+            merge.backgroundTintList = ColorStateList.valueOf(getColor(R.color.auth_green))
+            merge.setTextColor(getColor(R.color.card_secondary_bg))
+        } else {
+            merge.isEnabled = false
+            merge.backgroundTintList = ColorStateList.valueOf(getColor(R.color.card_secondary_bg))
+            merge.setTextColor(getColor(R.color.textSecondary))
+        }
+    }
+
     private fun updateApplicationObserverSwitch(upDown: Boolean = settingsManager.getApplicationObserverEnabled()) {
         applicationObserverSwitch.setCompoundDrawablesWithIntrinsicBounds(null, null, ContextCompat.getDrawable(this, if (upDown) R.drawable.angle_up else R.drawable.angle_down)
             ?.apply {
@@ -725,6 +959,12 @@ class MainActivity : AppCompatActivity() {
 
     private fun refreshRecentCommits() {
         runOnUiThread {
+            val mergeConflictIndex = recentCommits.indexOfFirst { it.reference == RecentCommitsAdapter.MERGE_CONFLICT}
+            if (mergeConflictIndex >= 0) {
+                recentCommits.removeAt(mergeConflictIndex)
+                recentCommitsAdapter.notifyItemRemoved(mergeConflictIndex)
+            }
+
             val recentCommitsReferences = recentCommits.map { commit -> commit.reference }
             val newRecentCommits = gitManager.getRecentCommits(gitDirPath.text.toString())
                 .filter { !recentCommitsReferences.contains(it.reference) }
@@ -732,6 +972,16 @@ class MainActivity : AppCompatActivity() {
                 recentCommits.addAll(0, newRecentCommits)
                 recentCommitsAdapter.notifyItemRangeInserted(0, newRecentCommits.size)
                 recentCommitsRecycler.smoothScrollToPosition(0);
+            }
+
+            if (gitManager.getConflicting(settingsManager.getGitDirUri()).isNotEmpty()) {
+                forceSyncButton.isEnabled = false
+
+                recentCommits.add(0, Commit("", "", 0L, RecentCommitsAdapter.MERGE_CONFLICT, 0, 0))
+                recentCommitsAdapter.notifyItemInserted(0)
+                recentCommitsRecycler.smoothScrollToPosition(0);
+            } else {
+                forceSyncButton.isEnabled = true
             }
         }
     }
