@@ -63,7 +63,7 @@ object Helper {
                 }
 
                 try {
-                    val configFile = File(directory, ".git/config")
+                    val configFile = File(directory, context.getString(R.string.git_config_path))
                     if (configFile.exists()) {
                         configFile.readText()
                     }

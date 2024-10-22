@@ -743,7 +743,7 @@ class MainActivity : AppCompatActivity() {
             val gitDirUri = settingsManager.getGitDirUri()
 
             gitDirUri?.let {
-                val gitConfigFile = File("${Helper.getPathFromUri(this, it)}/.git/config")
+                val gitConfigFile = File("${Helper.getPathFromUri(this, it)}${getString(R.string.git_config_path)}")
                 if (gitConfigFile.exists()) {
                     val fileContents = gitConfigFile.readText()
 
