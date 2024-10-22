@@ -10,6 +10,7 @@ import com.github.syari.kgit.KGit
 import com.viscouspot.gitsync.R
 import com.viscouspot.gitsync.Secrets
 import com.viscouspot.gitsync.ui.adapter.Commit
+import com.viscouspot.gitsync.util.Helper.sendCheckoutConflictNotification
 import com.viscouspot.gitsync.util.Logger.log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -22,15 +23,20 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import org.eclipse.jgit.api.RebaseCommand
+import org.eclipse.jgit.api.ResetCommand
+import org.eclipse.jgit.api.errors.CheckoutConflictException
 import org.eclipse.jgit.api.errors.GitAPIException
 import org.eclipse.jgit.api.errors.InvalidRemoteException
 import org.eclipse.jgit.api.errors.JGitInternalException
 import org.eclipse.jgit.api.errors.TransportException
+import org.eclipse.jgit.api.errors.WrongRepositoryStateException
 import org.eclipse.jgit.diff.DiffFormatter
 import org.eclipse.jgit.errors.NotSupportedException
 import org.eclipse.jgit.internal.storage.file.FileRepository
 import org.eclipse.jgit.lib.BatchingProgressMonitor
 import org.eclipse.jgit.lib.BranchTrackingStatus
+import org.eclipse.jgit.lib.Constants
+import org.eclipse.jgit.lib.ObjectId
 import org.eclipse.jgit.lib.StoredConfig
 import org.eclipse.jgit.revwalk.RevSort
 import org.eclipse.jgit.revwalk.RevWalk
@@ -258,7 +264,7 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
         try {
             var returnResult: Boolean? = false
             log(LogType.PullFromRepo, "Getting local directory")
-            val repo = FileRepository("${Helper.getPathFromUri(context, userStorageUri)}/.git")
+            val repo = FileRepository("${Helper.getPathFromUri(context, userStorageUri)}/${context.getString(R.string.git_path)}")
             val git = KGit(repo)
             val cp = UsernamePasswordCredentialsProvider(username, token)
 
@@ -267,12 +273,19 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
                 setCredentialsProvider(cp)
             }
 
-            if (!fetchResult.trackingRefUpdates.isEmpty()) {
+            val localHead: ObjectId = repo.resolve(Constants.HEAD)
+            val remoteHead: ObjectId = repo.resolve(Constants.FETCH_HEAD)
+
+            if (!fetchResult.trackingRefUpdates.isEmpty() || !localHead.equals(remoteHead)) {
                 log(LogType.PullFromRepo, "Pulling changes")
                 onSync.invoke()
                 val result = git.pull {
                     setCredentialsProvider(cp)
                     remote = "origin"
+                }
+                if (!result.mergeResult.mergeStatus.isSuccessful) {
+                    sendCheckoutConflictNotification(context)
+                    return null
                 }
                 returnResult = if (result.isSuccessful()) {
                     true
@@ -285,13 +298,22 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
             closeRepo(repo)
 
             return returnResult
-        } catch (e: Exception) {
+        } catch (e: CheckoutConflictException) {
+            log(LogType.PullFromRepo, e.stackTraceToString())
+            return false
+        } catch (e: WrongRepositoryStateException) {
+            if (e.message?.contains(context.getString(R.string.merging_exception_message)) == true) {
+                return false
+            }
+            log(context, LogType.PullFromRepo, e)
+            return null
+        } catch (e: Throwable) {
             log(context, LogType.PullFromRepo, e)
         }
         return null
     }
 
-    fun uploadChanges(repoUrl: String, userStorageUri: Uri, syncMessage: String, username: String, token: String, onSync: () -> Unit): Boolean? {
+    fun uploadChanges(userStorageUri: Uri, syncMessage: String, username: String, token: String, onSync: () -> Unit): Boolean? {
         if (!Helper.isNetworkAvailable(context)) {
             return false
         }
@@ -299,7 +321,7 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
             var returnResult = false
             log(LogType.PushToRepo, "Getting local directory")
 
-            val repo = FileRepository("${Helper.getPathFromUri(context, userStorageUri)}/.git")
+            val repo = FileRepository("${Helper.getPathFromUri(context, userStorageUri)}/${context.getString(R.string.git_path)}")
             val git = KGit(repo)
 
             logStatus(git)
@@ -338,7 +360,7 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
             log(LogType.PushToRepo, "Pushing changes")
             for (pushResult in git.push {
                 setCredentialsProvider(UsernamePasswordCredentialsProvider(username, token))
-                remote = repoUrl
+                remote = "origin"
             }) {
                 for (remoteUpdate in pushResult.remoteUpdates) {
                     when (remoteUpdate.status) {
@@ -351,11 +373,15 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
                                 setUpstream(trackingStatus.remoteTrackingBranch)
                             }
 
+                            logStatus(git)
+
                             if (!rebaseResult.status.isSuccessful) {
                                 git.rebase {
                                     setOperation(RebaseCommand.Operation.ABORT)
                                 }
-                                throw Exception(context.getString(R.string.auto_rebase_failed_exception))
+
+                                downloadChanges(userStorageUri, username, token, onSync)
+                                return false
                             }
                             break
                         }
@@ -413,16 +439,15 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
 
     fun getRecentCommits(gitDirPath: String): List<Commit> {
         try {
-            if (!File("$gitDirPath/.git").exists()) return listOf()
+            if (!File("$gitDirPath/${context.getString(R.string.git_path)}").exists()) return listOf()
 
             log(LogType.RecentCommits, ".git folder found")
             
-            val repo = FileRepository("$gitDirPath/.git")
+            val repo = FileRepository("$gitDirPath/${context.getString(R.string.git_path)}")
             val revWalk = RevWalk(repo)
 
-            val headRef = repo.fullBranch ?: repo.findRef("HEAD")?.target?.name
-            val head = repo.resolve(headRef)
-            revWalk.markStart(revWalk.parseCommit(head))
+            val localHead = repo.resolve(Constants.HEAD)
+            revWalk.markStart(revWalk.parseCommit(localHead))
             log(LogType.RecentCommits, "HEAD parsed")
             
             revWalk.sort(RevSort.COMMIT_TIME_DESC)
@@ -473,17 +498,57 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
         return listOf()
     }
 
-    fun readGitignore(gitDirPath: String): String {
-        if (!File("$gitDirPath/.gitignore").exists()) return ""
+    fun getConflicting(gitDirUri: Uri?): MutableList<String> {
+        if (gitDirUri == null) return mutableListOf()
 
-        val gitignoreFile = File(gitDirPath, ".gitignore")
+        val repo = FileRepository("${Helper.getPathFromUri(context, gitDirUri)}/${context.getString(R.string.git_path)}")
+        val git = KGit(repo)
+        val status = git.status()
+        return status.conflicting.toMutableList()
+    }
+
+    fun abortMerge(gitDirUri: Uri?) {
+        if (gitDirUri == null) return
+        val gitDirPath = Helper.getPathFromUri(context, gitDirUri)
+
+        try {
+            val repo = FileRepository("$gitDirPath/${context.getString(R.string.git_path)}")
+            val git = KGit(repo)
+
+            val mergeHeadFile = File("$gitDirPath/${context.getString(R.string.git_merge_head_path)}")
+            if (mergeHeadFile.exists()) {
+                git.reset {
+                    setMode(ResetCommand.ResetType.HARD)
+                }
+
+                val mergeMsgFile = File("$gitDirPath/${context.getString(R.string.git_merge_msg_path)}")
+                if (mergeMsgFile.exists()) {
+                    mergeMsgFile.delete()
+                }
+                if (mergeHeadFile.exists()) {
+                    mergeHeadFile.delete()
+                }
+            }
+
+            log(LogType.AbortMerge, "Merge successful")
+        } catch (e: IOException) {
+            log(context, LogType.AbortMerge, e)
+        } catch (e: GitAPIException) {
+            log(context, LogType.AbortMerge, e)
+        }
+    }
+
+    fun readGitignore(gitDirPath: String): String {
+        if (!File("$gitDirPath/${context.getString(R.string.gitignore_path)}").exists()) return ""
+
+        val gitignoreFile = File(gitDirPath, context.getString(R.string.gitignore_path))
         return gitignoreFile.readText()
     }
 
     fun writeGitignore(gitDirPath: String, gitignoreString: String) {
-        if (!File("$gitDirPath/.gitignore").exists()) return
+        if (!File("$gitDirPath/${context.getString(R.string.gitignore_path)}").exists()) return
 
-        val gitignoreFile = File(gitDirPath, ".gitignore")
+        val gitignoreFile = File(gitDirPath, context.getString(R.string.gitignore_path))
         try {
             FileWriter(gitignoreFile, false).use { writer ->
                 writer.write(gitignoreString)
@@ -495,7 +560,7 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
 
     private fun closeRepo(repo: FileRepository) {
         repo.close()
-        val lockFile = File(repo.directory, "index.lock")
+        val lockFile = File(repo.directory, context.getString(R.string.git_lock_path))
         if (lockFile.exists()) lockFile.delete()
     }
 }

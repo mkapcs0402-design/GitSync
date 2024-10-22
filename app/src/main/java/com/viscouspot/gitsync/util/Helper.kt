@@ -1,8 +1,13 @@
 package com.viscouspot.gitsync.util
 
+import android.Manifest
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.ContentUris
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.database.Cursor
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
@@ -17,12 +22,17 @@ import androidx.activity.result.ActivityResultCaller
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.DrawableRes
+import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
+import com.viscouspot.gitsync.MainActivity
 import com.viscouspot.gitsync.R
 import java.io.File
 import java.io.IOException
 import java.util.regex.Matcher
 import java.util.regex.Pattern
+import kotlin.random.Random
 
 object Helper {
     fun isNetworkAvailable(context: Context, toastMessage: String = "Network unavailable!\nRetry when reconnected"): Boolean {
@@ -38,6 +48,37 @@ object Helper {
                 Toast.makeText(context, toastMessage, Toast.LENGTH_SHORT).show()
                 false
             }
+        }
+    }
+
+    fun sendCheckoutConflictNotification(context: Context) {
+        val channelId = "git_sync_bug_channel"
+        val channel = NotificationChannel(
+            channelId,
+            "Git Sync Bug",
+            NotificationManager.IMPORTANCE_HIGH
+        )
+        val manager = context.getSystemService(NotificationManager::class.java)
+        manager?.createNotificationChannel(channel)
+
+        val intent = Intent(context, MainActivity::class.java)
+        val buttonPendingIntent = PendingIntent.getActivity(context, Random.nextInt(0, 100), intent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+
+        val builder = NotificationCompat.Builder(context, channelId)
+            .setSmallIcon(R.drawable.merge_conflict)
+            .setContentTitle("<Merge Conflict> Tap to fix")
+            .setContentText("There is an irreconcilable difference between the local and remote changes")
+            .setContentIntent(buttonPendingIntent)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+
+        with(NotificationManagerCompat.from(context)) {
+            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(context, "${context.getString(R.string.report_bug)} ${context.getString(
+                    R.string.enable_notifications)}", Toast.LENGTH_SHORT).show()
+                return
+            }
+
+            notify(2, builder.build())
         }
     }
 

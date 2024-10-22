@@ -28,6 +28,7 @@ enum class LogType(val type: String) {
     AccessibilityService("AccessibilityService"),
 
     Sync("Sync"),
+    AbortMerge("AbortMerge"),
     GithubAuthCredentials("GithubAuthCredentials"),
     GetRepos("GetRepos"),
     CloneRepo("CloneRepo"),
@@ -70,15 +71,13 @@ object Logger {
 
     private fun sendBugReportNotification(context: Context) {
         val channelId = "git_sync_bug_channel"
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                channelId,
-                "Git Sync Bug",
-                NotificationManager.IMPORTANCE_HIGH
-            )
-            val manager = context.getSystemService(NotificationManager::class.java)
-            manager?.createNotificationChannel(channel)
-        }
+        val channel = NotificationChannel(
+            channelId,
+            "Git Sync Bug",
+            NotificationManager.IMPORTANCE_HIGH
+        )
+        val manager = context.getSystemService(NotificationManager::class.java)
+        manager?.createNotificationChannel(channel)
 
         val emailIntent = createBugReportEmailIntent(context)
         val buttonPendingIntent = PendingIntent.getActivity(context, Random.nextInt(0, 100), emailIntent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)

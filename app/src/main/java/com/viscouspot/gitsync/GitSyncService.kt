@@ -130,38 +130,28 @@ class GitSyncService : Service() {
     }
 
     private fun sync(forced: Boolean = false) {
+        if (gitManager.getConflicting(settingsManager.getGitDirUri()).isNotEmpty()) {
+            Toast.makeText(
+                applicationContext,
+                "Ongoing merge conflict",
+                Toast.LENGTH_SHORT
+            ).show()
+            return
+        }
+
         log(LogType.Sync, "Start Sync")
         isSyncing = true
 
         val job = CoroutineScope(Dispatchers.Default).launch {
             val authCredentials = settingsManager.getGitAuthCredentials()
-
             val gitDirUri = settingsManager.getGitDirUri()
-            val gitDirPath = if (gitDirUri != null) Helper.getPathFromUri(applicationContext, gitDirUri) else null
-            val file = if (gitDirPath != null) File("${gitDirPath}/.git/config") else null
 
-            if (gitDirUri == null || gitDirPath == null || file?.exists() != true) {
+            if (gitDirUri == null) {
                 withContext(Dispatchers.Main) {
                     log(LogType.Sync, "Repository Not Found")
                     Toast.makeText(
                         applicationContext,
                         getString(R.string.repository_not_found),
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-                return@launch
-            }
-
-            val fileContents = file.readText()
-
-            val gitConfigUrlRegex = "url = (.*?)\\n".toRegex()
-            var gitConfigUrlResult = gitConfigUrlRegex.find(fileContents)
-            val repoUrl = gitConfigUrlResult?.groups?.get(1)?.value ?: run {
-                withContext(Dispatchers.Main) {
-                    log(LogType.Sync, "Invalid Repository URL")
-                    Toast.makeText(
-                        applicationContext,
-                        getString(R.string.invalid_repository_url),
                         Toast.LENGTH_SHORT
                     ).show()
                 }
@@ -185,18 +175,17 @@ class GitSyncService : Service() {
                     log(LogType.Sync, "Pull Repo Failed")
                     return@launch
                 }
-
                 true -> log(LogType.Sync, "Pull Complete")
                 false -> log(LogType.Sync, "Pull Not Required")
             }
 
-            while (File(gitDirPath, ".git/index.lock").exists()) {
+            while (File(Helper.getPathFromUri(applicationContext, gitDirUri),
+                    getString(R.string.git_lock_path)).exists()) {
                 delay(1000)
             }
 
             log(LogType.Sync, "Start Push Repo")
             val pushResult = gitManager.uploadChanges(
-                repoUrl,
                 gitDirUri,
                 settingsManager.getSyncMessage(),
                 authCredentials.first,
@@ -212,12 +201,11 @@ class GitSyncService : Service() {
                     log(LogType.Sync, "Push Repo Failed")
                     return@launch
                 }
-
                 true -> log(LogType.Sync, "Push Complete")
                 false -> log(LogType.Sync, "Push Not Required")
             }
 
-            while (File(gitDirPath, ".git/index.lock").exists()) {
+            while (File(Helper.getPathFromUri(applicationContext, gitDirUri), getString(R.string.git_lock_path)).exists()) {
                 delay(1000)
             }
 
@@ -230,16 +218,16 @@ class GitSyncService : Service() {
                 displaySyncMessage(getString(R.string.sync_complete))
             }
 
-            if (isForeground()) {
-                withContext(Dispatchers.Main) {
-                    val intent = Intent(MainActivity.REFRESH)
-                    LocalBroadcastManager.getInstance(this@GitSyncService).sendBroadcast(intent)
-                }
-            }
         }
 
         job.invokeOnCompletion {
             log(LogType.Sync, "Sync Complete")
+
+            if (isForeground()) {
+                val intent = Intent(MainActivity.REFRESH)
+                LocalBroadcastManager.getInstance(this@GitSyncService).sendBroadcast(intent)
+            }
+
             isSyncing = false
             if (isScheduled) {
                 CoroutineScope(Dispatchers.Default).launch {
