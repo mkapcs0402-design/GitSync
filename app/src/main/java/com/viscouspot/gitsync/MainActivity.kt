@@ -575,25 +575,13 @@ class MainActivity : AppCompatActivity() {
 
             if (file.exists()) {
                 val intent = Intent(Intent.ACTION_VIEW)
-
-                // Get URI for the file
                 val fileUri: Uri = FileProvider.getUriForFile(this, "${this.packageName}.fileprovider", file)
-
-                // Determine the MIME type
                 val mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(file.extension) ?: "text/plain"
 
-                // Set intent data and type
                 intent.setDataAndType(fileUri, mimeType)
                 intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
 
-                // Show chooser if there are multiple apps that can handle this intent
-                val chooserIntent = Intent.createChooser(intent, "Open file with")
-
-                // Start activity
-                this.startActivity(chooserIntent)
-            } else {
-                // Handle file not found case (optional)
-                println("File does not exist at path")
+                this.startActivity(Intent.createChooser(intent, "Open file with"))
             }
 
         }
