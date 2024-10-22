@@ -31,6 +31,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.accessibility.AccessibilityManager
 import android.view.inputmethod.InputMethodManager
+import android.webkit.MimeTypeMap
 import android.widget.EditText
 import android.widget.HorizontalScrollView
 import android.widget.Switch
@@ -45,6 +46,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.core.widget.doOnTextChanged
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.RecyclerView
@@ -540,7 +542,7 @@ class MainActivity : AppCompatActivity() {
 
         val conflictEditor = dialogView.findViewById<HorizontalScrollView>(R.id.conflictEditor)
         val conflictEditorInput = dialogView.findViewById<RecyclerView>(R.id.conflictEditorInput)
-        val fileName = dialogView.findViewById<TextView>(R.id.fileName)
+        val fileName = dialogView.findViewById<MaterialButton>(R.id.fileName)
         val filePrev = dialogView.findViewById<MaterialButton>(R.id.filePrev)
         val fileNext = dialogView.findViewById<MaterialButton>(R.id.fileNext)
         val merge = dialogView.findViewById<MaterialButton>(R.id.merge)
@@ -566,6 +568,35 @@ class MainActivity : AppCompatActivity() {
         mergeConflictDialog?.show()
 
         var conflictIndex = 0
+
+
+        fileName.setOnClickListener {
+            val file = File("${Helper.getPathFromUri(this, settingsManager.getGitDirUri()!!)}/${conflicts.elementAt(conflictIndex)}")
+
+            if (file.exists()) {
+                val intent = Intent(Intent.ACTION_VIEW)
+
+                // Get URI for the file
+                val fileUri: Uri = FileProvider.getUriForFile(this, "${this.packageName}.fileprovider", file)
+
+                // Determine the MIME type
+                val mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(file.extension) ?: "text/plain"
+
+                // Set intent data and type
+                intent.setDataAndType(fileUri, mimeType)
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+
+                // Show chooser if there are multiple apps that can handle this intent
+                val chooserIntent = Intent.createChooser(intent, "Open file with")
+
+                // Start activity
+                this.startActivity(chooserIntent)
+            } else {
+                // Handle file not found case (optional)
+                println("File does not exist at path")
+            }
+
+        }
 
         filePrev.setOnClickListener {
             conflictIndex = max(conflictIndex - 1, 0)
@@ -643,7 +674,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun refreshMergeConflictDialog(conflicts: MutableList<String>, conflictIndex: Int, merge: MaterialButton, fileName: TextView, filePrev: MaterialButton, fileNext: MaterialButton, conflictEditorInput: RecyclerView, conflictSections: MutableList<String>) {
+    private fun refreshMergeConflictDialog(conflicts: MutableList<String>, conflictIndex: Int, merge: MaterialButton, fileName: MaterialButton, filePrev: MaterialButton, fileNext: MaterialButton, conflictEditorInput: RecyclerView, conflictSections: MutableList<String>) {
         filePrev.isEnabled = conflictIndex > 0
         fileNext.isEnabled = conflictIndex < conflicts.size - 1
 
