@@ -164,7 +164,7 @@
         android:paddingHorizontal="@dimen/space_sm"
         android:paddingVertical="@dimen/space_sm"
         android:text="abort merge"
-        android:textColor="@color/textPrimary"
+        android:textColor="@color/primary_light"
         android:textSize="@dimen/text_size_sm"
         app:backgroundTint="@null"
         app:layout_constraintBottom_toBottomOf="@id/merge"

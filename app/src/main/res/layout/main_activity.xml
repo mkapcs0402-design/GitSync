@@ -211,7 +211,7 @@
                 android:insetTop="0dp"
                 android:insetBottom="0dp"
                 android:text="@string/auth"
-                android:textColor="@color/textPrimary"
+                android:textColor="@color/primary_light"
                 android:textSize="@dimen/text_size_md"
                 app:backgroundTint="@null"
                 app:icon="@drawable/circle_xmark"

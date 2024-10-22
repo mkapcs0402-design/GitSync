@@ -949,7 +949,7 @@ class MainActivity : AppCompatActivity() {
             } else {
                 selectApplication.text = getString(R.string.application_not_set)
                 selectApplication.setIconResource(R.drawable.circle_plus)
-                selectApplication.setIconTintResource(R.color.textPrimary)
+                selectApplication.setIconTintResource(R.color.primary_light)
                 selectApplication.iconTintMode = PorterDuff.Mode.SRC_IN
 
                 applicationRecycler.visibility = View.GONE

@@ -64,7 +64,7 @@
     </style>
 
     <style name="ApplicationSelectButton" parent="ThemeOverlay.Material3.Button">
-        <item name="android:textColor">@color/application_select_text_color</item>
-        <item name="iconTint">@color/application_select_icon_tint</item>
+        <item name="android:textColor">@color/primary_light</item>
+        <item name="iconTint">@color/primary_light</item>
     </style>
 </resources>
