@@ -1,37 +1,58 @@
-# <img alt="alt text" src="app/src/main/res/drawable-mdpi/gitsync_notif.png" /> GitSync
+<div align="center">
+  <img src="app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.webp" width="140" />
 
-<a href="https://buymeacoffee.com/viscouspotential" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
+  <h3>GitSync</h3>
+  <h4>Android git client for syncing a repository between remote and a local directory</h4>
+  
+  <p align="center">
+    <img src="https://img.shields.io/github/license/ViscousPotential/GitSync?v=1">
+    <img src="https://img.shields.io/github/last-commit/ViscousPotential/GitSync?v=1">
+    <img src="https://img.shields.io/github/stars/ViscousPotential/GitSync?v=1" alt="stars">
+    <img src="https://img.shields.io/github/downloads/ViscousPotential/GitSync/total?v=1" alt="downloads">
+  </p>
 
-Android mobile git client for syncing a repository between remote and a local directory
+  <a href="https://buymeacoffee.com/viscouspotential" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
 
-![Screenshot](https://i.postimg.cc/qR59qYfm/Screenshot-20240828-183827-Git-Sync.png)
-## Features
+
+  <p align="center">
+    <a href="https://github.com/ViscousPotential/GitSync/blob/master/Documentation.md">Documentation</a>
+  </p>
+
+</div>
+
+
+GitSync is an Android git client that aims to simplify the process of syncing a folder between a git remote and a local directory. Works in the background to keep your files synced with a simple one-time setup and numerous options for activating manual syncs
 
 - Authenticate with Github.com
-- Clone remote repository
+- Clone a remote repository
 - Sync repository
     - Fetch changes
     - Pull changes
     - Commit new changes
     - Push changes
+    - **Resolve merge conflicts**
 - Sync mechanisms
-    - From quick tile
-    - When app opened or closed
-    - From custom intent (advanced)
+    - From a quick tile
+    - When an app is opened or closed
+    - From a custom intent (advanced)
+- Settings
+    - Customise sync message
+    - Edit .gitignore file
+  
+Give us a ⭐ if you like our work. Much appreciated!
 
 ## Variants
 
 There are two variants of GitSync available for the most recent releases.
+
+We recommend using the "All files variant" for the best experience, as it will allow you to use a larger range of folders with the app.
+
 - Base variant 
   - `app-all-files-variant-release-signed.apk`
 - All files variant
   - `app-base-release-signed.apk`
 
 The main difference between these versions is the use of "All files access" permission.
-
-We recommend using the "All files variant" for the best experience, as it will allow you to use a larger range of folders with the app.
-
-## [Documentation](Documentation.md)
 
 ## Build Instructions
 
@@ -80,6 +101,8 @@ If you just want to try the app out, feel free to use a pre-built release from t
 
 For support, email bugs.viscouspotential@gmail.com.
 
+Consider sponsoring! Any help is hugely appreciated!
+
 
 ## Authors
 
@@ -89,4 +112,5 @@ For support, email bugs.viscouspotential@gmail.com.
 ## Acknowledgements
 
  - [KGit](https://github.com/sya-ri/KGit)
+
 
