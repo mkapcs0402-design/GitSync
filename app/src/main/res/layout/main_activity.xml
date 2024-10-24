@@ -101,7 +101,7 @@
                 android:insetBottom="0dp"
                 android:layout_marginEnd="@dimen/space_sm"
                 app:icon="@drawable/gear"
-                android:contentDescription="settings button"
+                android:contentDescription="settings"
                 app:iconGravity="textEnd"
                 app:iconPadding="0dp"
                 app:backgroundTint="@null"
