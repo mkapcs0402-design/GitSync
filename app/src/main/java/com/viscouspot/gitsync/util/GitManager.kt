@@ -38,6 +38,7 @@ import org.eclipse.jgit.lib.BranchTrackingStatus
 import org.eclipse.jgit.lib.Constants
 import org.eclipse.jgit.lib.ObjectId
 import org.eclipse.jgit.lib.StoredConfig
+import org.eclipse.jgit.merge.ResolveMerger
 import org.eclipse.jgit.revwalk.RevSort
 import org.eclipse.jgit.revwalk.RevWalk
 import org.eclipse.jgit.transport.RemoteRefUpdate
@@ -283,10 +284,15 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
                     setCredentialsProvider(cp)
                     remote = "origin"
                 }
+                if (result.mergeResult.failingPaths != null && result.mergeResult.failingPaths.containsValue(ResolveMerger.MergeFailureReason.DIRTY_WORKTREE)) {
+                    return false
+                }
+
                 if (!result.mergeResult.mergeStatus.isSuccessful) {
                     sendCheckoutConflictNotification(context)
                     return null
                 }
+
                 returnResult = if (result.isSuccessful()) {
                     true
                 } else {
