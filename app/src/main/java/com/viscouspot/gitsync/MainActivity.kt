@@ -137,7 +137,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun dirSelectionCallback(dirUri: Uri?) {
         if (dirUri == null) {
-            Toast.makeText(this, getString(R.string.inaccessible_directory_message), Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.inaccessible_directory_message), Toast.LENGTH_LONG).show()
             return
         }
 
@@ -211,6 +211,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+
+        if (settingsManager.isFirstTime()) return
 
         if (requestedPermission) {
             if (NotificationManagerCompat.from(this).areNotificationsEnabled()) {
@@ -301,131 +303,6 @@ class MainActivity : AppCompatActivity() {
 
         applicationObserverMax = ConstraintSet().apply { clone(applicationContext, R.layout.application_observer_max) }
         applicationObserverMin = ConstraintSet().apply { clone(applicationContext, R.layout.application_observer_min) }
-
-        if (settingsManager.isFirstTime()) {
-            val authDialogBuilder = AlertDialog.Builder(this, R.style.AlertDialogTheme)
-                .setCancelable(false)
-                .setTitle(getString(R.string.auth_dialog_title))
-                .setMessage(getString(R.string.auth_dialog_message))
-                .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
-                    dialog.dismiss()
-                    gitManager.launchGithubOAuthFlow()
-                }
-                .setNegativeButton(
-                    getString(R.string.skip)
-                ) { dialog, _ ->
-                    dialog.dismiss()
-                    settingsManager.setHadFirstTime()
-                }
-
-            val almostThereDialogLink = TextView(this).apply {
-                movementMethod = LinkMovementMethod.getInstance()
-                gravity = Gravity.END
-                setPadding(
-                    0,
-                    0,
-                    resources.getDimension(R.dimen.space_md).toInt(),
-                    0
-                )
-                text = Html.fromHtml(
-                    getString(R.string.documentation_html_link).format(getString(R.string.docs_link)),
-                    0
-                )
-            }
-
-            val almostThereDialogBuilder = AlertDialog.Builder(this, R.style.AlertDialogTheme)
-                .setCancelable(false)
-                .setTitle(getString(R.string.almost_there_dialog_title))
-                .setView(almostThereDialogLink)
-                .setMessage(getString(R.string.almost_there_dialog_message))
-                .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
-                    dialog.dismiss()
-                    authDialogBuilder.create().show()
-                }
-                .setNegativeButton(
-                    getString(android.R.string.cancel)
-                ) { dialog, _ ->
-                    dialog.dismiss()
-                }
-
-            val enableAllFilesDialogBuilder = AlertDialog.Builder(this, R.style.AlertDialogTheme)
-                .setCancelable(false)
-                .setTitle(getString(R.string.all_files_access_dialog_title))
-                .setMessage(getString(R.string.all_files_access_dialog_message))
-                .setPositiveButton(getString(android.R.string.ok)) { _, _ -> }
-                .setNegativeButton(
-                    getString(R.string.skip)
-                ) { dialog, _ ->
-                    dialog.dismiss()
-                    almostThereDialogBuilder.create().show()
-                }.create().apply {
-                    setOnShowListener {
-                        getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
-                            checkAndRequestStoragePermission {
-                                dismiss()
-                                almostThereDialogBuilder.create().show()
-                            }
-                            this.getButton(AlertDialog.BUTTON_POSITIVE).text = getString(R.string.done)
-                        }
-                    }
-                }
-
-            val enableNotificationsDialogBuilder = AlertDialog.Builder(this, R.style.AlertDialogTheme)
-                .setCancelable(false)
-                .setTitle(getString(R.string.notification_dialog_title))
-                .setMessage(getString(R.string.notification_dialog_message))
-                .setPositiveButton(getString(android.R.string.ok)) { _, _ -> }
-                .setNegativeButton(
-                    getString(R.string.skip)
-                ) { dialog, _ ->
-                    dialog.dismiss()
-                    if (BuildConfig.ALL_FILES) {
-                        enableAllFilesDialogBuilder.show()
-                    } else {
-                        almostThereDialogBuilder.create().show()
-                    }
-                }.create().apply {
-                    setOnShowListener {
-                        getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
-                            checkAndRequestNotificationPermission {
-                                dismiss()
-                                if (BuildConfig.ALL_FILES) {
-                                    enableAllFilesDialogBuilder.show()
-                                } else {
-                                    almostThereDialogBuilder.create().show()
-                                }
-                            }
-                            this.getButton(AlertDialog.BUTTON_POSITIVE).text =
-                                getString(R.string.done)
-                        }
-                    }
-                }
-
-            val welcomeDialogBuilder = AlertDialog.Builder(this, R.style.AlertDialogTheme)
-                .setCancelable(false)
-                .setTitle(getString(R.string.welcome))
-                .setMessage(getString(R.string.welcome_message))
-                .setPositiveButton(getString(R.string.welcome_positive)) { dialog, _ ->
-                    dialog.dismiss()
-                    enableNotificationsDialogBuilder.show()
-                }
-                .setNeutralButton(
-                    getString(R.string.welcome_neutral)
-                ) { dialog, _ ->
-                    dialog.dismiss()
-                }
-                .setNegativeButton(
-                    getString(R.string.welcome_negative)
-                ) { dialog, _ ->
-                    settingsManager.setHadFirstTime()
-                    dialog.dismiss()
-                }
-
-            welcomeDialogBuilder
-                .create()
-                .show()
-        }
-        refreshAll()
 
         recentCommitsRecycler.adapter = recentCommitsAdapter
         applicationRecycler.adapter = applicationListAdapter
@@ -522,6 +399,155 @@ class MainActivity : AppCompatActivity() {
             val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.docs_link)))
             startActivity(browserIntent)
         }
+
+        if (settingsManager.isFirstTime()) {
+            var hasSkipped = false
+
+            val authDialogBuilder = AlertDialog.Builder(this, R.style.AlertDialogTheme)
+                .setCancelable(false)
+                .setTitle(getString(R.string.auth_dialog_title))
+                .setMessage(getString(R.string.auth_dialog_message))
+                .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
+                    dialog.dismiss()
+                    gitManager.launchGithubOAuthFlow()
+                }
+                .setNegativeButton(
+                    getString(R.string.skip)
+                ) { dialog, _ ->
+                    dialog.dismiss()
+                    settingsManager.setHadFirstTime()
+                }
+
+            val almostThereDialogLink = TextView(this).apply {
+                movementMethod = LinkMovementMethod.getInstance()
+                gravity = Gravity.END
+                setPadding(
+                    0,
+                    0,
+                    resources.getDimension(R.dimen.space_md).toInt(),
+                    0
+                )
+                text = Html.fromHtml(
+                    getString(R.string.documentation_html_link).format(getString(R.string.docs_link)),
+                    0
+                )
+            }
+
+            val almostThereDialogBuilder = AlertDialog.Builder(this, R.style.AlertDialogTheme)
+                .setCancelable(false)
+                .setTitle(getString(R.string.almost_there_dialog_title))
+                .setView(almostThereDialogLink)
+                .setMessage(getString(R.string.almost_there_dialog_message))
+                .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
+                    dialog.dismiss()
+                    authDialogBuilder.create().show()
+                }
+                .setNegativeButton(
+                    getString(android.R.string.cancel)
+                ) { dialog, _ ->
+                    dialog.dismiss()
+                }
+
+            val enableAllFilesDialogBuilder = AlertDialog.Builder(this, R.style.AlertDialogTheme)
+                .setCancelable(false)
+                .setTitle(getString(R.string.all_files_access_dialog_title))
+                .setMessage(getString(R.string.all_files_access_dialog_message))
+                .setPositiveButton(getString(android.R.string.ok)) { _, _ -> }
+                .setNegativeButton(
+                    getString(R.string.skip)
+                ) { dialog, _ ->
+                    dialog.dismiss()
+                    if (hasSkipped) return@setNegativeButton
+                    almostThereDialogBuilder.create().show()
+                }.create().apply {
+                    setOnShowListener {
+                        getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+                            checkAndRequestStoragePermission {
+                                dismiss()
+                                if (hasSkipped) return@checkAndRequestStoragePermission
+                                almostThereDialogBuilder.create().show()
+                            }
+                            this.getButton(AlertDialog.BUTTON_POSITIVE).text = getString(R.string.done)
+                        }
+                    }
+                }
+
+            fun showAllFilesAccessOrNext() {
+                val hasPermissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) Environment.isExternalStorageManager() else
+                    ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+
+                if (BuildConfig.ALL_FILES && !hasPermissions) {
+                    enableAllFilesDialogBuilder.show()
+                } else {
+                    if (hasSkipped) return
+                    almostThereDialogBuilder.create().show()
+                }
+            }
+
+            val enableNotificationsDialogBuilder = AlertDialog.Builder(this, R.style.AlertDialogTheme)
+                .setCancelable(false)
+                .setTitle(getString(R.string.notification_dialog_title))
+                .setMessage(getString(R.string.notification_dialog_message))
+                .setPositiveButton(getString(android.R.string.ok)) { _, _ -> }
+                .setNegativeButton(
+                    getString(R.string.skip)
+                ) { dialog, _ ->
+                    dialog.dismiss()
+                    settingsManager.setSyncMessageEnabled(false)
+                    showAllFilesAccessOrNext()
+                }.create().apply {
+                    setOnShowListener {
+                        getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+                            checkAndRequestNotificationPermission {
+                                dismiss()
+                                showAllFilesAccessOrNext()
+                            }
+                            getButton(AlertDialog.BUTTON_POSITIVE).text =
+                                getString(R.string.done)
+                        }
+                    }
+                }
+
+            fun showNotificationsOrNext() {
+                if (!NotificationManagerCompat.from(this).areNotificationsEnabled()) {
+                    enableNotificationsDialogBuilder.show()
+                } else {
+                    showAllFilesAccessOrNext()
+                }
+            }
+
+            val welcomeDialogBuilder = AlertDialog.Builder(this, R.style.AlertDialogTheme)
+                .setCancelable(false)
+                .setTitle(getString(R.string.welcome))
+                .setMessage(getString(R.string.welcome_message))
+                .setPositiveButton(getString(R.string.welcome_positive)) { dialog, _ ->
+                    dialog.dismiss()
+                    showNotificationsOrNext()
+                }
+                .setNeutralButton(
+                    getString(R.string.welcome_neutral)
+                ) { dialog, _ ->
+                    hasSkipped = true
+                    dialog.dismiss()
+                    showNotificationsOrNext()
+                }
+                .setNegativeButton(
+                    getString(R.string.welcome_negative)
+                ) { dialog, _ ->
+                    hasSkipped = true
+                    settingsManager.setHadFirstTime()
+                    dialog.dismiss()
+                    showNotificationsOrNext()
+                }
+
+            welcomeDialogBuilder
+                .create()
+                .show()
+
+            return
+        }
+
+        refreshAll()
     }
 
     private fun openMergeConflictDialog() {
@@ -1101,7 +1127,7 @@ class MainActivity : AppCompatActivity() {
         openSettings.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_NO_HISTORY)
         startActivity(openSettings)
         requestedPermission = true
-        Toast.makeText(this, getString(R.string.enable_accessibility_service), Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, getString(R.string.enable_accessibility_service), Toast.LENGTH_LONG).show()
     }
 
     private fun checkAndRequestNotificationPermission(onGranted: (() -> Unit)? = null) {

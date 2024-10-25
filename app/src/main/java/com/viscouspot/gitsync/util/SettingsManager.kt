@@ -55,7 +55,7 @@ class SettingsManager internal constructor(private val context: Context) {
     }
 
     fun getSyncMessageEnabled(): Boolean {
-        return settingsSharedPref.getBoolean("syncMessageEnabled", false)
+        return settingsSharedPref.getBoolean("syncMessageEnabled", true)
     }
 
     fun setSyncMessageEnabled(enabled: Boolean) {

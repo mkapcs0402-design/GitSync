@@ -93,7 +93,7 @@ object Logger {
         with(NotificationManagerCompat.from(context)) {
             if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(context, "${context.getString(R.string.report_bug)} ${context.getString(
-                    R.string.enable_notifications)}", Toast.LENGTH_SHORT).show()
+                    R.string.enable_notifications)}", Toast.LENGTH_LONG).show()
                 return
             }
 

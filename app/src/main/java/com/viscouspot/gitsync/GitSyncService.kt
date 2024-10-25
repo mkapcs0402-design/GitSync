@@ -152,7 +152,7 @@ class GitSyncService : Service() {
                     Toast.makeText(
                         applicationContext,
                         getString(R.string.repository_not_found),
-                        Toast.LENGTH_SHORT
+                        Toast.LENGTH_LONG
                     ).show()
                 }
                 return@launch
