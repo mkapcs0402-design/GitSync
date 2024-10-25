@@ -448,6 +448,11 @@ class MainActivity : AppCompatActivity() {
                     dialog.dismiss()
                 }
 
+            fun showAlmostThereOrSkip() {
+                if (hasSkipped) return
+                almostThereDialogBuilder.create().show()
+            }
+
             val enableAllFilesDialogBuilder = AlertDialog.Builder(this, R.style.AlertDialogTheme)
                 .setCancelable(false)
                 .setTitle(getString(R.string.all_files_access_dialog_title))
@@ -457,15 +462,13 @@ class MainActivity : AppCompatActivity() {
                     getString(R.string.skip)
                 ) { dialog, _ ->
                     dialog.dismiss()
-                    if (hasSkipped) return@setNegativeButton
-                    almostThereDialogBuilder.create().show()
+                    showAlmostThereOrSkip()
                 }.create().apply {
                     setOnShowListener {
                         getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
                             checkAndRequestStoragePermission {
                                 dismiss()
-                                if (hasSkipped) return@checkAndRequestStoragePermission
-                                almostThereDialogBuilder.create().show()
+                                showAlmostThereOrSkip()
                             }
                             this.getButton(AlertDialog.BUTTON_POSITIVE).text = getString(R.string.done)
                         }
@@ -479,8 +482,7 @@ class MainActivity : AppCompatActivity() {
                 if (BuildConfig.ALL_FILES && !hasPermissions) {
                     enableAllFilesDialogBuilder.show()
                 } else {
-                    if (hasSkipped) return
-                    almostThereDialogBuilder.create().show()
+                    showAlmostThereOrSkip()
                 }
             }
 
