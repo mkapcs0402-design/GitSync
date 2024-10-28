@@ -57,9 +57,9 @@ object Logger {
         addToLast5Logs(type, message)
     }
 
-    fun log(message: String) {
-        Log.d("///Git Sync//${LogType.TEST.type}", message)
-        addToLast5Logs(LogType.TEST, message)
+    fun log(message: Any?) {
+        Log.d("///Git Sync//${LogType.TEST.type}", message?.toString() ?: "null")
+        addToLast5Logs(LogType.TEST, message?.toString() ?: "null")
     }
 
     private fun addToLast5Logs(type: LogType, message: String) {

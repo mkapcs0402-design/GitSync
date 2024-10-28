@@ -236,7 +236,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.main_activity)
 
         Thread.setDefaultUncaughtExceptionHandler { _, paramThrowable ->
-            log(this, LogType.Global, Exception(paramThrowable))
+            log(this, LogType.Global, paramThrowable)
         }
 
         settingsManager = SettingsManager(this)

@@ -29,7 +29,7 @@
 
     <string name="report_bug">&lt;GitSync Error&gt; Tap to send a bug report</string>
     <string name="enable_notifications">Enable notifications permission to see more.</string>
-    <string name="select_email_client">"Send email using: "</string>
+    <string name="select_email_client">Send email using: </string>
     <string name="dismiss">Dismiss</string>
 
     <string name="docs_link">https://github.com/ViscousPotential/GitSync/blob/master/Documentation.md</string>
