@@ -285,10 +285,12 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
                     remote = "origin"
                 }
                 if (result.mergeResult.failingPaths != null && result.mergeResult.failingPaths.containsValue(ResolveMerger.MergeFailureReason.DIRTY_WORKTREE)) {
+                    log(LogType.PullFromRepo, "Merge conflict")
                     return false
                 }
 
                 if (!result.mergeResult.mergeStatus.isSuccessful) {
+                    log(LogType.PullFromRepo, "Checkout conflict")
                     sendCheckoutConflictNotification(context)
                     return null
                 }
@@ -309,6 +311,7 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
             return false
         } catch (e: WrongRepositoryStateException) {
             if (e.message?.contains(context.getString(R.string.merging_exception_message)) == true) {
+                log(LogType.PullFromRepo, "Merge conflict")
                 return false
             }
             log(context, LogType.PullFromRepo, e)

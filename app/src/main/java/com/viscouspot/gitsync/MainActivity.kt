@@ -643,6 +643,12 @@ class MainActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
+            merge.text = "..."
+            merge.isEnabled = false
+            merge.backgroundTintList = ColorStateList.valueOf(getColor(R.color.card_secondary_bg))
+            merge.setTextColor(getColor(R.color.textSecondary))
+            abortMerge.visibility = View.GONE
+
             CoroutineScope(Dispatchers.Default).launch {
                 val authCredentials = settingsManager.getGitAuthCredentials()
                 if (settingsManager.getGitDirUri() == null || authCredentials.first == "" || authCredentials.second == "") return@launch
@@ -714,24 +720,19 @@ class MainActivity : AppCompatActivity() {
                 while (reader.readLine().also { line = it } != null) {
                     lineCount += 1
                     when {
-                        inConflict -> {
-                            conflictBuilder.append(line).append("\n")
-                        }
-                        line!!.startsWith(getString(R.string.conflict_start)) -> {
-                            if (conflictBuilder.isNotEmpty()) {
-                                conflictSections.add(conflictBuilder.toString().trim())
-                                conflictEditorInput.adapter?.notifyItemInserted(conflictSections.size)
-                                conflictBuilder.clear()
-                            }
-                            inConflict = true
-                            conflictBuilder.append(line).append("\n")
-                        }
                         line!!.startsWith(getString(R.string.conflict_end)) -> {
                             conflictBuilder.append(line)
                             conflictSections.add(conflictBuilder.toString().trim())
                             conflictEditorInput.adapter?.notifyItemInserted(conflictSections.size)
                             conflictBuilder.clear()
                             inConflict = false
+                        }
+                        inConflict -> {
+                            conflictBuilder.append(line).append("\n")
+                        }
+                        line!!.startsWith(getString(R.string.conflict_start)) -> {
+                            inConflict = true
+                            conflictBuilder.append(line).append("\n")
                         }
                         else -> {
                             conflictSections.add(line!!.trim())

@@ -70,7 +70,7 @@ class ConflictEditorAdapter (
 
                 val lines = dataSet[position].split("\n")
                 val startIndex = lines.indexOfFirst { it.contains(context.getString(R.string.conflict_start)) }
-                val midIndex = lines.indexOfLast { it.contains(context.getString(R.string.conflict_separator)) }
+                val midIndex = lines.indexOfFirst { it.contains(context.getString(R.string.conflict_separator)) }
                 val endIndex = lines.indexOfLast { it.contains(context.getString(R.string.conflict_end)) }
 
                 val localLines = lines.subList(startIndex+1, midIndex)
