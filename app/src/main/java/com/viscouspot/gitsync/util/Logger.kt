@@ -20,6 +20,7 @@ import kotlin.random.Random
 import androidx.core.app.NotificationCompat
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import com.viscouspot.gitsync.BuildConfig
 
 enum class LogType(val type: String) {
     TEST("TEST"),
@@ -109,15 +110,19 @@ object Logger {
         val deviceModel = Build.MODEL               // e.g., "Pixel 4"
         val manufacturer = Build.MANUFACTURER       // e.g., "Google"
 
+        val appVersionName = BuildConfig.VERSION_NAME  // e.g., "1.205"
+        val appVersionCode = BuildConfig.VERSION_CODE  // e.g., 1205
+
         val version = "Android Version: $androidVersion (SDK: $sdkVersion)"
         val model = "Device Model: $manufacturer $deviceModel"
+        val appVersion = "App Version: $appVersionName (Code: $appVersionCode)"
 
         val emailIntent = Intent(Intent.ACTION_SEND).apply {
             data = Uri.parse("mailto:$recipient")
             type = "message/rfc822"
             putExtra(Intent.EXTRA_EMAIL, arrayOf(recipient))
             putExtra(Intent.EXTRA_SUBJECT, "Bug Report: Git Sync - [${DateTimeFormatter.ISO_INSTANT.format(Instant.now())}]")
-            putExtra(Intent.EXTRA_TEXT, "App logs are attached! \n $last5LogsString \n $version \n $model  \n\n\n")
+            putExtra(Intent.EXTRA_TEXT, "App logs are attached! \n $last5LogsString \n $version \n $model \n $appVersion \n\n\n")
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
 
