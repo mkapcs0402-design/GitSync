@@ -93,6 +93,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="@dimen/text_size_md"
+        android:textAlignment="viewEnd"
         android:textStyle="bold"
         android:textColor="@color/textSecondary"
         android:text="1" />
@@ -117,6 +118,7 @@
         app:layout_constraintBottom_toBottomOf="@id/lineRemote"
         android:id="@+id/lineNumberRemote"
         android:layout_width="wrap_content"
+        android:textAlignment="viewEnd"
         android:layout_height="wrap_content"
         android:textSize="@dimen/text_size_md"
         android:textStyle="bold"

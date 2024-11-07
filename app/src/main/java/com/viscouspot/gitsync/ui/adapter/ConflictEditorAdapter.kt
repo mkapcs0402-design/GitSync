@@ -15,7 +15,6 @@ class ConflictEditorAdapter (
     private val context: Context,
     private val dataSet: MutableList<String>,
     private val conflictEditor: HorizontalScrollView,
-    private val lineCount: Int,
     private val onAction: () -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -121,7 +120,7 @@ class ConflictEditorAdapter (
     }
 
     private fun Int.toPaddedString(): String {
-        return this.toString().padStart(lineCount.toString().length, '0')
+        return this.toString().padStart(dataSet.joinToString("\n").split("\n").size.toString().length, '0')
     }
 
     override fun getItemCount() = dataSet.size

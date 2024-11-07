@@ -565,7 +565,6 @@ class MainActivity : AppCompatActivity() {
         val dialogView: View = inflater.inflate(R.layout.merge_conflict_dialog, null)
 
         builder.setView(dialogView)
-
         mergeConflictDialog = builder.create()
 
         val conflictEditor = dialogView.findViewById<HorizontalScrollView>(R.id.conflictEditor)
@@ -577,9 +576,8 @@ class MainActivity : AppCompatActivity() {
         val abortMerge = dialogView.findViewById<MaterialButton>(R.id.abortMerge)
 
         val conflictSections = mutableListOf<String>()
-        var lineCount = 0
 
-        conflictEditorInput.adapter = ConflictEditorAdapter(this, conflictSections, conflictEditor, lineCount) {
+        conflictEditorInput.adapter = ConflictEditorAdapter(this, conflictSections, conflictEditor) {
             if (conflictSections.isEmpty() || conflictSections.firstOrNull { it.contains(getString(R.string.conflict_start)) } == null) {
                 merge.isEnabled = true
                 merge.backgroundTintList = ColorStateList.valueOf(getColor(R.color.auth_green))
@@ -596,7 +594,6 @@ class MainActivity : AppCompatActivity() {
         mergeConflictDialog?.show()
 
         var conflictIndex = 0
-
 
         fileName.setOnClickListener {
             val file = File("${Helper.getPathFromUri(this, settingsManager.getGitDirUri()!!)}/${conflicts.elementAt(conflictIndex)}")
@@ -616,16 +613,16 @@ class MainActivity : AppCompatActivity() {
 
         filePrev.setOnClickListener {
             conflictIndex = max(conflictIndex - 1, 0)
-            refreshMergeConflictDialog(conflicts, conflictIndex, merge, fileName, filePrev, fileNext, conflictEditorInput, conflictSections)
+            refreshMergeConflictDialog(conflicts, conflictSections, conflictIndex, merge, fileName, filePrev, fileNext, conflictEditorInput)
         }
 
         fileNext.setOnClickListener {
             conflictIndex = min(conflictIndex + 1, conflicts.size - 1)
-            refreshMergeConflictDialog(conflicts, conflictIndex, merge, fileName, filePrev, fileNext, conflictEditorInput, conflictSections)
+            refreshMergeConflictDialog(conflicts, conflictSections, conflictIndex, merge, fileName, filePrev, fileNext, conflictEditorInput)
         }
 
         merge.post {
-            refreshMergeConflictDialog(conflicts, conflictIndex, merge, fileName, filePrev, fileNext, conflictEditorInput, conflictSections)
+            refreshMergeConflictDialog(conflicts, conflictSections, conflictIndex, merge, fileName, filePrev, fileNext, conflictEditorInput)
         }
 
         merge.setOnClickListener{
@@ -639,7 +636,7 @@ class MainActivity : AppCompatActivity() {
             if (conflicts.size > 1) {
                 conflicts.removeAt(conflictIndex)
                 conflictIndex = min(conflictIndex, conflicts.size - 1)
-                refreshMergeConflictDialog(conflicts, conflictIndex, merge, fileName, filePrev, fileNext, conflictEditorInput, conflictSections)
+                refreshMergeConflictDialog(conflicts, conflictSections, conflictIndex, merge, fileName, filePrev, fileNext, conflictEditorInput)
                 return@setOnClickListener
             }
 
@@ -696,7 +693,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun refreshMergeConflictDialog(conflicts: MutableList<String>, conflictIndex: Int, merge: MaterialButton, fileName: MaterialButton, filePrev: MaterialButton, fileNext: MaterialButton, conflictEditorInput: RecyclerView, conflictSections: MutableList<String>) {
+    private fun refreshMergeConflictDialog(conflicts: MutableList<String>, conflictSections: MutableList<String>, conflictIndex: Int, merge: MaterialButton, fileName: MaterialButton, filePrev: MaterialButton, fileNext: MaterialButton, conflictEditorInput: RecyclerView) {
         filePrev.isEnabled = conflictIndex > 0
         fileNext.isEnabled = conflictIndex < conflicts.size - 1
 
