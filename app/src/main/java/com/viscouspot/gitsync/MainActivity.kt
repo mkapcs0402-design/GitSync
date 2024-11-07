@@ -708,42 +708,10 @@ class MainActivity : AppCompatActivity() {
         }
 
         if (file.exists()) {
-            val conflictBuilder = StringBuilder()
-            var inConflict = false
-            var lineCount = 0
-
-            BufferedReader(InputStreamReader(FileInputStream(file))).use { reader ->
-                var line: String?
-                while (reader.readLine().also { line = it } != null) {
-                    lineCount += 1
-                    when {
-                        line!!.startsWith(getString(R.string.conflict_end)) -> {
-                            conflictBuilder.append(line)
-                            conflictSections.add(conflictBuilder.toString().trim())
-                            conflictEditorInput.adapter?.notifyItemInserted(conflictSections.size)
-                            conflictBuilder.clear()
-                            inConflict = false
-                        }
-                        inConflict -> {
-                            conflictBuilder.append(line).append("\n")
-                        }
-                        line!!.startsWith(getString(R.string.conflict_start)) -> {
-                            inConflict = true
-                            conflictBuilder.append(line).append("\n")
-                        }
-                        else -> {
-                            conflictSections.add(line!!.trim())
-                            conflictEditorInput.adapter?.notifyItemInserted(conflictSections.size)
-                        }
-                    }
-                }
-
-                if (conflictBuilder.isNotEmpty()) {
-                    conflictSections.add(conflictBuilder.toString().trim())
-                    conflictEditorInput.adapter?.notifyItemInserted(conflictSections.size)
-                }
+            Helper.extractConflictSections(this, file) {
+                conflictSections.add(it.trim())
+                conflictEditorInput.adapter?.notifyItemInserted(conflictSections.size)
             }
-
 
             log(conflictSections.toString())
         } else {

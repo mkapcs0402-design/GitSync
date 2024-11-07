@@ -28,13 +28,49 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import com.viscouspot.gitsync.MainActivity
 import com.viscouspot.gitsync.R
+import java.io.BufferedReader
 import java.io.File
+import java.io.FileInputStream
 import java.io.IOException
+import java.io.InputStreamReader
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 import kotlin.random.Random
 
 object Helper {
+    fun extractConflictSections(context: Context, file: File, add: (text: String) -> Unit) {
+        val conflictBuilder = StringBuilder()
+        var inConflict = false
+
+        BufferedReader(InputStreamReader(FileInputStream(file))).use { reader ->
+            var line: String?
+            while (reader.readLine().also { line = it } != null) {
+                when {
+                    line!!.startsWith(context.getString(R.string.conflict_end)) -> {
+                        conflictBuilder.append(line)
+                        add(conflictBuilder.toString().trim())
+                        conflictBuilder.clear()
+                        inConflict = false
+                    }
+                    inConflict -> {
+                        conflictBuilder.append(line).append("\n")
+                    }
+                    line!!.startsWith(context.getString(R.string.conflict_start)) -> {
+                        inConflict = true
+                        conflictBuilder.append(line).append("\n")
+                    }
+                    else -> {
+                        add(line.toString().trim())
+                    }
+                }
+            }
+
+            if (conflictBuilder.isNotEmpty()) {
+                add(conflictBuilder.toString().trim())
+            }
+        }
+    }
+
     fun isNetworkAvailable(context: Context, toastMessage: String = "Network unavailable!\nRetry when reconnected"): Boolean {
         val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val nw = connectivityManager.activeNetwork ?: return false
