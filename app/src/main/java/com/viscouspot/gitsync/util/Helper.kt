@@ -265,14 +265,9 @@ object Helper {
     }
 
     fun isValidGitRepo(url: String): Boolean {
-        val regex = ("((http|git|ssh|http(s)|file|\\/?)|"
-                + "(git@[\\w\\.]+))(:(\\/\\/)?)"
-                + "([\\w\\.@\\:/\\-~]+)(\\.git)(\\/)?")
+        val regex = """^(https?://(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,6}/[a-zA-Z0-9-_]+/[a-zA-Z0-9-_]+\.git)${'$'}""".toRegex()
 
-        val p: Pattern = Pattern.compile(regex)
-        val m: Matcher = p.matcher(url)
-
-        return m.matches()
+        return regex.matches(url)
     }
 }
 
