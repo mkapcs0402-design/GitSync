@@ -37,6 +37,7 @@ import org.eclipse.jgit.lib.BatchingProgressMonitor
 import org.eclipse.jgit.lib.BranchTrackingStatus
 import org.eclipse.jgit.lib.Constants
 import org.eclipse.jgit.lib.ObjectId
+import org.eclipse.jgit.lib.RepositoryState
 import org.eclipse.jgit.lib.StoredConfig
 import org.eclipse.jgit.merge.ResolveMerger
 import org.eclipse.jgit.revwalk.RevSort
@@ -378,6 +379,14 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
                             logStatus(git)
                             val trackingStatus = BranchTrackingStatus.of(git.repository, git.repository.branch)
                                 ?: throw Exception(context.getString(R.string.auto_rebase_failed_exception))
+
+                            if (git.repository.repositoryState == RepositoryState.MERGING || git.repository.repositoryState == RepositoryState.MERGING_RESOLVED) {
+                                log(LogType.PushToRepo, "Aborting previous merge to ensure clean state for rebase")
+                                git.rebase {
+                                    setOperation(RebaseCommand.Operation.ABORT)
+                                }
+                            }
+
                             val rebaseResult = git.rebase {
                                 setUpstream(trackingStatus.remoteTrackingBranch)
                             }
