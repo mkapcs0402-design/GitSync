@@ -185,7 +185,7 @@
         android:minHeight="1dp"
         android:paddingHorizontal="@dimen/space_sm"
         android:paddingVertical="@dimen/space_sm"
-        android:text="merge"
+        android:text="@string/merge"
         android:enabled="false"
         android:textColor="@color/textSecondary"
         android:textSize="@dimen/text_size_sm"

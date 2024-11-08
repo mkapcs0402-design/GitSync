@@ -94,6 +94,8 @@
 
     <string name="merge_conflict_item_title">MERGE CONFLICT</string>
     <string name="merge_conflict_item_message">There is a merge conflict! Tap to resolve</string>
+    <string name="merge">Merge</string>
+    <string name="merging">Merging...</string>
 
     <string name="conflict_start"><![CDATA[<<<<<<<]]></string>
     <string name="conflict_separator">=======</string>

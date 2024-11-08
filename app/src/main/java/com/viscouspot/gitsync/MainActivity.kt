@@ -640,7 +640,7 @@ class MainActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            merge.text = "..."
+            merge.text = getString(R.string.merging)
             merge.isEnabled = false
             merge.backgroundTintList = ColorStateList.valueOf(getColor(R.color.card_secondary_bg))
             merge.setTextColor(getColor(R.color.textSecondary))
