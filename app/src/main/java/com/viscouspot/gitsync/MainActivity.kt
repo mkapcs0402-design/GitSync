@@ -123,12 +123,17 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         const val REFRESH = "REFRESH"
+        const val MERGE_COMPLETE = "MERGE_COMPLETE"
     }
 
     private val broadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             when (intent.action) {
                 REFRESH -> refreshRecentCommits()
+                MERGE_COMPLETE -> {
+                    mergeConflictDialog?.dismiss()
+                    refreshRecentCommits()
+                }
             }
         }
     }
@@ -225,10 +230,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         refreshAll()
-
-        if (gitManager.getConflicting(settingsManager.getGitDirUri()).isNotEmpty()) {
-            openMergeConflictDialog()
-        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -646,44 +647,9 @@ class MainActivity : AppCompatActivity() {
             merge.setTextColor(getColor(R.color.textSecondary))
             abortMerge.visibility = View.GONE
 
-            CoroutineScope(Dispatchers.Default).launch {
-                val authCredentials = settingsManager.getGitAuthCredentials()
-                if (settingsManager.getGitDirUri() == null || authCredentials.first == "" || authCredentials.second == "") return@launch
-
-                val pushResult = gitManager.uploadChanges(
-                    settingsManager.getGitDirUri()!!,
-                    settingsManager.getSyncMessage(),
-                    authCredentials.first,
-                    authCredentials.second
-                ) {
-                    Handler(Looper.getMainLooper()).post {
-                        Toast.makeText(
-                            applicationContext,
-                            "Resolving merge...",
-                            Toast.LENGTH_SHORT
-                        )
-                            .show()
-                    }
-                }
-
-                when (pushResult) {
-                    null -> {
-                        log(LogType.Sync, "Merge Failed")
-                        return@launch
-                    }
-
-                    true -> log(LogType.Sync, "Merge Complete")
-                    false -> log(LogType.Sync, "Merge Not Required")
-                }
-
-                refreshRecentCommits()
-
-                val forceSyncIntent = Intent(this@MainActivity, GitSyncService::class.java)
-                forceSyncIntent.setAction(GitSyncService.FORCE_SYNC)
-                startService(forceSyncIntent)
-
-                mergeConflictDialog?.dismiss()
-            }
+            val forceSyncIntent = Intent(this@MainActivity, GitSyncService::class.java)
+            forceSyncIntent.setAction(GitSyncService.MERGE)
+            startService(forceSyncIntent)
         }
 
         abortMerge.setOnClickListener {

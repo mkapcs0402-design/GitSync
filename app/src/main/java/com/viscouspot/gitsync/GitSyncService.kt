@@ -44,6 +44,7 @@ class GitSyncService : Service() {
     companion object {
         const val NOTIFICATION_CHANNEL_ID = "git_sync_service_channel"
         const val NOTIFICATION_CHANNEL_NAME = "Git Sync Service"
+        const val MERGE = "MERGE"
         const val FORCE_SYNC = "FORCE_SYNC"
         const val APPLICATION_SYNC = "APPLICATION_SYNC"
         const val INTENT_SYNC = "INTENT_SYNC"
@@ -55,6 +56,10 @@ class GitSyncService : Service() {
         }
 
         when (intent.action) {
+            MERGE -> {
+                log(LogType.ToServiceCommand, "Merge")
+                merge()
+            }
             FORCE_SYNC -> {
                 log(LogType.ToServiceCommand, "Force Sync")
                 debouncedSync(forced = true)
@@ -236,6 +241,46 @@ class GitSyncService : Service() {
                     isScheduled = false
                     sync()
                 }
+            }
+        }
+    }
+
+    private fun merge() {
+        CoroutineScope(Dispatchers.Default).launch {
+            val authCredentials = settingsManager.getGitAuthCredentials()
+            if (settingsManager.getGitDirUri() == null || authCredentials.first == "" || authCredentials.second == "") return@launch
+
+            val pushResult = gitManager.uploadChanges(
+                settingsManager.getGitDirUri()!!,
+                settingsManager.getSyncMessage(),
+                authCredentials.first,
+                authCredentials.second
+            ) {
+                Handler(Looper.getMainLooper()).post {
+                    Toast.makeText(
+                        applicationContext,
+                        getString(R.string.resolving_merge),
+                        Toast.LENGTH_SHORT
+                    )
+                        .show()
+                }
+            }
+
+            when (pushResult) {
+                null -> {
+                    log(LogType.Sync, "Merge Failed")
+                    return@launch
+                }
+
+                true -> log(LogType.Sync, "Merge Complete")
+                false -> log(LogType.Sync, "Merge Not Required")
+            }
+
+            debouncedSync(forced = true)
+
+            if (isForeground()) {
+                val intent = Intent(MainActivity.MERGE_COMPLETE)
+                LocalBroadcastManager.getInstance(this@GitSyncService).sendBroadcast(intent)
             }
         }
     }
