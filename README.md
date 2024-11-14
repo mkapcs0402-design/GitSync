@@ -21,7 +21,7 @@
 </div>
 
 
-GitSync is an Android git client that aims to simplify the process of syncing a folder between a git remote and a local directory. Works in the background to keep your files synced with a simple one-time setup and numerous options for activating manual syncs
+GitSync is an Android git client that aims to simplify the process of syncing a folder between a git remote and a local directory. It works in the background to keep your files synced with a simple one-time setup and numerous options for activating manual syncs
 
 - Authenticate with Github.com
 - Clone a remote repository
@@ -83,7 +83,7 @@ If you just want to try the app out, feel free to use a pre-built release from t
   - Homepage URL: `https://github.com/ViscousPotential/GitSync`
   - Authorization callback URL: `gitsync://auth`
   - Enable Device Flow: `leave unchecked` 
-- Fill `Secrets.kt` with the new OAuth app ID and SECRET
+- Fill `Secrets.kt` with the new OAuth App ID and SECRET
 
 ### 3. Build & Run
 - There are two flavors of GitSync
@@ -106,7 +106,7 @@ Consider sponsoring! Any help is hugely appreciated!
 
 ## Authors
 
-- [@ViscousPotential](https://github.com/ViscousPotential)
+- [@ViscousPot](https://github.com/ViscousPot)
 
 
 ## Acknowledgements
