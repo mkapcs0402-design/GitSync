@@ -83,7 +83,7 @@ If you just want to try the app out, feel free to use a pre-built release from t
   - Homepage URL: `https://github.com/ViscousPotential/GitSync`
   - Authorization callback URL: `gitsync://auth`
   - Enable Device Flow: `leave unchecked` 
-- Fill `Secrets.kt` with the new OAuth app ID and SECRET
+- Fill `Secrets.kt` with the new OAuth App ID and SECRET
 
 ### 3. Build & Run
 - There are two flavors of GitSync
