@@ -349,9 +349,11 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
                 log(LogType.PushToRepo, "Adding Files to Stage")
                 git.add {
                     addFilepattern(".")
+                    isRenormalize = false
                 }
                 git.add {
                     addFilepattern(".")
+                    isRenormalize = false
                     isUpdate = true
                 }
 
