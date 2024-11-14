@@ -21,7 +21,7 @@
 </div>
 
 
-GitSync is an Android git client that aims to simplify the process of syncing a folder between a git remote and a local directory. Works in the background to keep your files synced with a simple one-time setup and numerous options for activating manual syncs
+GitSync is an Android git client that aims to simplify the process of syncing a folder between a git remote and a local directory. It works in the background to keep your files synced with a simple one-time setup and numerous options for activating manual syncs
 
 - Authenticate with Github.com
 - Clone a remote repository
