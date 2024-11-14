@@ -110,16 +110,21 @@ class GitSyncService : Service() {
         startForeground(1, notification)
     }
 
+    private fun scheduleNetworkSync() {
+        log(LogType.Sync, "Scheduling sync for network regained")
+        val constraints: Constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+        val workRequest = OneTimeWorkRequest.Builder(NetworkWorker::class.java)
+            .setConstraints(constraints).build()
+
+        WorkManager.getInstance(this).enqueueUniqueWork("networkScheduledSync", ExistingWorkPolicy.KEEP, workRequest)
+        return
+    }
+
     private fun debouncedSync(forced: Boolean = false) {
         if (!Helper.isNetworkAvailable(this, getString(R.string.network_unavailable))) {
-            val constraints: Constraints = Constraints.Builder()
-                .setRequiredNetworkType(NetworkType.CONNECTED)
-                .build()
-            val workRequest = OneTimeWorkRequest.Builder(NetworkWorker::class.java)
-                .setConstraints(constraints).build()
-
-            WorkManager.getInstance(this).enqueueUniqueWork("networkScheduledSync", ExistingWorkPolicy.KEEP, workRequest)
-            return
+            scheduleNetworkSync()
         }
         if (isScheduled) {
             return
@@ -169,7 +174,8 @@ class GitSyncService : Service() {
             val pullResult = gitManager.downloadChanges(
                 gitDirUri,
                 authCredentials.first,
-                authCredentials.second
+                authCredentials.second,
+                ::scheduleNetworkSync,
             ) {
                 synced = true
                 displaySyncMessage(getString(R.string.sync_start_pull))
@@ -194,7 +200,8 @@ class GitSyncService : Service() {
                 gitDirUri,
                 settingsManager.getSyncMessage(),
                 authCredentials.first,
-                authCredentials.second
+                authCredentials.second,
+                ::scheduleNetworkSync,
             ) {
                 if (!synced) {
                     displaySyncMessage(getString(R.string.sync_start_push))
@@ -254,7 +261,8 @@ class GitSyncService : Service() {
                 settingsManager.getGitDirUri()!!,
                 settingsManager.getSyncMessage(),
                 authCredentials.first,
-                authCredentials.second
+                authCredentials.second,
+                ::scheduleNetworkSync,
             ) {
                 Handler(Looper.getMainLooper()).post {
                     Toast.makeText(

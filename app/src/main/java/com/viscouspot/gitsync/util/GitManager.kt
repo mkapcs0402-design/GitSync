@@ -32,6 +32,7 @@ import org.eclipse.jgit.api.errors.TransportException
 import org.eclipse.jgit.api.errors.WrongRepositoryStateException
 import org.eclipse.jgit.diff.DiffFormatter
 import org.eclipse.jgit.errors.NotSupportedException
+import org.eclipse.jgit.internal.JGitText
 import org.eclipse.jgit.internal.storage.file.FileRepository
 import org.eclipse.jgit.lib.BatchingProgressMonitor
 import org.eclipse.jgit.lib.BranchTrackingStatus
@@ -259,9 +260,9 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
         }
     }
 
-    fun downloadChanges(userStorageUri: Uri, username: String, token: String, onSync: () -> Unit): Boolean? {
-        if (!Helper.isNetworkAvailable(context)) {
-            return false
+    fun downloadChanges(userStorageUri: Uri, username: String, token: String, scheduleNetworkSync: () -> Unit, onSync: () -> Unit): Boolean? {
+        if (conditionallyScheduleNetworkSync(scheduleNetworkSync)) {
+            return null
         }
         try {
             var returnResult: Boolean? = false
@@ -273,6 +274,10 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
             log(LogType.PullFromRepo, "Fetching changes")
             val fetchResult = git.fetch {
                 setCredentialsProvider(cp)
+            }
+
+            if (conditionallyScheduleNetworkSync(scheduleNetworkSync)) {
+                return null
             }
 
             val localHead: ObjectId = repo.resolve(Constants.HEAD)
@@ -317,15 +322,17 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
             }
             log(context, LogType.PullFromRepo, e)
             return null
+        } catch (e: TransportException) {
+            handleTransportException(e, scheduleNetworkSync)
         } catch (e: Throwable) {
             log(context, LogType.PullFromRepo, e)
         }
         return null
     }
 
-    fun uploadChanges(userStorageUri: Uri, syncMessage: String, username: String, token: String, onSync: () -> Unit): Boolean? {
-        if (!Helper.isNetworkAvailable(context)) {
-            return false
+    fun uploadChanges(userStorageUri: Uri, syncMessage: String, username: String, token: String, scheduleNetworkSync: () -> Unit, onSync: () -> Unit): Boolean? {
+        if (conditionallyScheduleNetworkSync(scheduleNetworkSync)) {
+            return null
         }
         try {
             var returnResult = false
@@ -367,6 +374,10 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
                 returnResult = true
             }
 
+            if (conditionallyScheduleNetworkSync(scheduleNetworkSync)) {
+                return null
+            }
+
             log(LogType.PushToRepo, "Pushing changes")
             for (pushResult in git.push {
                 setCredentialsProvider(UsernamePasswordCredentialsProvider(username, token))
@@ -398,7 +409,7 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
                                     setOperation(RebaseCommand.Operation.ABORT)
                                 }
 
-                                downloadChanges(userStorageUri, username, token, onSync)
+                                downloadChanges(userStorageUri, username, token, scheduleNetworkSync, onSync)
                                 return false
                             }
                             break
@@ -433,10 +444,35 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
             closeRepo(repo)
 
             return returnResult
+        } catch (e: TransportException) {
+            handleTransportException(e, scheduleNetworkSync)
         } catch (e: Throwable) {
             log(context, LogType.PushToRepo, e)
         }
         return null
+    }
+
+    private fun conditionallyScheduleNetworkSync(scheduleNetworkSync: () -> Unit): Boolean {
+        if (!Helper.isNetworkAvailable(context)) {
+            scheduleNetworkSync()
+            return true
+        }
+        return false
+    }
+
+    private fun handleTransportException(e: TransportException, scheduleNetworkSync: () -> Unit) {
+        log("testyes")
+        log(e)
+        log(e.cause)
+        log(e.message)
+        if (listOf(
+            JGitText.get().connectionFailed,
+            JGitText.get().connectionTimeOut,
+            JGitText.get().transactionAborted,
+            JGitText.get().cannotOpenService
+        ).any{ e.message.toString().contains(it) } ) {
+            scheduleNetworkSync.invoke()
+        }
     }
 
     private fun logStatus(git: KGit) {
@@ -460,14 +496,14 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
             if (!File("$gitDirPath/${context.getString(R.string.git_path)}").exists()) return listOf()
 
             log(LogType.RecentCommits, ".git folder found")
-            
+
             val repo = FileRepository("$gitDirPath/${context.getString(R.string.git_path)}")
             val revWalk = RevWalk(repo)
 
             val localHead = repo.resolve(Constants.HEAD)
             revWalk.markStart(revWalk.parseCommit(localHead))
             log(LogType.RecentCommits, "HEAD parsed")
-            
+
             revWalk.sort(RevSort.COMMIT_TIME_DESC)
 
             val commits = mutableListOf<Commit>()
