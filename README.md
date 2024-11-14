@@ -106,7 +106,7 @@ Consider sponsoring! Any help is hugely appreciated!
 
 ## Authors
 
-- [@ViscousPotential](https://github.com/ViscousPotential)
+- [@ViscousPotential](https://github.com/ViscousPot)
 
 
 ## Acknowledgements
