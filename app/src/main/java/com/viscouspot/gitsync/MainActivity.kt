@@ -62,6 +62,7 @@ import com.viscouspot.gitsync.util.GitManager
 import com.viscouspot.gitsync.util.Helper
 import com.viscouspot.gitsync.util.LogType
 import com.viscouspot.gitsync.util.Logger.log
+import com.viscouspot.gitsync.util.OnboardingController
 import com.viscouspot.gitsync.util.SettingsManager
 import com.viscouspot.gitsync.util.rightDrawable
 import kotlinx.coroutines.CoroutineScope
@@ -401,152 +402,9 @@ class MainActivity : AppCompatActivity() {
             startActivity(browserIntent)
         }
 
-        if (settingsManager.isFirstTime()) {
-            var hasSkipped = false
-
-            val authDialogBuilder = AlertDialog.Builder(this, R.style.AlertDialogTheme)
-                .setCancelable(false)
-                .setTitle(getString(R.string.auth_dialog_title))
-                .setMessage(getString(R.string.auth_dialog_message))
-                .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
-                    dialog.dismiss()
-                    gitManager.launchGithubOAuthFlow()
-                }
-                .setNegativeButton(
-                    getString(R.string.skip)
-                ) { dialog, _ ->
-                    dialog.dismiss()
-                    settingsManager.setHadFirstTime()
-                }
-
-            val almostThereDialogLink = TextView(this).apply {
-                movementMethod = LinkMovementMethod.getInstance()
-                gravity = Gravity.END
-                setPadding(
-                    0,
-                    0,
-                    resources.getDimension(R.dimen.space_md).toInt(),
-                    0
-                )
-                text = Html.fromHtml(
-                    getString(R.string.documentation_html_link).format(getString(R.string.docs_link)),
-                    0
-                )
-            }
-
-            val almostThereDialogBuilder = AlertDialog.Builder(this, R.style.AlertDialogTheme)
-                .setCancelable(false)
-                .setTitle(getString(R.string.almost_there_dialog_title))
-                .setView(almostThereDialogLink)
-                .setMessage(getString(R.string.almost_there_dialog_message))
-                .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
-                    dialog.dismiss()
-                    authDialogBuilder.create().show()
-                }
-                .setNegativeButton(
-                    getString(android.R.string.cancel)
-                ) { dialog, _ ->
-                    dialog.dismiss()
-                }
-
-            fun showAlmostThereOrSkip() {
-                if (hasSkipped) return
-                almostThereDialogBuilder.create().show()
-            }
-
-            val enableAllFilesDialogBuilder = AlertDialog.Builder(this, R.style.AlertDialogTheme)
-                .setCancelable(false)
-                .setTitle(getString(R.string.all_files_access_dialog_title))
-                .setMessage(getString(R.string.all_files_access_dialog_message))
-                .setPositiveButton(getString(android.R.string.ok)) { _, _ -> }
-                .setNegativeButton(
-                    getString(R.string.skip)
-                ) { dialog, _ ->
-                    dialog.dismiss()
-                    showAlmostThereOrSkip()
-                }.create().apply {
-                    setOnShowListener {
-                        getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
-                            checkAndRequestStoragePermission {
-                                dismiss()
-                                showAlmostThereOrSkip()
-                            }
-                            this.getButton(AlertDialog.BUTTON_POSITIVE).text = getString(R.string.done)
-                        }
-                    }
-                }
-
-            fun showAllFilesAccessOrNext() {
-                val hasPermissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) Environment.isExternalStorageManager() else
-                    ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
-
-                if (BuildConfig.ALL_FILES && !hasPermissions) {
-                    enableAllFilesDialogBuilder.show()
-                } else {
-                    showAlmostThereOrSkip()
-                }
-            }
-
-            val enableNotificationsDialogBuilder = AlertDialog.Builder(this, R.style.AlertDialogTheme)
-                .setCancelable(false)
-                .setTitle(getString(R.string.notification_dialog_title))
-                .setMessage(getString(R.string.notification_dialog_message))
-                .setPositiveButton(getString(android.R.string.ok)) { _, _ -> }
-                .setNegativeButton(
-                    getString(R.string.skip)
-                ) { dialog, _ ->
-                    dialog.dismiss()
-                    settingsManager.setSyncMessageEnabled(false)
-                    showAllFilesAccessOrNext()
-                }.create().apply {
-                    setOnShowListener {
-                        getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
-                            checkAndRequestNotificationPermission {
-                                dismiss()
-                                showAllFilesAccessOrNext()
-                            }
-                            getButton(AlertDialog.BUTTON_POSITIVE).text =
-                                getString(R.string.done)
-                        }
-                    }
-                }
-
-            fun showNotificationsOrNext() {
-                if (!NotificationManagerCompat.from(this).areNotificationsEnabled()) {
-                    enableNotificationsDialogBuilder.show()
-                } else {
-                    showAllFilesAccessOrNext()
-                }
-            }
-
-            val welcomeDialogBuilder = AlertDialog.Builder(this, R.style.AlertDialogTheme)
-                .setCancelable(false)
-                .setTitle(getString(R.string.welcome))
-                .setMessage(getString(R.string.welcome_message))
-                .setPositiveButton(getString(R.string.welcome_positive)) { dialog, _ ->
-                    dialog.dismiss()
-                    showNotificationsOrNext()
-                }
-                .setNeutralButton(
-                    getString(R.string.welcome_neutral)
-                ) { dialog, _ ->
-                    hasSkipped = true
-                    dialog.dismiss()
-                    showNotificationsOrNext()
-                }
-                .setNegativeButton(
-                    getString(R.string.welcome_negative)
-                ) { dialog, _ ->
-                    hasSkipped = true
-                    settingsManager.setHadFirstTime()
-                    dialog.dismiss()
-                    showNotificationsOrNext()
-                }
-
-            welcomeDialogBuilder
-                .create()
-                .show()
-
+        if (settingsManager.getOnboardingStep() != -1) {
+            val onboardingController = OnboardingController(this, settingsManager, gitManager, ::checkAndRequestNotificationPermission, ::checkAndRequestStoragePermission)
+            onboardingController.show()
             return
         }
 

@@ -43,6 +43,17 @@ class SettingsManager internal constructor(private val context: Context) {
         }
     }
 
+    fun getOnboardingStep(): Int {
+        return settingsSharedPref.getInt("onboardingStep", 0)
+    }
+
+    fun setOnboardingStep(step: Int) {
+        with(settingsSharedPref.edit()) {
+            putInt("onboardingStep", step)
+            apply()
+        }
+    }
+
     fun getSyncMessage(): String {
         return settingsSharedPref.getString("syncMessage", null) ?: context.getString(R.string.sync_message)
     }
@@ -153,6 +164,11 @@ class SettingsManager internal constructor(private val context: Context) {
         val oldApplicationPackage = getApplicationPackage()
         if (oldApplicationPackage != "" && getApplicationPackages().isEmpty()) {
             setApplicationPackages(listOf(oldApplicationPackage))
+        }
+
+        val oldHadFirstTime = isFirstTime()
+        if (!oldHadFirstTime) {
+            setOnboardingStep(-1)
         }
     }
 }
