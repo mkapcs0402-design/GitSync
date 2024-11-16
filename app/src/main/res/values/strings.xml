@@ -9,7 +9,7 @@
     <string name="git_dir_path_hint">/storage/emulated/0/…</string>
 
     <string name="enable_application_observer">Auto Sync Settings</string>
-    <string name="enable_accessibility_service">Please enable the Git Sync Accessibility Service!</string>
+    <string name="enable_accessibility_service">Please enable Git Sync under "Installed apps"</string>
     <string name="accessibility_service_description">To enhance your experience, GitSync uses Android’s Accessibility Service to detect when apps are opened or closed. This helps us provide tailored features without storing or sharing any data. \n\n Key Points: \n Purpose: We use this service solely to improve your app experience. \n Privacy: No data is stored or sent elsewhere. \n Control: You can disable these permissions at any time in your device settings.</string>
     <string name="application_not_set">Select App(s)</string>
     <string name="select_application">Select application(s)</string>
@@ -56,7 +56,7 @@
     <string name="all_files_access_dialog_message">\nYou can use GitSync without granting \"All files access\" permissions, but we recommend enabling it for the best experience.\n\nThe app uses \"All files access\" for syncing your repository more consistently to a less limited range of directories on the device.\n</string>
 
     <string name="almost_there_dialog_title">Almost there!</string>
-    <string name="almost_there_dialog_message">\nSoon, we\'ll authenticate with GitHub.com and clone your repo to your device, preparing it for syncing.\n\nOnce that\'s set, there are several ways to trigger a sync:\n\n  • The GitSync quick tile\n  • The in-app \"Sync Now\" button\n  • Application Observer for auto-sync\n  • A custom intent (advanced)\n</string>
+    <string name="almost_there_dialog_message">\nSoon, we\'ll authenticate with GitHub.com and clone your repo to your device, preparing it for syncing.\n\nOnce that\'s set, there are several ways to trigger a sync:\n\n  • The GitSync quick tile\n  • The in-app \"Sync Now\" button\n  • Auto Sync\n  • A custom intent (advanced)\n</string>
 
     <string name="auth_dialog_title">Authenticate with Github.com</string>
     <string name="auth_dialog_message">Please authenticate with Github and continue on to clone your repo!</string>

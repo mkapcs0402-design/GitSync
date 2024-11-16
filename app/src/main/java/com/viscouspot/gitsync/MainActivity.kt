@@ -118,6 +118,8 @@ class MainActivity : AppCompatActivity() {
     private var requestLegacyStoragePermission: ActivityResultLauncher<Array<String>>? = null
     private var requestStoragePermission: ActivityResultLauncher<Intent>? = null
 
+    private var prominentDisclosure: Dialog? = null
+
     private var requestedPermission = false
 
 
@@ -1046,7 +1048,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun displayProminentDisclosure() {
-        AlertDialog.Builder(this, R.style.AlertDialogTheme)
+        prominentDisclosure?.dismiss()
+        prominentDisclosure = AlertDialog.Builder(this, R.style.AlertDialogTheme)
             .setTitle(getString(R.string.accessibility_service_disclosure_title))
             .setMessage(getString(R.string.accessibility_service_disclosure_message))
             .setPositiveButton(android.R.string.ok) { _, _ ->
