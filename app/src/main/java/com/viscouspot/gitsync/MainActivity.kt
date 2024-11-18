@@ -18,14 +18,9 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
-import android.os.Handler
-import android.os.Looper
 import android.provider.Settings
-import android.text.Html
 import android.text.Spannable
-import android.text.method.LinkMovementMethod
 import android.text.style.ForegroundColorSpan
-import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
@@ -65,13 +60,7 @@ import com.viscouspot.gitsync.util.Logger.log
 import com.viscouspot.gitsync.util.OnboardingController
 import com.viscouspot.gitsync.util.SettingsManager
 import com.viscouspot.gitsync.util.rightDrawable
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import java.io.BufferedReader
 import java.io.File
-import java.io.FileInputStream
-import java.io.InputStreamReader
 import java.util.Locale
 import kotlin.math.max
 import kotlin.math.min
@@ -82,6 +71,8 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var gitManager: GitManager
     private lateinit var settingsManager: SettingsManager
+    private lateinit var onboardingController: OnboardingController
+    private lateinit var cloneRepoFragment: CloneRepoFragment
 
     private val recentCommits: MutableList<Commit> = mutableListOf()
     private lateinit var recentCommitsRecycler: RecyclerViewEmptySupport
@@ -149,9 +140,12 @@ class MainActivity : AppCompatActivity() {
 
         settingsManager.setGitDirUri(dirUri.toString())
 
-
         gitDirPath.setText(Helper.getPathFromUri(this, dirUri))
         refreshGitRepo()
+
+        settingsManager.setOnboardingStep(4)
+        onboardingController.dismissAll()
+        onboardingController.show()
     }
 
     private val requestNotificationPermission = this.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { }
@@ -187,11 +181,12 @@ class MainActivity : AppCompatActivity() {
         gitManager.getGithubAuthCredentials(code, state) { username, authToken ->
             log(LogType.GithubAuthCredentials, "Username and Token Received")
 
-            settingsManager.setHadFirstTime()
             settingsManager.setGitAuthCredentials(username, authToken)
+            settingsManager.setOnboardingStep(3)
+            onboardingController.dismissAll()
             refreshAuthButton()
 
-            CloneRepoFragment(settingsManager, gitManager, ::dirSelectionCallback).show(supportFragmentManager, getString(R.string.clone_repo_title))
+            cloneRepoFragment.show(supportFragmentManager, getString(R.string.clone_repo_title))
         }
     }
 
@@ -207,6 +202,15 @@ class MainActivity : AppCompatActivity() {
         recyclerView.requestLayout()
     }
 
+    override fun onPause() {
+        super.onPause()
+
+        val onboardingStep = settingsManager.getOnboardingStep()
+        if (onboardingStep != 0) {
+            onboardingController.dismissAll()
+        }
+    }
+
     override fun onDestroy() {
         super.onDestroy()
 
@@ -218,8 +222,6 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
-        if (settingsManager.isFirstTime()) return
-
         if (requestedPermission) {
             if (NotificationManagerCompat.from(this).areNotificationsEnabled()) {
                 settingsManager.setSyncMessageEnabled(true)
@@ -228,6 +230,11 @@ class MainActivity : AppCompatActivity() {
                 settingsManager.setApplicationObserverEnabled(true)
             }
             requestedPermission = false
+        } else {
+            if (settingsManager.getOnboardingStep() != -1) {
+                onboardingController.show()
+                return
+            }
         }
 
         refreshAll()
@@ -263,7 +270,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        if (BuildConfig.ALL_FILES && !settingsManager.isFirstTime()) {
+        if (BuildConfig.ALL_FILES && settingsManager.getOnboardingStep() == -1) {
             checkAndRequestStoragePermission()
         }
 
@@ -308,6 +315,9 @@ class MainActivity : AppCompatActivity() {
 
         recentCommitsRecycler.adapter = recentCommitsAdapter
         applicationRecycler.adapter = applicationListAdapter
+
+        cloneRepoFragment = CloneRepoFragment(settingsManager, gitManager, ::dirSelectionCallback)
+        onboardingController = OnboardingController(this, this, settingsManager, gitManager, cloneRepoFragment, ::updateApplicationObserver, ::checkAndRequestNotificationPermission, ::checkAndRequestStoragePermission)
 
         setRecyclerViewHeight(recentCommitsRecycler)
 
@@ -365,24 +375,7 @@ class MainActivity : AppCompatActivity() {
         updateApplicationObserverSwitch()
 
         applicationObserverSwitch.setOnCheckedChangeListener { _, isChecked ->
-            (if (isChecked) applicationObserverMax else applicationObserverMin).applyTo(applicationObserverPanel)
-            if (isChecked) {
-                updateApplicationObserverSwitch(true)
-                if (!checkAccessibilityPermission()) {
-                    applicationObserverSwitch.isChecked = false
-                    syncAppOpened.isChecked = false
-                    syncAppClosed.isChecked = false
-                    updateApplicationObserverSwitch(false)
-                    applicationObserverMin.applyTo(applicationObserverPanel)
-                    displayProminentDisclosure()
-                } else {
-                    settingsManager.setApplicationObserverEnabled(true)
-                    refreshSelectedApplications()
-                }
-            } else {
-                updateApplicationObserverSwitch(false)
-                settingsManager.setApplicationObserverEnabled(false)
-            }
+            updateApplicationObserver(isChecked)
         }
 
         selectApplication.setOnClickListener {
@@ -401,14 +394,27 @@ class MainActivity : AppCompatActivity() {
             val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.docs_link)))
             startActivity(browserIntent)
         }
+    }
 
-        if (settingsManager.getOnboardingStep() != -1) {
-            val onboardingController = OnboardingController(this, settingsManager, gitManager, ::checkAndRequestNotificationPermission, ::checkAndRequestStoragePermission)
-            onboardingController.show()
-            return
+    private fun updateApplicationObserver(isChecked: Boolean) {
+        (if (isChecked) applicationObserverMax else applicationObserverMin).applyTo(applicationObserverPanel)
+        if (isChecked) {
+            updateApplicationObserverSwitch(true)
+            if (!checkAccessibilityPermission()) {
+                applicationObserverSwitch.isChecked = false
+                syncAppOpened.isChecked = false
+                syncAppClosed.isChecked = false
+                updateApplicationObserverSwitch(false)
+                applicationObserverMin.applyTo(applicationObserverPanel)
+                displayProminentDisclosure()
+            } else {
+                settingsManager.setApplicationObserverEnabled(true)
+                refreshSelectedApplications()
+            }
+        } else {
+            updateApplicationObserverSwitch(false)
+            settingsManager.setApplicationObserverEnabled(false)
         }
-
-        refreshAll()
     }
 
     private fun openMergeConflictDialog() {
