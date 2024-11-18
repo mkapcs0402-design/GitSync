@@ -31,64 +31,76 @@ class OnboardingController(
 
 
     fun show() {
-        val authCreds = settingsManager.getGitAuthCredentials()
-        if (authCreds.first == "" && authCreds.second == "") {
-            settingsManager.setOnboardingStep(3)
-        }
-        if (settingsManager.getGitDirUri() == null) {
-            settingsManager.setOnboardingStep(4)
-        }
-        if (settingsManager.getApplicationObserverEnabled()) {
-            settingsManager.setOnboardingStep(-1)
-        }
+        activity.runOnUiThread {
+            val authCreds = settingsManager.getGitAuthCredentials()
+            if (authCreds.first != "" && authCreds.second != "") {
+                settingsManager.setOnboardingStep(3)
+            }
+            if (settingsManager.getGitDirUri() != null) {
+                settingsManager.setOnboardingStep(4)
+            }
+            if (settingsManager.getApplicationObserverEnabled()) {
+                settingsManager.setOnboardingStep(-1)
+            }
 
-        when (settingsManager.getOnboardingStep()) {
-            0 -> getWelcomeDialog().show()
-            1 -> showAlmostThereOrSkip()
-            2 -> getAuthDialog().show()
-            3 -> if (!cloneRepoFragment.isAdded) cloneRepoFragment.show(activity.supportFragmentManager, context.getString(R.string.clone_repo_title))
-            4 -> getEnableAutoSyncDialog().show()
+            when (settingsManager.getOnboardingStep()) {
+                0 -> getWelcomeDialog().show()
+                1 -> showAlmostThereOrSkip()
+                2 -> getAuthDialog().show()
+                3 -> if (!cloneRepoFragment.isAdded) cloneRepoFragment.show(
+                    activity.supportFragmentManager,
+                    context.getString(R.string.clone_repo_title)
+                )
+
+                4 -> getEnableAutoSyncDialog().show()
+            }
         }
     }
 
     fun dismissAll() {
-        currentDialog?.dismiss()
+        activity.runOnUiThread {
+            currentDialog?.dismiss()
+        }
     }
 
     fun getEnableAutoSyncDialog(): AlertDialog {
-        currentDialog = AlertDialog.Builder(context, R.style.AlertDialogTheme)
-            .setCancelable(false)
-            .setTitle(context.getString(R.string.enable_autosync_title))
-            .setMessage(context.getString(R.string.enable_autosync_message))
-            .setPositiveButton(context.getString(android.R.string.ok)) { dialog, _ ->
-                dialog.dismiss()
-                activity.runOnUiThread {
-                    updateApplicationObserver(true)
+        activity.runOnUiThread {
+            currentDialog = AlertDialog.Builder(context, R.style.AlertDialogTheme)
+                .setCancelable(false)
+                .setTitle(context.getString(R.string.enable_autosync_title))
+                .setMessage(context.getString(R.string.enable_autosync_message))
+                .setPositiveButton(context.getString(android.R.string.ok)) { dialog, _ ->
+                    dialog.dismiss()
+                    activity.runOnUiThread {
+                        updateApplicationObserver(true)
+                    }
                 }
-            }
-            .setNegativeButton(
-                context.getString(R.string.skip)
-            ) { dialog, _ ->
-                dialog.dismiss()
-                settingsManager.setOnboardingStep(-1)
-            }.create()
+                .setNegativeButton(
+                    context.getString(R.string.skip)
+                ) { dialog, _ ->
+                    dialog.dismiss()
+                    settingsManager.setOnboardingStep(-1)
+                }.create()
+        }
         return currentDialog!!
     }
 
     fun getAuthDialog(): AlertDialog {
-        currentDialog = AlertDialog.Builder(context, R.style.AlertDialogTheme)
-            .setCancelable(false)
-            .setTitle(context.getString(R.string.auth_dialog_title))
-            .setMessage(context.getString(R.string.auth_dialog_message))
-            .setPositiveButton(context.getString(android.R.string.ok)) { dialog, _ ->
-                dialog.dismiss()
-                gitManager.launchGithubOAuthFlow()
-            }
-            .setNegativeButton(
-                context.getString(R.string.skip)
-            ) { dialog, _ ->
-                dialog.dismiss()
-            }.create()
+        activity.runOnUiThread {
+            currentDialog = AlertDialog.Builder(context, R.style.AlertDialogTheme)
+                .setCancelable(false)
+                .setTitle(context.getString(R.string.auth_dialog_title))
+                .setMessage(context.getString(R.string.auth_dialog_message))
+                .setPositiveButton(context.getString(android.R.string.ok)) { dialog, _ ->
+                    dialog.dismiss()
+                    gitManager.launchGithubOAuthFlow()
+                }
+                .setNegativeButton(
+                    context.getString(R.string.skip)
+                ) { dialog, _ ->
+                    dialog.dismiss()
+                }.create()
+        }
         return currentDialog!!
     }
 
@@ -110,6 +122,7 @@ class OnboardingController(
     }
 
     fun getAlmostThereDialog(): AlertDialog {
+        activity.runOnUiThread {
         currentDialog = AlertDialog.Builder(context, R.style.AlertDialogTheme)
             .setCancelable(false)
             .setTitle(context.getString(R.string.almost_there_dialog_title))
@@ -125,6 +138,7 @@ class OnboardingController(
             ) { dialog, _ ->
                 dialog.dismiss()
             }.create()
+        }
         return currentDialog!!
     }
 
@@ -135,6 +149,7 @@ class OnboardingController(
     }
 
     fun getEnableAllFilesDialog(): AlertDialog {
+        activity.runOnUiThread {
         currentDialog = AlertDialog.Builder(context, R.style.AlertDialogTheme)
             .setCancelable(false)
             .setTitle(context.getString(R.string.all_files_access_dialog_title))
@@ -157,6 +172,7 @@ class OnboardingController(
                     }
                 }
             }
+        }
         return currentDialog!!
     }
 
@@ -172,6 +188,7 @@ class OnboardingController(
     }
 
     fun getEnableNotificationsDialog(): AlertDialog {
+        activity.runOnUiThread {
         currentDialog = AlertDialog.Builder(context, R.style.AlertDialogTheme)
             .setCancelable(false)
             .setTitle(context.getString(R.string.notification_dialog_title))
@@ -189,6 +206,7 @@ class OnboardingController(
                     }
                 }
             }
+        }
         return currentDialog!!
     }
 
@@ -201,29 +219,31 @@ class OnboardingController(
     }
 
     fun getWelcomeDialog(): AlertDialog {
-        currentDialog = AlertDialog.Builder(context, R.style.AlertDialogTheme)
-            .setCancelable(false)
-            .setTitle(context.getString(R.string.welcome))
-            .setMessage(context.getString(R.string.welcome_message))
-            .setPositiveButton(context.getString(R.string.welcome_positive)) { dialog, _ ->
-                dialog.dismiss()
-                showNotificationsOrNext()
-            }
-            .setNeutralButton(
-                context.getString(R.string.welcome_neutral)
-            ) { dialog, _ ->
-                hasSkipped = true
-                dialog.dismiss()
-                showNotificationsOrNext()
-            }
-            .setNegativeButton(
-                context.getString(R.string.welcome_negative)
-            ) { dialog, _ ->
-                hasSkipped = true
-                settingsManager.setOnboardingStep(-1)
-                dialog.dismiss()
-                showNotificationsOrNext()
-            }.create()
+        activity.runOnUiThread {
+            currentDialog = AlertDialog.Builder(context, R.style.AlertDialogTheme)
+                .setCancelable(false)
+                .setTitle(context.getString(R.string.welcome))
+                .setMessage(context.getString(R.string.welcome_message))
+                .setPositiveButton(context.getString(R.string.welcome_positive)) { dialog, _ ->
+                    dialog.dismiss()
+                    showNotificationsOrNext()
+                }
+                .setNeutralButton(
+                    context.getString(R.string.welcome_neutral)
+                ) { dialog, _ ->
+                    hasSkipped = true
+                    dialog.dismiss()
+                    showNotificationsOrNext()
+                }
+                .setNegativeButton(
+                    context.getString(R.string.welcome_negative)
+                ) { dialog, _ ->
+                    hasSkipped = true
+                    settingsManager.setOnboardingStep(-1)
+                    dialog.dismiss()
+                    showNotificationsOrNext()
+                }.create()
+        }
         return currentDialog!!
     }
 }
