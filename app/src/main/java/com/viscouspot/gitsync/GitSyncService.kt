@@ -141,11 +141,13 @@ class GitSyncService : Service() {
 
     private fun sync(forced: Boolean = false) {
         if (gitManager.getConflicting(settingsManager.getGitDirUri()).isNotEmpty()) {
-            Toast.makeText(
-                applicationContext,
-                "Ongoing merge conflict",
-                Toast.LENGTH_SHORT
-            ).show()
+            Handler(Looper.getMainLooper()).post {
+                Toast.makeText(
+                    applicationContext,
+                    "Ongoing merge conflict",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
             return
         }
 
