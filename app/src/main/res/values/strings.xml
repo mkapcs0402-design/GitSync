@@ -78,6 +78,7 @@
     <string name="network_unavailable">Network unavailable!\nGitSync will retry when reconnected</string>
     <string name="out_of_memory">Application ran out of memory!</string>
     <string name="invalid_remote">Invalid remote!</string>
+    <string name="large_file">Singular files larger than 50MB not supported!</string>
     <string name="clone_failed">Failed to clone repository!</string>
     <string name="inaccessible_directory_message">Inaccessible! Please select a different directory.</string>
     <string name="repo_not_found">No repo found…</string>
