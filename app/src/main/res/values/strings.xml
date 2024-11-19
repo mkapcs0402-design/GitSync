@@ -80,7 +80,7 @@
     <string name="invalid_remote">Invalid remote!</string>
     <string name="large_file">Singular files larger than 50MB not supported!</string>
     <string name="clone_failed">Failed to clone repository!</string>
-    <string name="inaccessible_directory_message">Inaccessible! Please select a different directory.</string>
+    <string name="inaccessible_directory_message">Inaccessible directory! Please select a different location.</string>
     <string name="repo_not_found">No repo found…</string>
     <string name="auto_rebase_failed_exception">Remote is further ahead than local and we could not automatically rebase for you, as it would cause non fast-forward update.</string>
     <string name="non_existing_exception">Remote ref didn\'t exist.</string>
