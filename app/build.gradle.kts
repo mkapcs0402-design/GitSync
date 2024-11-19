@@ -10,7 +10,7 @@ android {
 
     defaultConfig {
         applicationId = "com.viscouspot.gitsync"
-        minSdk = 29
+        minSdk = 31
         targetSdk = 34
         versionCode = 1608
         versionName  = "1.608"
