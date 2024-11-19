@@ -237,10 +237,8 @@ class GitSyncService : Service() {
         job.invokeOnCompletion {
             log(LogType.Sync, "Sync Complete")
 
-            if (isForeground()) {
-                val intent = Intent(MainActivity.REFRESH)
-                LocalBroadcastManager.getInstance(this@GitSyncService).sendBroadcast(intent)
-            }
+            val intent = Intent(MainActivity.REFRESH)
+            LocalBroadcastManager.getInstance(this@GitSyncService).sendBroadcast(intent)
 
             isSyncing = false
             if (isScheduled) {
@@ -288,10 +286,8 @@ class GitSyncService : Service() {
 
             debouncedSync(forced = true)
 
-            if (isForeground()) {
-                val intent = Intent(MainActivity.MERGE_COMPLETE)
-                LocalBroadcastManager.getInstance(this@GitSyncService).sendBroadcast(intent)
-            }
+            val intent = Intent(MainActivity.MERGE_COMPLETE)
+            LocalBroadcastManager.getInstance(this@GitSyncService).sendBroadcast(intent)
         }
     }
 
@@ -302,16 +298,6 @@ class GitSyncService : Service() {
                     .show()
             }
         }
-    }
-
-    private fun isForeground(): Boolean {
-        val manager = getSystemService(ACTIVITY_SERVICE) as ActivityManager
-        val runningTaskInfo = manager.getRunningTasks(1)
-        if (runningTaskInfo.isEmpty()) {
-            return false
-        }
-        val componentInfo = runningTaskInfo[0].topActivity
-        return componentInfo!!.packageName == packageName
     }
 
     override fun onBind(intent: Intent?): IBinder? {
