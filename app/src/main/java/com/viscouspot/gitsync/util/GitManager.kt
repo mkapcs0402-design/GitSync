@@ -249,6 +249,13 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
                     failureCallback(e.localizedMessage ?: context.getString(R.string.clone_failed))
                 }
                 return@launch
+            } catch (e: NullPointerException) {
+                if (e.message?.contains("Inflater has been closed") == true) {
+                    failureCallback(context.getString(R.string.large_file))
+                    return@launch
+                }
+
+                log(context, LogType.CloneRepo, e)
             } catch (e: OutOfMemoryError) {
                 failureCallback(context.getString(R.string.out_of_memory))
                 return@launch
