@@ -166,7 +166,7 @@ class CloneRepoFragment(
         }
         val authCredentials = settingsManager.getGitAuthCredentials()
 
-        val cloneDialog = ProgressDialog(requireContext()).apply {
+        val cloneDialog = ProgressDialog(requireContext(), R.style.AlertDialogTheme).apply {
             setTitle(getString(R.string.cloning_repository))
             setMessage(getString(R.string.clone_message))
             max = 100
