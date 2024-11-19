@@ -1,6 +1,5 @@
 package com.viscouspot.gitsync
 
-import android.app.ActivityManager
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -12,6 +11,7 @@ import android.os.IBinder
 import android.os.Looper
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.work.Constraints
 import androidx.work.ExistingWorkPolicy
@@ -20,6 +20,7 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import com.viscouspot.gitsync.util.GitManager
 import com.viscouspot.gitsync.util.Helper
+import com.viscouspot.gitsync.util.Helper.CONFLICT_NOTIFICATION_ID
 import com.viscouspot.gitsync.util.LogType
 import com.viscouspot.gitsync.util.Logger.log
 import com.viscouspot.gitsync.util.NetworkWorker
@@ -288,6 +289,8 @@ class GitSyncService : Service() {
 
             val intent = Intent(MainActivity.MERGE_COMPLETE)
             LocalBroadcastManager.getInstance(this@GitSyncService).sendBroadcast(intent)
+
+            NotificationManagerCompat.from(applicationContext).cancel(CONFLICT_NOTIFICATION_ID)
         }
     }
 

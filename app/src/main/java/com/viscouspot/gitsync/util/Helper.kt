@@ -38,6 +38,8 @@ import java.util.regex.Pattern
 import kotlin.random.Random
 
 object Helper {
+    const val CONFLICT_NOTIFICATION_ID = 1756
+
     fun extractConflictSections(context: Context, file: File, add: (text: String) -> Unit) {
         val conflictBuilder = StringBuilder()
         var inConflict = false
@@ -115,7 +117,7 @@ object Helper {
                 return
             }
 
-            notify(2, builder.build())
+            notify(CONFLICT_NOTIFICATION_ID, builder.build())
         }
     }
 

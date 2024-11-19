@@ -42,6 +42,7 @@ enum class LogType(val type: String) {
 
 object Logger {
     private val last5Logs = mutableListOf<Pair<LogType, String>>()
+    private const val ERROR_NOTIFICATION_ID = 1757
 
     fun log(context: Context, type: LogType, e: Throwable) {
         val sw = StringWriter()
@@ -98,7 +99,7 @@ object Logger {
                 return
             }
 
-            notify(2, builder.build())
+            notify(ERROR_NOTIFICATION_ID, builder.build())
         }
     }
 
