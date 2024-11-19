@@ -119,6 +119,7 @@ class MainActivity : AppCompatActivity() {
     private var requestStoragePermission: ActivityResultLauncher<Intent>? = null
 
     private var prominentDisclosure: Dialog? = null
+    private var applicationSelectDialog: Dialog? = null
 
     private var requestedPermission = false
 
@@ -764,28 +765,30 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showApplicationSelectDialog() {
-        val builderSingle = AlertDialog.Builder(this@MainActivity, R.style.AlertDialogTheme)
+        if (applicationSelectDialog?.isShowing == true) applicationSelectDialog?.dismiss()
+
+        val applicationSelectDialogBuilder = AlertDialog.Builder(this@MainActivity, R.style.AlertDialogTheme)
         val selectedPackageNames = mutableListOf<String>()
 
-        builderSingle.setTitle(getString(R.string.select_application))
-        builderSingle.setPositiveButton(getString(R.string.save_application)) { dialog, _ ->
+        applicationSelectDialogBuilder.setTitle(getString(R.string.select_application))
+        applicationSelectDialogBuilder.setPositiveButton(getString(R.string.save_application)) { dialog, _ ->
             dialog.cancel()
             settingsManager.setApplicationPackages(selectedPackageNames)
             refreshSelectedApplications()
         }
-        builderSingle.setNegativeButton(getString(android.R.string.cancel)) { dialog, _ -> dialog.dismiss() }
+        applicationSelectDialogBuilder.setNegativeButton(getString(android.R.string.cancel)) { dialog, _ -> dialog.dismiss() }
 
-        val applicationSelectDialog = layoutInflater.inflate(R.layout.application_select_dialog, null)
-        builderSingle.setView(applicationSelectDialog)
-        val dialog = builderSingle.create()
+        val applicationSelectDialogView = layoutInflater.inflate(R.layout.application_select_dialog, null)
+        applicationSelectDialogBuilder.setView(applicationSelectDialogView)
+        applicationSelectDialog = applicationSelectDialogBuilder.create()
 
         val devicePackageNames = getDeviceApps()
         val filteredDevicePackageNames = devicePackageNames.toMutableList()
 
-        val recyclerView = applicationSelectDialog.findViewById<RecyclerView>(R.id.recyclerView)
+        val recyclerView = applicationSelectDialogView.findViewById<RecyclerView>(R.id.recyclerView)
         val adapter = ApplicationGridAdapter(packageManager, filteredDevicePackageNames, selectedPackageNames)
 
-        val searchView = applicationSelectDialog.findViewById<SearchView>(R.id.searchView)
+        val searchView = applicationSelectDialogView.findViewById<SearchView>(R.id.searchView)
         searchView.setOnQueryTextListener(object: SearchView.OnQueryTextListener{
             override fun onQueryTextSubmit(query: String?): Boolean {
                 return false
@@ -817,7 +820,7 @@ class MainActivity : AppCompatActivity() {
         })
 
         recyclerView.adapter = adapter
-        dialog.show()
+        applicationSelectDialog?.show()
         searchView.requestFocus()
     }
 
