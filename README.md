@@ -104,7 +104,7 @@ If you just want to try the app out, feel free to use a pre-built release from t
 
 For support, email bugs.viscouspotential@gmail.com.
 
-Consider sponsoring! Any help is hugely appreciated!
+Consider [sponsoring](https://buymeacoffee.com/viscouspotential)! Any help is hugely appreciated!
 
 
 ## Authors
