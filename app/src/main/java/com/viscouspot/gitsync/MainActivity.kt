@@ -272,6 +272,7 @@ class MainActivity : AppCompatActivity() {
         val bManager = LocalBroadcastManager.getInstance(this)
         val intentFilter = IntentFilter()
         intentFilter.addAction(REFRESH)
+        intentFilter.addAction(MERGE_COMPLETE)
         bManager.registerReceiver(broadcastReceiver, intentFilter)
 
         window.statusBarColor = getColor(R.color.app_bg)
