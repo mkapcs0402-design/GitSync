@@ -273,7 +273,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        if (BuildConfig.ALL_FILES && settingsManager.getOnboardingStep() == -1) {
+        if (!settingsManager.isFirstTime()) {
             checkAndRequestStoragePermission()
         }
 

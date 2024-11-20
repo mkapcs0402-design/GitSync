@@ -110,11 +110,6 @@ class CloneRepoFragment(
             selectLocalRepo()
         }
 
-        if (!BuildConfig.ALL_FILES) {
-            divider.visibility = View.GONE
-            localRepo.visibility = View.GONE
-        }
-
         return view
     }
 
