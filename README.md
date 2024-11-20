@@ -5,15 +5,15 @@
   <h4>Android git client for syncing a repository between remote and a local directory</h4>
   
   <p align="center">
-    <img src="https://img.shields.io/github/license/ViscousPotential/GitSync" alt="license">
-    <img src="https://img.shields.io/github/last-commit/ViscousPotential/GitSync?v=1" alt="last commit">
-    <img src="https://img.shields.io/github/stars/ViscousPotential/GitSync?v=1" alt="stars">
-    <img src="https://img.shields.io/github/downloads/ViscousPotential/GitSync/total" alt="downloads">
+    <img src="https://img.shields.io/github/license/ViscousPot/GitSync" alt="license">
+    <img src="https://img.shields.io/github/last-commit/ViscousPot/GitSync?v=1" alt="last commit">
+    <img src="https://img.shields.io/github/stars/ViscousPot/GitSync?v=1" alt="stars">
+    <img src="https://img.shields.io/github/downloads/ViscousPot/GitSync/total" alt="downloads">
+    <a href="https://github.com/sponsors/ViscousPot"><img src="https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86" alt="sponsor"></a>
   </p>
 
-  <a href="https://buymeacoffee.com/viscouspotential" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
   <p align="center">
-    <a href="https://github.com/ViscousPotential/GitSync/blob/master/Documentation.md">Documentation</a>
+    <a href="https://github.com/ViscousPot/GitSync/blob/master/Documentation.md">Documentation</a>
   </p>
   <br />
   <a href="https://play.google.com/store/apps/details?id=com.viscouspot.gitsync" target="_blank"><img src="https://github.com/user-attachments/assets/168cb841-392d-493a-bc47-a9e3e8a61a62" alt="Get it on Google Play" style="width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
@@ -64,7 +64,7 @@ If you just want to try the app out, feel free to use a pre-built release from t
 ### 1. Setup 
 - Clone the project
 ```bash
-  git clone https://github.com/ViscousPotential/GitSync.git
+  git clone https://github.com/ViscousPot/GitSync.git
 ```
 
 
@@ -83,7 +83,7 @@ If you just want to try the app out, feel free to use a pre-built release from t
 - Select `OAuth Apps`
 - Select `New OAuth App`
   - Application Name: GitSync
-  - Homepage URL: `https://github.com/ViscousPotential/GitSync`
+  - Homepage URL: `https://github.com/ViscousPot/GitSync`
   - Authorization callback URL: `gitsync://auth`
   - Enable Device Flow: `leave unchecked` 
 - Fill `Secrets.kt` with the new OAuth App ID and SECRET
@@ -104,7 +104,7 @@ If you just want to try the app out, feel free to use a pre-built release from t
 
 For support, email bugs.viscouspotential@gmail.com.
 
-Consider [sponsoring](https://buymeacoffee.com/viscouspotential)! Any help is hugely appreciated!
+Consider [sponsoring](https://github.com/sponsors/ViscousPot)! Any help is hugely appreciated!
 
 
 ## Authors
