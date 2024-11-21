@@ -40,7 +40,10 @@ class CloneRepoFragment(
     private var repoUrl = ""
     private var loadNextRepos: (() -> Unit)? = {}
     private var callback: ((dirUri: Uri?) -> Unit) = {dirUri: Uri? -> dirSelectionCallback(dirUri)}
-    private lateinit var adapter: RepoListAdapter
+    private val adapter = RepoListAdapter(repoList) {
+        repoUrl = it.second
+        selectLocalDir()
+    }
     private lateinit var repoListRecycler: RecyclerView
     private var loadingRepos = false
 
@@ -60,6 +63,8 @@ class CloneRepoFragment(
         savedInstanceState: Bundle?
     ): View {
         val view = inflater.inflate(R.layout.clone_repo_fragment, container, false)
+        adapter.notifyItemRangeRemoved(0, repoList.size)
+        repoList.clear()
 
         repoListRecycler = view.findViewById(R.id.repoList)
         val repoUrlEditText = view.findViewById<EditText>(R.id.repoUrlEditText)
@@ -67,11 +72,6 @@ class CloneRepoFragment(
         val divider = view.findViewById<View>(R.id.divider)
         val localRepo = view.findViewById<MaterialButton>(R.id.localRepo)
         repoListRecycler.setLayoutManager(GridLayoutManager(context, 1))
-
-        adapter = RepoListAdapter(repoList) {
-            repoUrl = it.second
-            selectLocalDir()
-        }
 
         setLoadingRepos(true)
         gitManager.getGithubRepos(settingsManager.getGitAuthCredentials().second, ::addRepos) {
@@ -125,13 +125,12 @@ class CloneRepoFragment(
                 adapter.notifyItemInserted(repoList.size - 1)
                 repoListRecycler.scrollToPosition(repoList.size - 1)
             }
-
         } else {
-            val loadingIndex = repoList.indexOf(Pair("Loading...", ""))
+            val loadingIndex = repoList.indexOfFirst { it.first == "Loading..." }
             if (loadingIndex > -1) {
                 repoList.removeAt(loadingIndex)
                 activity?.runOnUiThread {
-                adapter.notifyItemRemoved(loadingIndex)
+                    adapter.notifyItemRemoved(loadingIndex)
                 }
             }
         }
@@ -139,9 +138,11 @@ class CloneRepoFragment(
     }
 
     private fun addRepos(repos: List<Pair<String, String>>) {
-        val prevEnd = repoList.size - 1
         setLoadingRepos(false)
+        val prevEnd = repoList.size
         repoList.addAll(repos)
+
+        if (!isAdded || isStateSaved) return
         activity?.runOnUiThread {
             adapter.notifyItemRangeInserted(prevEnd, repos.size)
             repoListRecycler.scrollToPosition(prevEnd)

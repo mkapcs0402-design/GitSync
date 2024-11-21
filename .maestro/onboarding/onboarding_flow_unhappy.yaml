@@ -1,0 +1,153 @@
+
+appId: com.viscouspot.gitsync
+---
+
+- runFlow: ../common/disable_all_files_access.yaml
+- clearState
+- killApp
+
+- runFlow: ../common/launch_stls_no_perms.yaml
+- assertVisible: "Welcome!"
+- tapOn: "SKIP"
+- assertVisible: "Enable Notifications"
+- killApp
+
+- runFlow: ../common/launch_stls_no_perms.yaml
+- assertVisible: "Welcome!"
+- tapOn: "LET'S GO"
+- assertVisible: "Enable Notifications"
+- killApp
+
+- runFlow: ../common/launch_stls_no_perms.yaml
+- assertVisible: "Welcome!"
+- tapOn: "LET'S GO"
+- assertVisible: "Enable Notifications"
+- tapOn: "OK"
+- assertVisible: "You haven't allowed notifications from this app"
+- back
+- assertVisible: "Enable Notifications"
+- killApp
+
+- runFlow: ../common/launch_stls_no_perms.yaml
+- assertVisible: "Welcome!"
+- tapOn: "LET'S GO"
+- assertVisible: "Enable Notifications"
+- tapOn: "OK"
+- assertVisible: "You haven't allowed notifications from this app"
+- back
+- assertVisible: "Enable Notifications"
+- tapOn: "DONE"
+- assertVisible: "You haven't allowed notifications from this app"
+- tapOn: "All Git Sync notifications"
+- back
+- assertVisible: "Enable Notifications"
+- tapOn: "DONE"
+- assertVisible: 'Enable "All Files Access"'
+- killApp
+
+- runFlow: ../common/launch_notif_perm.yaml
+- assertVisible: "Welcome!"
+- tapOn: "LET'S GO"
+- assertVisible: 'Enable "All Files Access"'
+- tapOn: "OK"
+- back
+- assertVisible: 'Enable "All Files Access"'
+- killApp
+
+- runFlow: ../common/launch_notif_perm.yaml
+- assertVisible: "Welcome!"
+- tapOn: "LET'S GO"
+- assertVisible: 'Enable "All Files Access"'
+- tapOn: "OK"
+- back
+- assertVisible: 'Enable "All Files Access"'
+- tapOn: "DONE"
+- assertVisible: "Allow access to manage all files"
+- tapOn: "Allow access to manage all files"
+- back
+- assertVisible: "Almost there!"
+- killApp
+
+- runFlow: ../common/launch_notif_perm.yaml
+- assertVisible: "Almost there!"
+- tapOn: "CANCEL"
+- assertNotVisible: "Almost there!"
+- killApp
+
+- runFlow: ../common/launch_notif_perm.yaml
+- assertVisible: "Almost there!"
+- tapOn: "OK"
+- assertVisible: "Authenticate with Github.com"
+- killApp
+
+- runFlow: ../common/launch_notif_perm.yaml
+- assertVisible: "Authenticate with Github.com"
+- tapOn: "SKIP"
+- assertNotVisible: "Authenticate with Github.com"
+- killApp
+
+- runFlow: ../common/launch_notif_perm.yaml
+- assertVisible: "Authenticate with Github.com"
+- tapOn: "OK"
+- assertVisible: "Use a different account"
+- tapOn: "Continue"
+- assertVisible: "Clone remote repository"
+- killApp
+
+- runFlow: ../common/launch_notif_perm.yaml
+- assertVisible: "Clone remote repository"
+- assertVisible: "TestObsidianVault"
+- tapOn: "TestObsidianVault"
+- assertVisible: "Select a folder to clone into"
+- tapOn: "CANCEL"
+- assertNotVisible: "Select a folder to clone into"
+- killApp
+
+- runFlow: ../common/launch_notif_perm.yaml
+- assertVisible: "Clone remote repository"
+- assertVisible: "TestObsidianVault"
+- tapOn: "TestObsidianVault"
+- assertVisible: "Select a folder to clone into"
+- tapOn: "SELECT"
+- assertVisible: "USE THIS FOLDER"
+- assertVisible: "Documents"
+- tapOn: "Documents"
+- tapOn: "USE THIS FOLDER"
+- assertVisible: "ALLOW"
+- tapOn: "ALLOW"
+- assertVisible: "Failed to clone repository!"
+- assertVisible: "OK"
+- tapOn: "OK"
+- assertVisible: "TestObsidianVault"
+- tapOn: "TestObsidianVault"
+- assertVisible: "Select a folder to clone into"
+- tapOn: "SELECT"
+- assertVisible: "USE THIS FOLDER"
+- assertVisible: "Documents"
+- tapOn: "Documents"
+- tapOn:
+    point: 65%,5%
+- evalScript: ${output.randomDirName = Math.random()}
+- inputText: ${output.randomDirName}
+- assertVisible: "OK"
+- tapOn: "OK"
+- assertVisible: ${output.randomDirName}
+- tapOn: ${output.randomDirName}
+- assertVisible: "USE THIS FOLDER"
+- tapOn: "USE THIS FOLDER"
+- assertVisible: "ALLOW"
+- tapOn: "ALLOW"
+- assertVisible: "Enable Auto Sync"
+- killApp
+
+- runFlow: ../common/launch_notif_perm.yaml
+- assertVisible: "Enable Auto Sync"
+- assertVisible: "SKIP"
+- tapOn: "SKIP"
+- assertNotVisible: "Enable Auto Sync"
+- killApp
+
+- runFlow: ../common/launch_notif_perm.yaml
+- assertVisible: "SYNC NOW"
+- assertNotVisible: "Enable Auto Sync"
+- killApp

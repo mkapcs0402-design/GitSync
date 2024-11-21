@@ -1,0 +1,8 @@
+
+appId: com.viscouspot.gitsync
+---
+
+- clearState
+- launchApp:
+    permissions:
+      all: deny

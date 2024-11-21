@@ -112,7 +112,6 @@ class MainActivity : AppCompatActivity() {
 
     private var requestedPermission = false
 
-
     companion object {
         const val REFRESH = "REFRESH"
         const val MERGE_COMPLETE = "MERGE_COMPLETE"
@@ -181,12 +180,14 @@ class MainActivity : AppCompatActivity() {
         gitManager.getGithubAuthCredentials(code, state) { username, authToken ->
             log(LogType.GithubAuthCredentials, "Username and Token Received")
 
+            if (settingsManager.getOnboardingStep() != 3) {
+                cloneRepoFragment.show(supportFragmentManager, getString(R.string.clone_repo_title))
+            }
+
             settingsManager.setGitAuthCredentials(username, authToken)
             settingsManager.setOnboardingStep(3)
             onboardingController.dismissAll()
             refreshAuthButton()
-
-            cloneRepoFragment.show(supportFragmentManager, getString(R.string.clone_repo_title))
         }
     }
 
@@ -222,14 +223,17 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
+        log(requestedPermission)
+        log(checkAccessibilityPermission())
+
         if (requestedPermission) {
+            requestedPermission = false
             if (NotificationManagerCompat.from(this).areNotificationsEnabled()) {
                 settingsManager.setSyncMessageEnabled(true)
             }
             if (checkAccessibilityPermission()) {
                 settingsManager.setApplicationObserverEnabled(true)
             }
-            requestedPermission = false
         } else {
             if (settingsManager.getOnboardingStep() != -1) {
                 onboardingController.show()
@@ -689,10 +693,12 @@ class MainActivity : AppCompatActivity() {
 
             if (settingsManager.getSyncMessageEnabled()) {
                 settingsManager.setSyncMessageEnabled(false)
-                checkAndRequestNotificationPermission {
-                    settingsManager.setSyncMessageEnabled(true)
-                    syncMessageButton.setIconResource(R.drawable.notify)
-                    syncMessageButton.setIconTintResource(R.color.auth_green)
+                if (settingsManager.getOnboardingStep() != 0) {
+                    checkAndRequestNotificationPermission {
+                        settingsManager.setSyncMessageEnabled(true)
+                        syncMessageButton.setIconResource(R.drawable.notify)
+                        syncMessageButton.setIconTintResource(R.color.auth_green)
+                    }
                 }
             } else {
                 syncMessageButton.setIconResource(R.drawable.notify_off)
@@ -707,22 +713,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             val applicationObserverEnabled = settingsManager.getApplicationObserverEnabled()
-            applicationObserverSwitch.isChecked = applicationObserverEnabled
-
-            if (applicationObserverEnabled) {
-                if (!checkAccessibilityPermission()) {
-                    applicationObserverSwitch.isChecked = false
-                    settingsManager.setApplicationObserverEnabled(false)
-                    requestAccessibilityPermission()
-                }
-            }
-
-            (if (applicationObserverSwitch.isChecked) applicationObserverMax else applicationObserverMin).applyTo(
-                applicationObserverPanel
-            )
-
-            updateApplicationObserverSwitch()
-            refreshSelectedApplications()
+            updateApplicationObserver(applicationObserverEnabled)
 
             syncAppOpened.isChecked = settingsManager.getSyncOnAppOpened()
             syncAppClosed.isChecked = settingsManager.getSyncOnAppClosed()
@@ -923,8 +914,9 @@ class MainActivity : AppCompatActivity() {
     private fun requestAccessibilityPermission() {
         val openSettings = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
         openSettings.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_NO_HISTORY)
-        startActivity(openSettings)
         requestedPermission = true
+        settingsManager.setOnboardingStep(-1)
+        startActivity(openSettings)
         Toast.makeText(this, getString(R.string.enable_accessibility_service), Toast.LENGTH_LONG).show()
     }
 
@@ -956,6 +948,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         onStoragePermissionGranted = onGranted
+        requestedPermission = true
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             val uri = Uri.fromParts("package", packageName, null)

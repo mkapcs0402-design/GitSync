@@ -51,7 +51,6 @@ class OnboardingController(
                     activity.supportFragmentManager,
                     context.getString(R.string.clone_repo_title)
                 )
-
                 4 -> getEnableAutoSyncDialog().show()
             }
         }
@@ -155,12 +154,7 @@ class OnboardingController(
             .setTitle(context.getString(R.string.all_files_access_dialog_title))
             .setMessage(context.getString(R.string.all_files_access_dialog_message))
             .setPositiveButton(context.getString(android.R.string.ok)) { _, _ -> }
-            .setNegativeButton(
-                context.getString(R.string.skip)
-            ) { dialog, _ ->
-                dialog.dismiss()
-                showAlmostThereOrSkip()
-            }.create().apply {
+            .create().apply {
                 setOnShowListener {
                     getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
                         checkAndRequestStoragePermission {
