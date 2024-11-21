@@ -24,9 +24,12 @@ class RepoListAdapter(private val repoList: MutableList<Pair<String, String>>, p
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        val item = repoList[position]
         holder.container.setOnClickListener {
-            onSelect(repoList[position])
+            if (item.second != "") {
+                onSelect(item)
+            }
         }
-        holder.repoName.text = repoList[position].first
+        holder.repoName.text = item.first
     }
 }

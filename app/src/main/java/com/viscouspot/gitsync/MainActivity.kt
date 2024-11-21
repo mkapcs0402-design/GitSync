@@ -18,14 +18,9 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
-import android.os.Handler
-import android.os.Looper
 import android.provider.Settings
-import android.text.Html
 import android.text.Spannable
-import android.text.method.LinkMovementMethod
 import android.text.style.ForegroundColorSpan
-import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
@@ -62,15 +57,10 @@ import com.viscouspot.gitsync.util.GitManager
 import com.viscouspot.gitsync.util.Helper
 import com.viscouspot.gitsync.util.LogType
 import com.viscouspot.gitsync.util.Logger.log
+import com.viscouspot.gitsync.util.OnboardingController
 import com.viscouspot.gitsync.util.SettingsManager
 import com.viscouspot.gitsync.util.rightDrawable
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import java.io.BufferedReader
 import java.io.File
-import java.io.FileInputStream
-import java.io.InputStreamReader
 import java.util.Locale
 import kotlin.math.max
 import kotlin.math.min
@@ -81,6 +71,8 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var gitManager: GitManager
     private lateinit var settingsManager: SettingsManager
+    private lateinit var onboardingController: OnboardingController
+    private lateinit var cloneRepoFragment: CloneRepoFragment
 
     private val recentCommits: MutableList<Commit> = mutableListOf()
     private lateinit var recentCommitsRecycler: RecyclerViewEmptySupport
@@ -123,7 +115,6 @@ class MainActivity : AppCompatActivity() {
 
     private var requestedPermission = false
 
-
     companion object {
         const val REFRESH = "REFRESH"
         const val MERGE_COMPLETE = "MERGE_COMPLETE"
@@ -151,9 +142,12 @@ class MainActivity : AppCompatActivity() {
 
         settingsManager.setGitDirUri(dirUri.toString())
 
-
         gitDirPath.setText(Helper.getPathFromUri(this, dirUri))
         refreshGitRepo()
+
+        settingsManager.setOnboardingStep(4)
+        onboardingController.dismissAll()
+        onboardingController.show()
     }
 
     private val requestNotificationPermission = this.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { }
@@ -189,11 +183,14 @@ class MainActivity : AppCompatActivity() {
         gitManager.getGithubAuthCredentials(code, state) { username, authToken ->
             log(LogType.GithubAuthCredentials, "Username and Token Received")
 
-            settingsManager.setHadFirstTime()
-            settingsManager.setGitAuthCredentials(username, authToken)
-            refreshAuthButton()
+            if (settingsManager.getOnboardingStep() != 3) {
+                cloneRepoFragment.show(supportFragmentManager, getString(R.string.clone_repo_title))
+            }
 
-            CloneRepoFragment(settingsManager, gitManager, ::dirSelectionCallback).show(supportFragmentManager, getString(R.string.clone_repo_title))
+            settingsManager.setGitAuthCredentials(username, authToken)
+            settingsManager.setOnboardingStep(3)
+            onboardingController.dismissAll()
+            refreshAuthButton()
         }
     }
 
@@ -209,6 +206,15 @@ class MainActivity : AppCompatActivity() {
         recyclerView.requestLayout()
     }
 
+    override fun onPause() {
+        super.onPause()
+
+        val onboardingStep = settingsManager.getOnboardingStep()
+        if (onboardingStep != 0) {
+            onboardingController.dismissAll()
+        }
+    }
+
     override fun onDestroy() {
         super.onDestroy()
 
@@ -220,16 +226,22 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
-        if (settingsManager.isFirstTime()) return
+        log(requestedPermission)
+        log(checkAccessibilityPermission())
 
         if (requestedPermission) {
+            requestedPermission = false
             if (NotificationManagerCompat.from(this).areNotificationsEnabled()) {
                 settingsManager.setSyncMessageEnabled(true)
             }
             if (checkAccessibilityPermission()) {
                 settingsManager.setApplicationObserverEnabled(true)
             }
-            requestedPermission = false
+        } else {
+            if (settingsManager.getOnboardingStep() != -1) {
+                onboardingController.show()
+                return
+            }
         }
 
         refreshAll()
@@ -265,7 +277,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        if (BuildConfig.ALL_FILES && !settingsManager.isFirstTime()) {
+        if (BuildConfig.ALL_FILES && settingsManager.getOnboardingStep() == -1) {
             checkAndRequestStoragePermission()
         }
 
@@ -311,6 +323,9 @@ class MainActivity : AppCompatActivity() {
 
         recentCommitsRecycler.adapter = recentCommitsAdapter
         applicationRecycler.adapter = applicationListAdapter
+
+        cloneRepoFragment = CloneRepoFragment(settingsManager, gitManager, ::dirSelectionCallback)
+        onboardingController = OnboardingController(this, this, settingsManager, gitManager, cloneRepoFragment, ::updateApplicationObserver, ::checkAndRequestNotificationPermission, ::checkAndRequestStoragePermission)
 
         setRecyclerViewHeight(recentCommitsRecycler)
 
@@ -368,24 +383,7 @@ class MainActivity : AppCompatActivity() {
         updateApplicationObserverSwitch()
 
         applicationObserverSwitch.setOnCheckedChangeListener { _, isChecked ->
-            (if (isChecked) applicationObserverMax else applicationObserverMin).applyTo(applicationObserverPanel)
-            if (isChecked) {
-                updateApplicationObserverSwitch(true)
-                if (!checkAccessibilityPermission()) {
-                    applicationObserverSwitch.isChecked = false
-                    syncAppOpened.isChecked = false
-                    syncAppClosed.isChecked = false
-                    updateApplicationObserverSwitch(false)
-                    applicationObserverMin.applyTo(applicationObserverPanel)
-                    displayProminentDisclosure()
-                } else {
-                    settingsManager.setApplicationObserverEnabled(true)
-                    refreshSelectedApplications()
-                }
-            } else {
-                updateApplicationObserverSwitch(false)
-                settingsManager.setApplicationObserverEnabled(false)
-            }
+            updateApplicationObserver(isChecked)
         }
 
         selectApplication.setOnClickListener {
@@ -404,157 +402,27 @@ class MainActivity : AppCompatActivity() {
             val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.docs_link)))
             startActivity(browserIntent)
         }
+    }
 
-        if (settingsManager.isFirstTime()) {
-            var hasSkipped = false
-
-            val authDialogBuilder = AlertDialog.Builder(this, R.style.AlertDialogTheme)
-                .setCancelable(false)
-                .setTitle(getString(R.string.auth_dialog_title))
-                .setMessage(getString(R.string.auth_dialog_message))
-                .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
-                    dialog.dismiss()
-                    gitManager.launchGithubOAuthFlow()
-                }
-                .setNegativeButton(
-                    getString(R.string.skip)
-                ) { dialog, _ ->
-                    dialog.dismiss()
-                    settingsManager.setHadFirstTime()
-                }
-
-            val almostThereDialogLink = TextView(this).apply {
-                movementMethod = LinkMovementMethod.getInstance()
-                gravity = Gravity.END
-                setPadding(
-                    0,
-                    0,
-                    resources.getDimension(R.dimen.space_md).toInt(),
-                    0
-                )
-                text = Html.fromHtml(
-                    getString(R.string.documentation_html_link).format(getString(R.string.docs_link)),
-                    0
-                )
+    private fun updateApplicationObserver(isChecked: Boolean) {
+        (if (isChecked) applicationObserverMax else applicationObserverMin).applyTo(applicationObserverPanel)
+        if (isChecked) {
+            updateApplicationObserverSwitch(true)
+            if (!checkAccessibilityPermission()) {
+                applicationObserverSwitch.isChecked = false
+                syncAppOpened.isChecked = false
+                syncAppClosed.isChecked = false
+                updateApplicationObserverSwitch(false)
+                applicationObserverMin.applyTo(applicationObserverPanel)
+                displayProminentDisclosure()
+            } else {
+                settingsManager.setApplicationObserverEnabled(true)
+                refreshSelectedApplications()
             }
-
-            val almostThereDialogBuilder = AlertDialog.Builder(this, R.style.AlertDialogTheme)
-                .setCancelable(false)
-                .setTitle(getString(R.string.almost_there_dialog_title))
-                .setView(almostThereDialogLink)
-                .setMessage(getString(R.string.almost_there_dialog_message))
-                .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
-                    dialog.dismiss()
-                    authDialogBuilder.create().show()
-                }
-                .setNegativeButton(
-                    getString(android.R.string.cancel)
-                ) { dialog, _ ->
-                    dialog.dismiss()
-                }
-
-            fun showAlmostThereOrSkip() {
-                if (hasSkipped) return
-                almostThereDialogBuilder.create().show()
-            }
-
-            val enableAllFilesDialogBuilder = AlertDialog.Builder(this, R.style.AlertDialogTheme)
-                .setCancelable(false)
-                .setTitle(getString(R.string.all_files_access_dialog_title))
-                .setMessage(getString(R.string.all_files_access_dialog_message))
-                .setPositiveButton(getString(android.R.string.ok)) { _, _ -> }
-                .setNegativeButton(
-                    getString(R.string.skip)
-                ) { dialog, _ ->
-                    dialog.dismiss()
-                    showAlmostThereOrSkip()
-                }.create().apply {
-                    setOnShowListener {
-                        getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
-                            checkAndRequestStoragePermission {
-                                dismiss()
-                                showAlmostThereOrSkip()
-                            }
-                            this.getButton(AlertDialog.BUTTON_POSITIVE).text = getString(R.string.done)
-                        }
-                    }
-                }
-
-            fun showAllFilesAccessOrNext() {
-                val hasPermissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) Environment.isExternalStorageManager() else
-                    ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
-
-                if (BuildConfig.ALL_FILES && !hasPermissions) {
-                    enableAllFilesDialogBuilder.show()
-                } else {
-                    showAlmostThereOrSkip()
-                }
-            }
-
-            val enableNotificationsDialogBuilder = AlertDialog.Builder(this, R.style.AlertDialogTheme)
-                .setCancelable(false)
-                .setTitle(getString(R.string.notification_dialog_title))
-                .setMessage(getString(R.string.notification_dialog_message))
-                .setPositiveButton(getString(android.R.string.ok)) { _, _ -> }
-                .setNegativeButton(
-                    getString(R.string.skip)
-                ) { dialog, _ ->
-                    dialog.dismiss()
-                    settingsManager.setSyncMessageEnabled(false)
-                    showAllFilesAccessOrNext()
-                }.create().apply {
-                    setOnShowListener {
-                        getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
-                            checkAndRequestNotificationPermission {
-                                dismiss()
-                                showAllFilesAccessOrNext()
-                            }
-                            getButton(AlertDialog.BUTTON_POSITIVE).text =
-                                getString(R.string.done)
-                        }
-                    }
-                }
-
-            fun showNotificationsOrNext() {
-                if (!NotificationManagerCompat.from(this).areNotificationsEnabled()) {
-                    enableNotificationsDialogBuilder.show()
-                } else {
-                    showAllFilesAccessOrNext()
-                }
-            }
-
-            val welcomeDialogBuilder = AlertDialog.Builder(this, R.style.AlertDialogTheme)
-                .setCancelable(false)
-                .setTitle(getString(R.string.welcome))
-                .setMessage(getString(R.string.welcome_message))
-                .setPositiveButton(getString(R.string.welcome_positive)) { dialog, _ ->
-                    dialog.dismiss()
-                    showNotificationsOrNext()
-                }
-                .setNeutralButton(
-                    getString(R.string.welcome_neutral)
-                ) { dialog, _ ->
-                    hasSkipped = true
-                    dialog.dismiss()
-                    showNotificationsOrNext()
-                }
-                .setNegativeButton(
-                    getString(R.string.welcome_negative)
-                ) { dialog, _ ->
-                    hasSkipped = true
-                    settingsManager.setHadFirstTime()
-                    dialog.dismiss()
-                    showNotificationsOrNext()
-                }
-
-            welcomeDialogBuilder
-                .create()
-                .show()
-
-            return
+        } else {
+            updateApplicationObserverSwitch(false)
+            settingsManager.setApplicationObserverEnabled(false)
         }
-
-        refreshAll()
     }
 
     private fun openMergeConflictDialog() {
@@ -831,10 +699,12 @@ class MainActivity : AppCompatActivity() {
 
             if (settingsManager.getSyncMessageEnabled()) {
                 settingsManager.setSyncMessageEnabled(false)
-                checkAndRequestNotificationPermission {
-                    settingsManager.setSyncMessageEnabled(true)
-                    syncMessageButton.setIconResource(R.drawable.notify)
-                    syncMessageButton.setIconTintResource(R.color.auth_green)
+                if (settingsManager.getOnboardingStep() != 0) {
+                    checkAndRequestNotificationPermission {
+                        settingsManager.setSyncMessageEnabled(true)
+                        syncMessageButton.setIconResource(R.drawable.notify)
+                        syncMessageButton.setIconTintResource(R.color.auth_green)
+                    }
                 }
             } else {
                 syncMessageButton.setIconResource(R.drawable.notify_off)
@@ -849,22 +719,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             val applicationObserverEnabled = settingsManager.getApplicationObserverEnabled()
-            applicationObserverSwitch.isChecked = applicationObserverEnabled
-
-            if (applicationObserverEnabled) {
-                if (!checkAccessibilityPermission()) {
-                    applicationObserverSwitch.isChecked = false
-                    settingsManager.setApplicationObserverEnabled(false)
-                    requestAccessibilityPermission()
-                }
-            }
-
-            (if (applicationObserverSwitch.isChecked) applicationObserverMax else applicationObserverMin).applyTo(
-                applicationObserverPanel
-            )
-
-            updateApplicationObserverSwitch()
-            refreshSelectedApplications()
+            updateApplicationObserver(applicationObserverEnabled)
 
             syncAppOpened.isChecked = settingsManager.getSyncOnAppOpened()
             syncAppClosed.isChecked = settingsManager.getSyncOnAppClosed()
@@ -1066,8 +921,9 @@ class MainActivity : AppCompatActivity() {
     private fun requestAccessibilityPermission() {
         val openSettings = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
         openSettings.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_NO_HISTORY)
-        startActivity(openSettings)
         requestedPermission = true
+        settingsManager.setOnboardingStep(-1)
+        startActivity(openSettings)
         Toast.makeText(this, getString(R.string.enable_accessibility_service), Toast.LENGTH_LONG).show()
     }
 
@@ -1099,6 +955,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         onStoragePermissionGranted = onGranted
+        requestedPermission = true
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             val uri = Uri.fromParts("package", packageName, null)

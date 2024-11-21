@@ -1,0 +1,26 @@
+
+appId: com.android.settings
+---
+
+- launchApp
+- tapOn: "Apps"
+- assertVisible: "Recently opened apps"
+- scroll
+- assertVisible: "Special app access"
+- tapOn: "Special app access"
+- assertVisible: "All files access"
+- tapOn: "All files access"
+- assertVisible: "Git Sync"
+- runFlow:
+    when:
+      notVisible: 'Not allowed'
+    commands:
+        - tapOn: "Git Sync"
+        - assertVisible: "Allow access to manage all files"
+        - tapOn: "Allow access to manage all files"
+- back
+- back
+- back
+- back
+- back
+- killApp

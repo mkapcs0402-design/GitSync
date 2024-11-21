@@ -61,6 +61,9 @@
     <string name="auth_dialog_title">Authenticate with Github.com</string>
     <string name="auth_dialog_message">Please authenticate with Github and continue on to clone your repo!</string>
 
+    <string name="enable_autosync_title">Enable Auto Sync</string>
+    <string name="enable_autosync_message">Keep your data up-to-date effortlessly. Turn on Auto Sync to automatically sync in the background whenever apps are opened or closed.</string>
+
     <string name="accessibility_service_disclosure_title">Accessibility Service Disclosure</string>
     <string name="accessibility_service_disclosure_message">To enhance your experience,\nGitSync uses Android’s Accessibility Service to detect when apps are opened or closed.\n\nThis helps us provide tailored features without storing or sharing any data.\n\nᴘʟᴇᴀsᴇ ᴇɴᴀʙʟᴇ ɢɪᴛsʏɴᴄ ᴏɴ ᴛʜᴇ ɴᴇxᴛ sᴄʀᴇᴇɴ</string>
 
