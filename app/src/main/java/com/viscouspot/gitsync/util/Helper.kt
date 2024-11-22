@@ -264,10 +264,15 @@ object Helper {
         return ""
     }
 
-    fun isValidGitRepo(url: String): Boolean {
-        val regex = """^(https?://(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,6}/[a-zA-Z0-9-_]+/[a-zA-Z0-9-_]+\.git)${'$'}""".toRegex()
+    fun isValidGitRepo(url: String): String? {
+        val validDomains = listOf("github.com")
+        val regex = Regex("^https?://([a-zA-Z0-9.-]+)/(\\S+)/(\\S+)\$")
 
-        return regex.matches(url)
+        return when {
+            !regex.matches(url) -> "URL must be an HTTP or HTTPS URL and follow the format 'https://domain/user/repo'"
+            !validDomains.any { url.startsWith("https://$it") || url.startsWith("http://$it") } -> "URL domain is not allowed"
+            else -> null
+        }
     }
 }
 
