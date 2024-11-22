@@ -48,6 +48,7 @@ class SettingsManager internal constructor(private val context: Context) {
     }
 
     fun setOnboardingStep(step: Int) {
+        if (getOnboardingStep() == -1) return
         with(settingsSharedPref.edit()) {
             putInt("onboardingStep", step)
             apply()
