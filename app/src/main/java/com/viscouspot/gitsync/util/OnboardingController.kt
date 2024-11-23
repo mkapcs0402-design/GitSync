@@ -47,10 +47,14 @@ class OnboardingController(
                 0 -> getWelcomeDialog().show()
                 1 -> showAlmostThereOrSkip()
                 2 -> getAuthDialog().show()
-                3 -> if (!cloneRepoFragment.isAdded) cloneRepoFragment.show(
-                    activity.supportFragmentManager,
-                    context.getString(R.string.clone_repo_title)
-                )
+                3 -> {
+                    if (!cloneRepoFragment.isAdded) {
+                        cloneRepoFragment.show(
+                            activity.supportFragmentManager,
+                            context.getString(R.string.clone_repo_title)
+                        )
+                    }
+                }
                 4 -> getEnableAutoSyncDialog().show()
             }
         }
