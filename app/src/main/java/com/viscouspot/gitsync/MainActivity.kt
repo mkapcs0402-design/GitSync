@@ -604,6 +604,7 @@ class MainActivity : AppCompatActivity() {
         val gitignoreInputWrapper = view.findViewById<HorizontalScrollView>(R.id.gitignoreInputWrapper)
         val gitignoreInput = view.findViewById<EditText>(R.id.gitignoreInput)
         gitignoreInput.setText(gitManager.readGitignore(gitDirPath.text.toString()))
+        highlightCommentsInInput(gitignoreInput)
         gitignoreInput.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
                 gitignoreInputWrapper.post { gitignoreInputWrapper.scrollTo(0, 0) }
@@ -611,6 +612,7 @@ class MainActivity : AppCompatActivity() {
         }
         gitignoreInput.doOnTextChanged { text, _, _, _ ->
             gitManager.writeGitignore(gitDirPath.text.toString(), text.toString())
+            highlightCommentsInInput(gitignoreInput)
         }
     }
 
@@ -618,6 +620,7 @@ class MainActivity : AppCompatActivity() {
         val gitInfoExcludeInputWrapper = view.findViewById<HorizontalScrollView>(R.id.gitInfoExcludeInputWrapper)
         val gitInfoExcludeInput = view.findViewById<EditText>(R.id.gitInfoExcludeInput)
         gitInfoExcludeInput.setText(gitManager.readGitInfoExclude(gitDirPath.text.toString()))
+        highlightCommentsInInput(gitInfoExcludeInput)
         gitInfoExcludeInput.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
                 gitInfoExcludeInputWrapper.post { gitInfoExcludeInputWrapper.scrollTo(0, 0) }
@@ -625,6 +628,7 @@ class MainActivity : AppCompatActivity() {
         }
         gitInfoExcludeInput.doOnTextChanged { text, _, _, _ ->
             gitManager.writeGitInfoExclude(gitDirPath.text.toString(), text.toString())
+            highlightCommentsInInput(gitInfoExcludeInput)
         }
     }
 
@@ -633,6 +637,21 @@ class MainActivity : AppCompatActivity() {
         if (start == -1) return
 
         syncMessageInput.getText().setSpan(ForegroundColorSpan(getColor(R.color.additions)), start, start + 2, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+    }
+
+    private fun highlightCommentsInInput(syncMessageInput: EditText) {
+        val text = syncMessageInput.text.toString()
+        val lines = text.split("\n")
+        var start = 0
+
+        for (line in lines) {
+            if (line.trim().startsWith("#")) {
+                val lineStart = text.indexOf(line, start)
+                val lineEnd = lineStart + line.length
+                syncMessageInput.getText().setSpan(ForegroundColorSpan(getColor(R.color.textSecondary)), lineStart, lineEnd, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            }
+            start += line.length + 1
+        }
     }
 
     private fun getDeviceApps(): List<String> {
