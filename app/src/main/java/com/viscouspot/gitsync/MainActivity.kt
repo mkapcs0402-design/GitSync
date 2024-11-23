@@ -578,6 +578,7 @@ class MainActivity : AppCompatActivity() {
 
         setupSyncMessageSettings(dialogView)
         setupGitignoreSettings(dialogView)
+        setupGitInfoExcludeSettings(dialogView)
 
         builder.setView(dialogView)
 
@@ -609,6 +610,20 @@ class MainActivity : AppCompatActivity() {
         }
         gitignoreInput.doOnTextChanged { text, _, _, _ ->
             gitManager.writeGitignore(gitDirPath.text.toString(), text.toString())
+        }
+    }
+
+    private fun setupGitInfoExcludeSettings(view: View) {
+        val gitInfoExcludeInputWrapper = view.findViewById<HorizontalScrollView>(R.id.gitInfoExcludeInputWrapper)
+        val gitInfoExcludeInput = view.findViewById<EditText>(R.id.gitInfoExcludeInput)
+        gitInfoExcludeInput.setText(gitManager.readGitInfoExclude(gitDirPath.text.toString()))
+        gitInfoExcludeInput.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                gitInfoExcludeInputWrapper.post { gitInfoExcludeInputWrapper.scrollTo(0, 0) }
+            }
+        }
+        gitInfoExcludeInput.doOnTextChanged { text, _, _, _ ->
+            gitManager.writeGitInfoExclude(gitDirPath.text.toString(), text.toString())
         }
     }
 
