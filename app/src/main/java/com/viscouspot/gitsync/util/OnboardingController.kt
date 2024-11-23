@@ -26,8 +26,8 @@ class OnboardingController(
     private val checkAndRequestNotificationPermission: (onGranted: (() -> Unit)?) -> Unit,
     private val checkAndRequestStoragePermission: (onGranted: (() -> Unit)?) -> Unit
     ) {
-    private var hasSkipped = false
-    var currentDialog: AlertDialog? = null
+    var hasSkipped = false
+    private var currentDialog: AlertDialog? = null
 
 
     fun show() {
@@ -62,7 +62,7 @@ class OnboardingController(
         }
     }
 
-    fun getEnableAutoSyncDialog(): AlertDialog {
+    private fun getEnableAutoSyncDialog(): AlertDialog {
         activity.runOnUiThread {
             currentDialog = AlertDialog.Builder(context, R.style.AlertDialogTheme)
                 .setCancelable(false)
@@ -84,7 +84,7 @@ class OnboardingController(
         return currentDialog!!
     }
 
-    fun getAuthDialog(): AlertDialog {
+    private fun getAuthDialog(): AlertDialog {
         activity.runOnUiThread {
             currentDialog = AlertDialog.Builder(context, R.style.AlertDialogTheme)
                 .setCancelable(false)
@@ -103,7 +103,7 @@ class OnboardingController(
         return currentDialog!!
     }
 
-    fun getAlmostThereDialogLink(): TextView {
+    private fun getAlmostThereDialogLink(): TextView {
         return TextView(context).apply {
             movementMethod = LinkMovementMethod.getInstance()
             gravity = Gravity.END
@@ -120,7 +120,7 @@ class OnboardingController(
         }
     }
 
-    fun getAlmostThereDialog(): AlertDialog {
+    private fun getAlmostThereDialog(): AlertDialog {
         activity.runOnUiThread {
         currentDialog = AlertDialog.Builder(context, R.style.AlertDialogTheme)
             .setCancelable(false)
@@ -141,13 +141,13 @@ class OnboardingController(
         return currentDialog!!
     }
 
-    fun showAlmostThereOrSkip() {
+    private fun showAlmostThereOrSkip() {
         settingsManager.setOnboardingStep(1)
         if (hasSkipped) return
         getAlmostThereDialog().show()
     }
 
-    fun getEnableAllFilesDialog(): AlertDialog {
+    private fun getEnableAllFilesDialog(): AlertDialog {
         activity.runOnUiThread {
         currentDialog = AlertDialog.Builder(context, R.style.AlertDialogTheme)
             .setCancelable(false)
@@ -170,7 +170,7 @@ class OnboardingController(
         return currentDialog!!
     }
 
-    fun showAllFilesAccessOrNext() {
+    private fun showAllFilesAccessOrNext() {
         val hasPermissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) Environment.isExternalStorageManager() else
             ContextCompat.checkSelfPermission(context, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
 
@@ -181,7 +181,7 @@ class OnboardingController(
         }
     }
 
-    fun getEnableNotificationsDialog(): AlertDialog {
+    private fun getEnableNotificationsDialog(): AlertDialog {
         activity.runOnUiThread {
         currentDialog = AlertDialog.Builder(context, R.style.AlertDialogTheme)
             .setCancelable(false)
@@ -204,7 +204,7 @@ class OnboardingController(
         return currentDialog!!
     }
 
-    fun showNotificationsOrNext() {
+    private fun showNotificationsOrNext() {
         if (!NotificationManagerCompat.from(context).areNotificationsEnabled()) {
             getEnableNotificationsDialog().show()
         } else {
@@ -212,7 +212,7 @@ class OnboardingController(
         }
     }
 
-    fun getWelcomeDialog(): AlertDialog {
+    private fun getWelcomeDialog(): AlertDialog {
         activity.runOnUiThread {
             currentDialog = AlertDialog.Builder(context, R.style.AlertDialogTheme)
                 .setCancelable(false)
