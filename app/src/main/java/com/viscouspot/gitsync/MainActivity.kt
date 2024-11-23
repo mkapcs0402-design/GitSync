@@ -226,9 +226,6 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
-        log(requestedPermission)
-        log(checkAccessibilityPermission())
-
         if (requestedPermission) {
             requestedPermission = false
             if (NotificationManagerCompat.from(this).areNotificationsEnabled()) {

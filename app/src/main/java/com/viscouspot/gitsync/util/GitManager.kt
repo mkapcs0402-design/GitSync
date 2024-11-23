@@ -470,10 +470,6 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
     }
 
     private fun handleTransportException(e: TransportException, scheduleNetworkSync: () -> Unit) {
-        log("testyes")
-        log(e)
-        log(e.cause)
-        log(e.message)
         if (listOf(
             JGitText.get().connectionFailed,
             JGitText.get().connectionTimeOut,
