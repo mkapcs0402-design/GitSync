@@ -142,8 +142,8 @@ class CloneRepoFragment(
             repoList.addAll(repos)
 
             if (!isAdded || isStateSaved) return@runOnUiThread
-                adapter.notifyItemRangeInserted(prevEnd, repos.size)
-                repoListRecycler.scrollToPosition(prevEnd)
+            adapter.notifyItemRangeInserted(prevEnd, repos.size)
+            repoListRecycler.scrollToPosition(prevEnd)
         }
     }
 
