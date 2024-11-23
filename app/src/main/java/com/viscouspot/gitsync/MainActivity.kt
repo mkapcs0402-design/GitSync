@@ -210,7 +210,7 @@ class MainActivity : AppCompatActivity() {
         super.onPause()
 
         val onboardingStep = settingsManager.getOnboardingStep()
-        if (onboardingStep != 0) {
+        if (settingsManager.getOnboardingStep() != 0 && !onboardingController.hasSkipped) {
             onboardingController.dismissAll()
         }
     }
