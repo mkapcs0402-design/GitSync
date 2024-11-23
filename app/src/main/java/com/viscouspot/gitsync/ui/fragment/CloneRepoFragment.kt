@@ -119,33 +119,31 @@ class CloneRepoFragment(
     }
 
     private fun setLoadingRepos(loading: Boolean) {
-        if (loading && loadNextRepos != null) {
-            repoList.add(Pair("Loading...", ""))
-            activity?.runOnUiThread {
-                adapter.notifyItemInserted(repoList.size - 1)
-                repoListRecycler.scrollToPosition(repoList.size - 1)
-            }
-        } else {
-            val loadingIndex = repoList.indexOfFirst { it.first == "Loading..." }
-            if (loadingIndex > -1) {
-                repoList.removeAt(loadingIndex)
-                activity?.runOnUiThread {
-                    adapter.notifyItemRemoved(loadingIndex)
+        activity?.runOnUiThread {
+            if (loading && loadNextRepos != null) {
+                repoList.add(Pair("Loading...", ""))
+                    adapter.notifyItemInserted(repoList.size - 1)
+                    repoListRecycler.scrollToPosition(repoList.size - 1)
+            } else {
+                val loadingIndex = repoList.indexOfFirst { it.first == "Loading..." }
+                if (loadingIndex > -1) {
+                    repoList.removeAt(loadingIndex)
+                        adapter.notifyItemRemoved(loadingIndex)
                 }
             }
+            loadingRepos = loading
         }
-        loadingRepos = loading
     }
 
     private fun addRepos(repos: List<Pair<String, String>>) {
-        setLoadingRepos(false)
-        val prevEnd = repoList.size
-        repoList.addAll(repos)
-
-        if (!isAdded || isStateSaved) return
         activity?.runOnUiThread {
-            adapter.notifyItemRangeInserted(prevEnd, repos.size)
-            repoListRecycler.scrollToPosition(prevEnd)
+            setLoadingRepos(false)
+            val prevEnd = repoList.size
+            repoList.addAll(repos)
+
+            if (!isAdded || isStateSaved) return@runOnUiThread
+                adapter.notifyItemRangeInserted(prevEnd, repos.size)
+                repoListRecycler.scrollToPosition(prevEnd)
         }
     }
 
