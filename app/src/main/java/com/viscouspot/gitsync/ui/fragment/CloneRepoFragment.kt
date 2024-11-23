@@ -149,7 +149,7 @@ class CloneRepoFragment(
 
     private fun localRepoCallback(dirUri: Uri?){
         dirSelectionCallback.invoke(dirUri)
-        dismiss()
+        dismissAllowingStateLoss()
     }
 
     private fun selectLocalRepo() {
@@ -160,7 +160,7 @@ class CloneRepoFragment(
     private fun localDirCallback(dirUri: Uri?) {
         if (dirUri == null) {
             dirSelectionCallback.invoke(null)
-            dismiss()
+            dismissAllowingStateLoss()
             return
         }
         val authCredentials = settingsManager.getGitAuthCredentials()
@@ -175,10 +175,10 @@ class CloneRepoFragment(
         }
         gitManager.cloneRepository(repoUrl, dirUri, authCredentials.first, authCredentials.second,
             { task -> activity?.runOnUiThread { cloneDialog.setMessage("${getString(R.string.clone_message)}$task") } },
-            { progress -> cloneDialog.progress = progress},
+            { progress -> activity?.runOnUiThread { cloneDialog.progress = progress } },
             { error ->
                 log(LogType.CloneRepo, error)
-                requireActivity().runOnUiThread {
+                activity?.runOnUiThread {
                     Toast.makeText(context, getString(R.string.clone_failed), Toast.LENGTH_SHORT).show()
                     cloneDialog.dismiss()
                     val message = if (getString(R.string.clone_failed) == error) "" else error
@@ -191,9 +191,11 @@ class CloneRepoFragment(
                 }
             },
             {
-                cloneDialog.dismiss()
-                dirSelectionCallback.invoke(dirUri)
-                dismiss()
+                activity?.runOnUiThread {
+                    cloneDialog.dismiss()
+                    dirSelectionCallback.invoke(dirUri)
+                    dismissAllowingStateLoss()
+                }
             })
     }
 
