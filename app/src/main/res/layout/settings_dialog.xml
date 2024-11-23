@@ -83,7 +83,7 @@
         app:layout_constraintTop_toBottomOf="@+id/syncMessageInput"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:text="GitIgnore"/>
+        android:text=".GitIgnore"/>
 
     <TextView
         android:id="@+id/gitIgnoreDescription"
@@ -96,7 +96,7 @@
         app:layout_constraintTop_toBottomOf="@+id/gitIgnoreLabel"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:text="list files or folders to ignore"/>
+        android:text="list files or folders to ignore on all devices"/>
 
     <HorizontalScrollView
         android:id="@+id/gitignoreInputWrapper"
@@ -112,6 +112,66 @@
         app:layout_constraintEnd_toEndOf="parent">
         <EditText
             android:id="@+id/gitignoreInput"
+            android:hint=".trash/\n./…"
+            android:background="@null"
+            android:backgroundTint="@null"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="@dimen/space_xl"
+            android:singleLine="false"
+            android:maxLines="8"
+            android:minLines="4"
+            android:inputType="textMultiLine"
+            android:textColorHint="@color/textSecondary"
+            android:gravity="top|start"
+            android:textSize="@dimen/text_size_md"
+            android:textStyle="bold"
+            android:textColor="@color/textPrimary"
+            android:text=""/>
+    </HorizontalScrollView>
+
+    <TextView
+        android:id="@+id/gitInfoExcludeLabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/text_size_md"
+        android:textColor="@color/textPrimary"
+        android:layout_marginStart="@dimen/space_sm"
+        android:layout_marginTop="@dimen/space_md"
+        android:textAllCaps="true"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@+id/gitignoreInputWrapper"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:text="Git/info/exclude"/>
+
+    <TextView
+        android:id="@+id/gitInfoExcludeDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/text_size_sm"
+        android:textColor="@color/textSecondary"
+        android:layout_marginStart="@dimen/space_md"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@+id/gitInfoExcludeLabel"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:text="list files or folders to ignore on this device"/>
+
+    <HorizontalScrollView
+        android:id="@+id/gitInfoExcludeInputWrapper"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_sm"
+        android:background="@drawable/input_bg_left"
+        android:backgroundTint="@color/card_secondary_bg"
+        app:layout_constraintTop_toBottomOf="@+id/gitInfoExcludeDescription"
+        app:layout_constraintStart_toStartOf="parent"
+        android:paddingHorizontal="@dimen/space_md"
+        android:paddingVertical="@dimen/space_md"
+        app:layout_constraintEnd_toEndOf="parent">
+        <EditText
+            android:id="@+id/gitInfoExcludeInput"
             android:hint=".trash/\n./…"
             android:background="@null"
             android:backgroundTint="@null"

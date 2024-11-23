@@ -605,9 +605,34 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
     }
 
     fun writeGitignore(gitDirPath: String, gitignoreString: String) {
-        if (!File("$gitDirPath/${context.getString(R.string.gitignore_path)}").exists()) return
-
         val gitignoreFile = File(gitDirPath, context.getString(R.string.gitignore_path))
+        if (!gitignoreFile.exists()) gitignoreFile.createNewFile()
+        try {
+            FileWriter(gitignoreFile, false).use { writer ->
+                writer.write(gitignoreString)
+            }
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+    }
+
+    fun readGitInfoExclude(gitDirPath: String): String {
+        if (!File("$gitDirPath/${context.getString(R.string.git_info_exclude_path)}").exists()) return ""
+
+        val gitignoreFile = File(gitDirPath, context.getString(R.string.git_info_exclude_path))
+        return gitignoreFile.readText()
+    }
+
+    fun writeGitInfoExclude(gitDirPath: String, gitignoreString: String) {
+        val gitignoreFile = File(gitDirPath, context.getString(R.string.git_info_exclude_path))
+        val parentDir = gitignoreFile.parentFile
+        if (parentDir != null) {
+            if (!parentDir.exists()) {
+                parentDir.mkdirs()
+            }
+        }
+        if (!gitignoreFile.exists()) gitignoreFile.createNewFile()
+
         try {
             FileWriter(gitignoreFile, false).use { writer ->
                 writer.write(gitignoreString)
