@@ -209,7 +209,6 @@ class MainActivity : AppCompatActivity() {
     override fun onPause() {
         super.onPause()
 
-        val onboardingStep = settingsManager.getOnboardingStep()
         if (settingsManager.getOnboardingStep() != 0 && !onboardingController.hasSkipped) {
             onboardingController.dismissAll()
         }
