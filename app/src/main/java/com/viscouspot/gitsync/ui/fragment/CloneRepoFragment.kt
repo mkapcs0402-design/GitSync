@@ -21,7 +21,6 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
-import com.viscouspot.gitsync.BuildConfig
 import com.viscouspot.gitsync.R
 import com.viscouspot.gitsync.ui.adapter.RepoListAdapter
 import com.viscouspot.gitsync.util.GitManager
@@ -108,11 +107,6 @@ class CloneRepoFragment(
 
         localRepo.setOnClickListener {
             selectLocalRepo()
-        }
-
-        if (!BuildConfig.ALL_FILES) {
-            divider.visibility = View.GONE
-            localRepo.visibility = View.GONE
         }
 
         return view

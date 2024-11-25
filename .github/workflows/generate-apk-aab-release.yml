@@ -44,18 +44,16 @@ jobs:
         
       - name: Build Release APKs
         run: |
-          bash ./gradlew assembleBaseRelease
-          bash ./gradlew assembleAll-files-variantRelease
+          bash ./gradlew assembleRelease
 
       - name: Build Release Bundles
         run: |
-          bash ./gradlew bundleAll-files-variantRelease
+          bash ./gradlew bundleRelease
 
       - name: Move files
         run: |
-          mv app/build/outputs/apk/base/release/app-base-release-unsigned.apk app/build/outputs/app-base-release.apk
-          mv app/build/outputs/bundle/all-files-variantRelease/app-all-files-variant-release.aab app/build/outputs/app-base-release.aab
-          mv app/build/outputs/apk/all-files-variant/release/app-all-files-variant-release-unsigned.apk app/build/outputs/app-all-files-variant-release.apk
+          mv app/build/outputs/apk/release/app-release-unsigned.apk app/build/outputs/app-release.apk
+          mv app/build/outputs/bundle/release/app-release.aab app/build/outputs/app-release.aab
           
       - name: Sign App
         id: sign_app
@@ -82,7 +80,6 @@ jobs:
           name: release-artifacts
           path: |
             ${{ steps.signed_files.outputs._0 }}
-            ${{ steps.signed_files.outputs._2 }}
 
 
       - name: Build Changelog
@@ -102,19 +99,11 @@ jobs:
             find: '/github/workspace/' 
             replace: ''   
             
-      - name: Find and Replace
-        uses: mad9000/actions-find-and-replace-string@5
-        id: signed_file_path_2
-        with:
-            source: ${{ steps.signed_files.outputs._2 }} 
-            find: '/github/workspace/' 
-            replace: ''  
-
       - name: Create Release
         id: create_release
         uses: ncipollo/release-action@v1.13.0
         with:
-          artifacts: "${{ steps.signed_file_path_0.outputs.value }}, ${{ steps.signed_file_path_2.outputs.value }}"
+          artifacts: "${{ steps.signed_file_path_0.outputs.value }}"
           body: ${{ steps.changelog.outputs.changelog }}
           name: Release ${{ github.ref_name }}
           token: ${{ secrets.GITHUB_TOKEN }}

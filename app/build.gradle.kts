@@ -50,20 +50,6 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
-
-    productFlavors {
-        flavorDimensions += "version"
-        productFlavors {
-            create("base") {
-                dimension = "version"
-                buildConfigField("boolean", "ALL_FILES", "false")
-            }
-            create("all-files-variant") {
-                dimension = "version"
-                buildConfigField("boolean", "ALL_FILES", "true")
-            }
-        }
-    }
 }
 
 dependencies {
