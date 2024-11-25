@@ -496,9 +496,9 @@ class GitManager(private val context: Context, private val activity: AppCompatAc
         """.trimIndent())
     }
 
-    fun getRecentCommits(gitDirPath: String): List<Commit> {
+    fun getRecentCommits(gitDirPath: String?): List<Commit> {
         try {
-            if (!File("$gitDirPath/${context.getString(R.string.git_path)}").exists()) return listOf()
+            if (gitDirPath == null || !File("$gitDirPath/${context.getString(R.string.git_path)}").exists()) return listOf()
 
             log(LogType.RecentCommits, ".git folder found")
 
