@@ -90,6 +90,14 @@ jobs:
           mention-new-contributors: false
           include-compare: false
           semver: false
+
+      - name: Find and Replace
+        uses: mad9000/actions-find-and-replace-string@5
+        id: signed_file_path_0
+        with:
+            source: ${{ steps.signed_files.outputs._0 }} 
+            find: '/github/workspace/' 
+            replace: ''   
           
       - name: Find and Replace
         uses: mad9000/actions-find-and-replace-string@5
@@ -115,6 +123,6 @@ jobs:
           serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
           packageName: com.viscouspot.gitsync
           releaseName: ${{ github.ref_name }}
-          releaseFiles: ${{ steps.signed_files.outputs._0 }}
+          releaseFiles: ${{ steps.signed_file_path_0.outputs.value }}
           track: internal
           status: draft
