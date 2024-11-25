@@ -178,7 +178,7 @@ class OnboardingController(
         val hasPermissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) Environment.isExternalStorageManager() else
             ContextCompat.checkSelfPermission(context, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
 
-        if (BuildConfig.ALL_FILES && !hasPermissions) {
+        if (!hasPermissions) {
             getEnableAllFilesDialog().show()
         } else {
             showAlmostThereOrSkip()
