@@ -851,7 +851,7 @@ class MainActivity : AppCompatActivity() {
                     var gitConfigUrlResult = gitConfigUrlRegex.find(fileContents)
                     val url = gitConfigUrlResult?.groups?.get(1)?.value
 
-                    val gitRepoNameRegex = ".*/([^/]+)\\.git$".toRegex()
+                    val gitRepoNameRegex = ".*/([^/]+?)(\\.git)?$".toRegex()
                     val gitRepoNameResult = gitRepoNameRegex.find(url.toString())
                     repoName = gitRepoNameResult?.groups?.get(1)?.value ?: ""
                 }

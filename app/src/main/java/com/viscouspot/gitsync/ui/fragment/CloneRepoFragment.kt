@@ -12,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.Window
 import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AlertDialog
@@ -67,12 +68,15 @@ class CloneRepoFragment(
 
         repoListRecycler = view.findViewById(R.id.repoList)
         val repoUrlEditText = view.findViewById<EditText>(R.id.repoUrlEditText)
+        val invalidRepoError = view.findViewById<TextView>(R.id.invalidRepoError)
         val pullButton = view.findViewById<MaterialButton>(R.id.pullButton)
         val divider = view.findViewById<View>(R.id.divider)
         val localRepo = view.findViewById<MaterialButton>(R.id.localRepo)
         repoListRecycler.setLayoutManager(GridLayoutManager(context, 1))
 
+        invalidRepoError.text = ""
         setLoadingRepos(true)
+
         gitManager.getGithubRepos(settingsManager.getGitAuthCredentials().second, ::addRepos) {
             loadNextRepos = it
         }
@@ -82,12 +86,15 @@ class CloneRepoFragment(
         }
 
         pullButton.setOnClickListener {
-            if (Helper.isValidGitRepo(repoUrlEditText.text.toString())) {
+            val invalidRepoErrorText = Helper.isValidGitRepo(repoUrlEditText.text.toString())
+            if (invalidRepoErrorText == null) {
                 repoUrl = repoUrlEditText.text.toString()
+                invalidRepoError.text = ""
                 selectLocalDir()
             } else {
                 repoUrlEditText.rightDrawable(R.drawable.circle_xmark)
                 repoUrlEditText.compoundDrawableTintList = requireContext().getColorStateList(R.color.auth_red)
+                invalidRepoError.text = invalidRepoErrorText
             }
         }
 
