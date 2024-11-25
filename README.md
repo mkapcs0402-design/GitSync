@@ -44,19 +44,6 @@ GitSync is an Android git client that aims to simplify the process of syncing a 
   
 Give us a ⭐ if you like our work. Much appreciated!
 
-## Variants
-
-There are two variants of GitSync available for the most recent releases.
-
-We recommend using the "All files variant" for the best experience, as it will allow you to use a larger range of folders with the app.
-
-- Base variant 
-  - `app-all-files-variant-release-signed.apk`
-- All files variant
-  - `app-base-release-signed.apk`
-
-The main difference between these versions is the use of "All files access" permission.
-
 ## Build Instructions
 
 If you just want to try the app out, feel free to use a pre-built release from the [Releases](https://github.com/ViscousPotential/GitSync/releases) page
