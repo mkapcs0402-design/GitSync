@@ -350,7 +350,7 @@ class MainActivity : AppCompatActivity() {
             } else {
                 settingsManager.setSyncMessageEnabled(false)
                 syncMessageButton.setIconResource(R.drawable.notify_off)
-                syncMessageButton.setIconTintResource(R.color.textPrimary)
+                syncMessageButton.setIconTintResource(R.color.text_primary)
             }
         }
 
@@ -454,7 +454,7 @@ class MainActivity : AppCompatActivity() {
             } else {
                 merge.isEnabled = false
                 merge.backgroundTintList = ColorStateList.valueOf(getColor(R.color.card_secondary_bg))
-                merge.setTextColor(getColor(R.color.textSecondary))
+                merge.setTextColor(getColor(R.color.text_secondary))
             }
         }
 
@@ -512,7 +512,7 @@ class MainActivity : AppCompatActivity() {
             merge.text = getString(R.string.merging)
             merge.isEnabled = false
             merge.backgroundTintList = ColorStateList.valueOf(getColor(R.color.card_secondary_bg))
-            merge.setTextColor(getColor(R.color.textSecondary))
+            merge.setTextColor(getColor(R.color.text_secondary))
             abortMerge.visibility = View.GONE
 
             val forceSyncIntent = Intent(this@MainActivity, GitSyncService::class.java)
@@ -560,14 +560,14 @@ class MainActivity : AppCompatActivity() {
         } else {
             merge.isEnabled = false
             merge.backgroundTintList = ColorStateList.valueOf(getColor(R.color.card_secondary_bg))
-            merge.setTextColor(getColor(R.color.textSecondary))
+            merge.setTextColor(getColor(R.color.text_secondary))
         }
     }
 
     private fun updateApplicationObserverSwitch(upDown: Boolean = settingsManager.getApplicationObserverEnabled()) {
         applicationObserverSwitch.setCompoundDrawablesWithIntrinsicBounds(null, null, ContextCompat.getDrawable(this, if (upDown) R.drawable.angle_up else R.drawable.angle_down)
             ?.apply {
-                setTint(getColor(if (checkAccessibilityPermission()) R.color.auth_green else R.color.textSecondary))
+                setTint(getColor(if (checkAccessibilityPermission()) R.color.auth_green else R.color.text_secondary))
             }, null)
     }
 
@@ -647,7 +647,7 @@ class MainActivity : AppCompatActivity() {
             if (line.trim().startsWith("#")) {
                 val lineStart = text.indexOf(line, start)
                 val lineEnd = lineStart + line.length
-                syncMessageInput.getText().setSpan(ForegroundColorSpan(getColor(R.color.textSecondary)), lineStart, lineEnd, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                syncMessageInput.getText().setSpan(ForegroundColorSpan(getColor(R.color.text_secondary)), lineStart, lineEnd, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
             }
             start += line.length + 1
         }
@@ -738,7 +738,7 @@ class MainActivity : AppCompatActivity() {
                 }
             } else {
                 syncMessageButton.setIconResource(R.drawable.notify_off)
-                syncMessageButton.setIconTintResource(R.color.textPrimary)
+                syncMessageButton.setIconTintResource(R.color.text_primary)
             }
 
             refreshAuthButton()

@@ -21,7 +21,7 @@
             android:layout_marginStart="@dimen/space_sm"
             android:text="Keep changes"
             android:textAllCaps="true"
-            android:textColor="@color/textPrimary"
+            android:textColor="@color/text_primary"
             android:textSize="@dimen/space_sm"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="@id/local"
@@ -54,7 +54,7 @@
             android:layout_height="0dp"
             android:layout_marginEnd="@dimen/space_xxs"
             android:background="@drawable/input_bg_sm"
-            android:backgroundTint="@color/textSecondary"
+            android:backgroundTint="@color/text_secondary"
             android:foreground="?android:attr/selectableItemBackground"
             android:padding="0dp"
             android:text="both"
@@ -95,7 +95,7 @@
         android:textSize="@dimen/text_size_md"
         android:textAlignment="viewEnd"
         android:textStyle="bold"
-        android:textColor="@color/textSecondary"
+        android:textColor="@color/text_secondary"
         android:text="1" />
 
     <TextView
@@ -122,7 +122,7 @@
         android:layout_height="wrap_content"
         android:textSize="@dimen/text_size_md"
         android:textStyle="bold"
-        android:textColor="@color/textSecondary"
+        android:textColor="@color/text_secondary"
         android:text="2" />
 
     <TextView

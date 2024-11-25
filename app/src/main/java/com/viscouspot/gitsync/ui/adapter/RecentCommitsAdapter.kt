@@ -57,9 +57,9 @@ class RecentCommitsAdapter(private val context: Context, private val recentCommi
         holder.container.backgroundTintList = ColorStateList.valueOf(context.getColor(R.color.card_secondary_bg))
         holder.commitMessage.text = commit.commitMessage
         holder.commitMessage.setTypeface(null, Typeface.NORMAL)
-        holder.commitMessage.setTextColor(context.getColor(R.color.textPrimary))
+        holder.commitMessage.setTextColor(context.getColor(R.color.text_primary))
         holder.author.text = commit.author
-        holder.author.setTextColor(context.getColor(R.color.textSecondary))
+        holder.author.setTextColor(context.getColor(R.color.text_secondary))
         holder.committed.visibility = View.VISIBLE
         holder.commitRef.visibility = View.VISIBLE
         holder.commitRef.text = commit.reference

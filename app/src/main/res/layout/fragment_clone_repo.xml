@@ -18,7 +18,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:text="@string/clone_repo"
-        android:textColor="@color/textPrimary"
+        android:textColor="@color/text_primary"
         android:textSize="24sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
@@ -80,7 +80,7 @@
         android:backgroundTint="@color/card_bg"
         android:insetTop="0dp"
         android:insetBottom="0dp"
-        android:textColor="@color/textPrimary"
+        android:textColor="@color/text_primary"
         android:textStyle="bold"
         android:paddingHorizontal="@dimen/space_md"
         android:paddingVertical="@dimen/space_md"
@@ -112,7 +112,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="64dp"
         android:backgroundTint="@color/card_bg"
-        android:textColor="@color/textPrimary"
+        android:textColor="@color/text_primary"
         android:text="I have a local repository"
         android:textSize="14sp"
         app:cornerRadius="16dp"
@@ -123,7 +123,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:iconSize="14sp"
         app:iconGravity="end"
-        app:iconTint="@color/textPrimary"
+        app:iconTint="@color/text_primary"
         app:icon="@drawable/folder_open"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

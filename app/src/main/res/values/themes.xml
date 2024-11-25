@@ -2,7 +2,7 @@
 <resources>
 
     <style name="Theme.GitSync" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
-        <item name="android:textColorPrimary">@color/textPrimary</item>
+        <item name="android:textColorPrimary">@color/text_primary</item>
 
         <item name="android:actionBarStyle">@style/ThemeActionBar</item>
         <item name="android:windowActionBarOverlay">true</item>
@@ -20,10 +20,10 @@
     <style name="AlertDialogTheme" parent="Theme.MaterialComponents.DayNight.Dialog.Alert">
         <item name="android:background">@drawable/input_bg_sm</item>
         <item name="android:backgroundTint">@color/card_bg</item>
-        <item name="colorPrimary">@color/textSecondary</item>
+        <item name="colorPrimary">@color/text_secondary</item>
         <item name="buttonIconDimen">20dp</item>
-        <item name="android:textColor">@color/textPrimary</item>
-        <item name="android:textColorPrimary">@color/textPrimary</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textColorPrimary">@color/text_primary</item>
         <item name="buttonBarNegativeButtonStyle">@style/NegativeButtonStyle</item>
         <item name="buttonBarNeutralButtonStyle">@style/NeutralButtonStyle</item>
         <item name="buttonBarPositiveButtonStyle">@style/PositiveButtonStyle</item>
@@ -36,11 +36,11 @@
     </style>
 
     <style name="NeutralButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
-        <item name="android:textColor">@color/textSecondary</item>
+        <item name="android:textColor">@color/text_secondary</item>
     </style>
 
     <style name="NegativeButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
-        <item name="android:textColor">@color/textSecondary</item>
+        <item name="android:textColor">@color/text_secondary</item>
     </style>
 
     <style name="PositiveButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
