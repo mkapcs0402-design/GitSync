@@ -54,7 +54,7 @@
                 android:enabled="false"
                 android:text="@string/repo_not_found"
                 android:textAlignment="center"
-                android:textColor="@color/textSecondary"
+                android:textColor="@color/text_secondary"
                 android:textSize="@dimen/text_size_md"
                 app:backgroundTint="@color/card_bg"
                 android:foreground="?android:attr/selectableItemBackground"
@@ -130,7 +130,7 @@
                 app:backgroundTint="@null"
                 android:background="@drawable/input_bg_bottom_right"
                 app:iconSize="@dimen/text_size_lg"
-                app:iconTint="@color/textPrimary"
+                app:iconTint="@color/text_primary"
                 android:foreground="?android:attr/selectableItemBackground"
                 android:clipToOutline="true"
                 app:layout_constraintBottom_toBottomOf="@+id/forceSyncButton"
@@ -320,7 +320,7 @@
         app:iconSize="@dimen/text_size_lg"
         app:iconGravity="textEnd"
         android:minWidth="1dp"
-        app:iconTint="@color/textSecondary"
+        app:iconTint="@color/text_secondary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
