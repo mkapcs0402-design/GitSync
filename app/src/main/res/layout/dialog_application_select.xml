@@ -25,6 +25,6 @@
         android:orientation="vertical"
         app:spanCount="2"
         tools:itemCount="24"
-        tools:listitem="@layout/application_item" />
+        tools:listitem="@layout/item_application" />
 
 </LinearLayout>

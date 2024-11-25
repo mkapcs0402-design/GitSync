@@ -245,7 +245,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.main_activity)
+        setContentView(R.layout.activity_main)
 
         Thread.setDefaultUncaughtExceptionHandler { _, paramThrowable ->
             log(this, LogType.Global, paramThrowable)
@@ -431,7 +431,7 @@ class MainActivity : AppCompatActivity() {
 
         val builder = AlertDialog.Builder(this, R.style.AlertDialogMinTheme)
         val inflater = layoutInflater
-        val dialogView: View = inflater.inflate(R.layout.merge_conflict_dialog, null)
+        val dialogView: View = inflater.inflate(R.layout.dialog_merge_conflict, null)
 
         builder.setView(dialogView)
         mergeConflictDialog = builder.create()
@@ -574,7 +574,7 @@ class MainActivity : AppCompatActivity() {
     private fun openSettingsDialog() {
         val builder = AlertDialog.Builder(this, R.style.AlertDialogMinTheme)
         val inflater = layoutInflater
-        val dialogView: View = inflater.inflate(R.layout.settings_dialog, null)
+        val dialogView: View = inflater.inflate(R.layout.dialog_settings, null)
 
         setupSyncMessageSettings(dialogView)
         setupGitignoreSettings(dialogView)
@@ -677,7 +677,7 @@ class MainActivity : AppCompatActivity() {
         }
         applicationSelectDialogBuilder.setNegativeButton(getString(android.R.string.cancel)) { dialog, _ -> dialog.dismiss() }
 
-        val applicationSelectDialogView = layoutInflater.inflate(R.layout.application_select_dialog, null)
+        val applicationSelectDialogView = layoutInflater.inflate(R.layout.dialog_application_select, null)
         applicationSelectDialogBuilder.setView(applicationSelectDialogView)
         applicationSelectDialog = applicationSelectDialogBuilder.create()
 

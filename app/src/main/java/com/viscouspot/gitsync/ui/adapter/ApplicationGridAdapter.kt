@@ -16,7 +16,7 @@ class ApplicationGridAdapter(private val packageManager: PackageManager, private
     }
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(viewGroup.context).inflate(R.layout.application_item, viewGroup, false)
+        val view = LayoutInflater.from(viewGroup.context).inflate(R.layout.item_application, viewGroup, false)
         return ViewHolder(view)
     }
 

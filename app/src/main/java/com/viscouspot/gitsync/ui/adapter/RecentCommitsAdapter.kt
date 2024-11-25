@@ -33,7 +33,7 @@ class RecentCommitsAdapter(private val context: Context, private val recentCommi
     }
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(viewGroup.context).inflate(R.layout.recent_commit, viewGroup, false)
+        val view = LayoutInflater.from(viewGroup.context).inflate(R.layout.item_recent_commit, viewGroup, false)
         return ViewHolder(view)
     }
 

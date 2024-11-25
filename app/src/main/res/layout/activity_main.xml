@@ -38,7 +38,7 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:reverseLayout="true"
                 app:spanCount="1"
-                tools:listitem="@layout/recent_commit" />
+                tools:listitem="@layout/item_recent_commit" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/emptyCommitsView"

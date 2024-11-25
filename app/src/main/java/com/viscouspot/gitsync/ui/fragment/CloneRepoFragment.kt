@@ -35,7 +35,7 @@ class CloneRepoFragment(
     private val settingsManager: SettingsManager,
     private val gitManager: GitManager,
     private val dirSelectionCallback: ((dirUri: Uri?) -> Unit)
-): DialogFragment(R.layout.clone_repo_fragment) {
+): DialogFragment(R.layout.fragment_clone_repo) {
     private val repoList = mutableListOf<Pair<String, String>>()
     private var repoUrl = ""
     private var loadNextRepos: (() -> Unit)? = {}
@@ -62,7 +62,7 @@ class CloneRepoFragment(
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val view = inflater.inflate(R.layout.clone_repo_fragment, container, false)
+        val view = inflater.inflate(R.layout.fragment_clone_repo, container, false)
         adapter.notifyItemRangeRemoved(0, repoList.size)
         repoList.clear()
 
