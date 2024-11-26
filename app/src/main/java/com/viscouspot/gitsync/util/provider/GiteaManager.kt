@@ -26,6 +26,7 @@ import java.util.UUID
 class GiteaManager(private val context: Context) : GitProviderManager {
     private val client = OkHttpClient()
     private var codeVerifier: String? = null
+    override val oAuthSupport = true
 
     companion object {
         private val DOMAIN = defaultDomainMap[GitProviderManager.Companion.Provider.GITEA]
@@ -53,7 +54,9 @@ class GiteaManager(private val context: Context) : GitProviderManager {
         })
     }
 
-    override fun getOAuthCredentials(uri: Uri, setCallback: (username: String?, accessToken: String?) -> Unit) {
+    override fun getOAuthCredentials(uri: Uri?, setCallback: (username: String?, accessToken: String?) -> Unit) {
+        if (uri == null) return
+
         val code = uri.getQueryParameter("code")
         val state = uri.getQueryParameter("state")
 

@@ -6,25 +6,35 @@ import com.viscouspot.gitsync.R
 import com.viscouspot.gitsync.util.SettingsManager
 
 interface GitProviderManager {
+    val oAuthSupport: Boolean;
+
     companion object {
         enum class Provider {
             GITHUB,
-            GITEA
+            GITEA,
+            HTTPS,
+            SSH,
         }
 
         val detailsMap: Map<Provider, Pair<String, Int>> = mapOf(
             Provider.GITHUB to Pair("GitHub", R.drawable.provider_github),
-            Provider.GITEA to Pair("Gitea", R.drawable.provider_gitea)
+            Provider.GITEA to Pair("Gitea", R.drawable.provider_gitea),
+            Provider.HTTPS to Pair("HTTP/S", R.drawable.provider_https),
+            Provider.SSH to Pair("SSH", R.drawable.provider_ssh),
         )
 
         val defaultDomainMap: Map<Provider, String> = mapOf(
             Provider.GITHUB to "github.com",
-            Provider.GITEA to "gitea.com"
+            Provider.GITEA to "gitea.com",
+            Provider.HTTPS to "",
+            Provider.SSH to "",
         )
 
         private val managerMap: Map<Provider, (Context) -> GitProviderManager> = mapOf(
-            Provider.GITHUB to { context: Context -> GithubManager(context) },
-            Provider.GITEA to { context: Context -> GiteaManager(context) }
+            Provider.GITHUB to { context -> GithubManager(context) },
+            Provider.GITEA to { context -> GiteaManager(context) },
+            Provider.HTTPS to { _ -> HttpsManager() },
+            Provider.SSH to { _ -> SshManager() },
         )
 
         fun getManager(context: Context, settingsManager: SettingsManager): GitProviderManager {
@@ -36,7 +46,7 @@ interface GitProviderManager {
     fun launchOAuthFlow() {}
 
     fun getOAuthCredentials(
-        uri: Uri,
+        uri: Uri?,
         setCallback: (username: String?, accessToken: String?) -> Unit
     ) {}
 
