@@ -62,24 +62,6 @@
             android:layout_height="wrap_content"/>
     </RelativeLayout>
 
-    <EditText
-        android:id="@+id/domainInput"
-        style="@style/SingleLineEditText"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:background="@drawable/input_bg_sm"
-        android:backgroundTint="@color/card_secondary_bg"
-        android:hint="github.com"
-        android:inputType="textNoSuggestions"
-        android:paddingHorizontal="@dimen/space_md"
-        android:paddingVertical="@dimen/space_md"
-        android:textColorHint="@color/text_secondary"
-        android:textSize="@dimen/text_size_md"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="@dimen/space_lg"
-        app:layout_constraintTop_toBottomOf="@id/gitProvider" />
-
     <com.google.android.material.button.MaterialButton
         android:id="@+id/oAuthButton"
         android:layout_width="wrap_content"
@@ -94,14 +76,14 @@
         app:backgroundTint="@null"
         app:icon="@drawable/open_external"
         app:iconPadding="@dimen/space_sm"
-        android:layout_marginTop="@dimen/space_md"
+        android:layout_marginTop="@dimen/space_lg"
         android:layout_marginBottom="@dimen/space_lg"
         app:iconSize="@dimen/text_size_md"
         app:iconTint="@color/auth_green"
         android:foreground="?android:attr/selectableItemBackground"
         android:clipToOutline="true"
         android:visibility="visible"
-        app:layout_constraintTop_toBottomOf="@id/domainInput"
+        app:layout_constraintTop_toBottomOf="@id/gitProvider"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

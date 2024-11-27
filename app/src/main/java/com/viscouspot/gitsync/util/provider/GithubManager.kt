@@ -7,6 +7,7 @@ import com.viscouspot.gitsync.Secrets
 import com.viscouspot.gitsync.util.Helper
 import com.viscouspot.gitsync.util.LogType
 import com.viscouspot.gitsync.util.Logger.log
+import com.viscouspot.gitsync.util.provider.GitProviderManager.Companion.defaultDomainMap
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.OkHttpClient
@@ -18,11 +19,15 @@ import org.json.JSONObject
 import java.io.IOException
 import java.util.UUID
 
-class GithubManager(private val context: Context, private val domain: String) : GitProviderManager {
+class GithubManager(private val context: Context) : GitProviderManager {
     private val client = OkHttpClient()
 
+    companion object {
+        private val DOMAIN = defaultDomainMap[GitProviderManager.Companion.Provider.GITHUB]
+    }
+
     override fun launchOAuthFlow() {
-        val fullAuthUrl = "https://${domain}/login/oauth/authorize?client_id=${Secrets.GITHUB_CLIENT_ID}&scope=repo&state=${UUID.randomUUID()}"
+        val fullAuthUrl = "https://${DOMAIN}/login/oauth/authorize?client_id=${Secrets.GITHUB_CLIENT_ID}&scope=repo&state=${UUID.randomUUID()}"
 
         log(LogType.GithubOAuthFlow, "Launching Flow")
         context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(fullAuthUrl)).apply {
@@ -41,7 +46,7 @@ class GithubManager(private val context: Context, private val domain: String) : 
             return
         }
         val accessTokenRequest: Request = Request.Builder()
-            .url("https://${domain}/login/oauth/access_token?client_id=${Secrets.GITHUB_CLIENT_ID}&client_secret=${Secrets.GITHUB_CLIENT_SECRET}&code=$code&state=$state")
+            .url("https://${DOMAIN}/login/oauth/access_token?client_id=${Secrets.GITHUB_CLIENT_ID}&client_secret=${Secrets.GITHUB_CLIENT_SECRET}&code=$code&state=$state")
             .post("".toRequestBody())
             .addHeader("Accept", "application/json")
             .build()
@@ -69,7 +74,7 @@ class GithubManager(private val context: Context, private val domain: String) : 
             return
         }
         val profileRequest: Request = Request.Builder()
-            .url("https://api.${domain}/user")
+            .url("https://api.${DOMAIN}/user")
             .addHeader("Accept", "application/json")
             .addHeader("Authorization", "token $accessToken")
             .build()
@@ -93,7 +98,7 @@ class GithubManager(private val context: Context, private val domain: String) : 
 
     override fun getRepos(accessToken: String, updateCallback: (repos: List<Pair<String, String>>) -> Unit, nextPageCallback: (nextPage: (() -> Unit)?) -> Unit): Boolean {
         log(LogType.GetRepos, "Getting User Repos")
-        getReposRequest(accessToken, "https://api.${domain}/user/repos", updateCallback, nextPageCallback)
+        getReposRequest(accessToken, "https://api.${DOMAIN}/user/repos", updateCallback, nextPageCallback)
 
         return true
     }

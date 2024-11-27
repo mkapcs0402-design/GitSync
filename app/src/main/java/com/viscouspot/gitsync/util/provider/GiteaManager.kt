@@ -8,6 +8,7 @@ import com.viscouspot.gitsync.Secrets
 import com.viscouspot.gitsync.util.Helper
 import com.viscouspot.gitsync.util.LogType
 import com.viscouspot.gitsync.util.Logger.log
+import com.viscouspot.gitsync.util.provider.GitProviderManager.Companion.defaultDomainMap
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.MediaType.Companion.toMediaType
@@ -22,11 +23,12 @@ import java.security.MessageDigest
 import java.security.SecureRandom
 import java.util.UUID
 
-class GiteaManager(private val context: Context, private val domain: String) : GitProviderManager {
+class GiteaManager(private val context: Context) : GitProviderManager {
     private val client = OkHttpClient()
     private var codeVerifier: String? = null
 
     companion object {
+        private val DOMAIN = defaultDomainMap[GitProviderManager.Companion.Provider.GITEA]
         private const val REDIRECT_URI = "gitsync://auth"
         private const val CODE_VERIFIER_LENGTH = 128
     }
@@ -35,7 +37,7 @@ class GiteaManager(private val context: Context, private val domain: String) : G
         codeVerifier = generateCodeVerifier()
         val codeChallenge = generateCodeChallenge(codeVerifier!!)
 
-        val fullAuthUrl = "https://${domain}/login/oauth/authorize" +
+        val fullAuthUrl = "https://${DOMAIN}/login/oauth/authorize" +
                 "?client_id=${Secrets.GITEA_CLIENT_ID}" +
                 "&client_secret=${Secrets.GITEA_CLIENT_SECRET}" +
                 "&redirect_uri=$REDIRECT_URI" +
@@ -72,7 +74,7 @@ class GiteaManager(private val context: Context, private val domain: String) : G
         }
 
         val accessTokenRequest: Request = Request.Builder()
-            .url("https://${domain}/login/oauth/access_token")
+            .url("https://${DOMAIN}/login/oauth/access_token")
             .post(jsonObject.toString().toRequestBody("application/json".toMediaType()))
             .addHeader("Accept", "application/json")
             .build()
@@ -112,7 +114,7 @@ class GiteaManager(private val context: Context, private val domain: String) : G
             return
         }
         val profileRequest: Request = Request.Builder()
-            .url("https://${domain}/api/v1/user")
+            .url("https://${DOMAIN}/api/v1/user")
             .addHeader("Accept", "application/json")
             .addHeader("Authorization", "token $accessToken")
             .build()
@@ -135,7 +137,7 @@ class GiteaManager(private val context: Context, private val domain: String) : G
 
     override fun getRepos(accessToken: String, updateCallback: (repos: List<Pair<String, String>>) -> Unit, nextPageCallback: (nextPage: (() -> Unit)?) -> Unit): Boolean {
         log(LogType.GetRepos, "Getting User Repos")
-        getReposRequest(accessToken, "https://${domain}/api/v1/user/repos", updateCallback, nextPageCallback)
+        getReposRequest(accessToken, "https://${DOMAIN}/api/v1/user/repos", updateCallback, nextPageCallback)
 
         return true
     }

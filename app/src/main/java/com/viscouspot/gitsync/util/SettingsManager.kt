@@ -92,17 +92,6 @@ class SettingsManager internal constructor(private val context: Context) {
         }
     }
 
-    fun getGitDomain(): String {
-        return settingsSharedPref.getString("gitDomain", "").toString()
-    }
-
-    fun setGitDomain(domain: String) {
-        with(settingsSharedPref.edit()) {
-            putString("gitDomain", domain)
-            apply()
-        }
-    }
-
     fun getGitProvider(): GitProviderManager.Companion.Provider {
         val gitProviderString = settingsSharedPref.getString("gitProvider", "").toString()
         val providerEntry = GitProviderManager.detailsMap.firstNotNullOf {

@@ -91,7 +91,7 @@ class CloneRepoFragment(
         }
 
         pullButton.setOnClickListener {
-            val invalidRepoErrorText = Helper.isValidGitRepo(settingsManager, repoUrlEditText.text.toString())
+            val invalidRepoErrorText = Helper.isValidGitRepo(repoUrlEditText.text.toString())
             if (invalidRepoErrorText == null) {
                 repoUrl = repoUrlEditText.text.toString()
                 invalidRepoError.text = ""

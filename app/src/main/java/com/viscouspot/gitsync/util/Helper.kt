@@ -29,6 +29,7 @@ import androidx.core.content.ContextCompat
 import com.viscouspot.gitsync.MainActivity
 import com.viscouspot.gitsync.R
 import com.viscouspot.gitsync.util.provider.GitProviderManager
+import com.viscouspot.gitsync.util.provider.GitProviderManager.Companion.defaultDomainMap
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileInputStream
@@ -265,9 +266,8 @@ object Helper {
         return ""
     }
 
-    fun isValidGitRepo(settingsManager: SettingsManager, url: String): String? {
-        val validDomains = mutableListOf(settingsManager.getGitDomain())
-        validDomains.addAll(GitProviderManager.defaultDomainMap.values)
+    fun isValidGitRepo(url: String): String? {
+        val validDomains = listOf(defaultDomainMap.values)
         val regex = Regex("^https?://([a-zA-Z0-9.-]+)/(\\S+)/(\\S+)\$")
 
         return when {

@@ -34,18 +34,10 @@ class AuthDialog(context: Context, settingsManager: SettingsManager) : AlertDial
             spinner.dropDownWidth = spinner.width
         }
 
-        val domainInput = view.findViewById<EditText>(R.id.domainInput)
-        domainInput.doOnTextChanged { text, _, _, _->
-            settingsManager.setGitDomain(text.toString())
-        }
-
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
                 val provider = providers.keys.toList()[position]
                 settingsManager.setGitProvider(provider)
-                val defaultDomain = GitProviderManager.defaultDomainMap[provider]!!
-                domainInput.setHint(defaultDomain)
-                settingsManager.setGitDomain(defaultDomain)
             }
 
             override fun onNothingSelected(parent: AdapterView<*>) {}

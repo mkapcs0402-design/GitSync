@@ -22,13 +22,13 @@ interface GitProviderManager {
             Provider.GITEA to "gitea.com"
         )
 
-        private val managerMap: Map<Provider, (Context, String) -> GitProviderManager> = mapOf(
-            Provider.GITHUB to { context: Context, domain: String -> GithubManager(context, domain) },
-            Provider.GITEA to { context: Context, domain: String -> GiteaManager(context, domain) }
+        private val managerMap: Map<Provider, (Context) -> GitProviderManager> = mapOf(
+            Provider.GITHUB to { context: Context -> GithubManager(context) },
+            Provider.GITEA to { context: Context -> GiteaManager(context) }
         )
 
         fun getManager(context: Context, settingsManager: SettingsManager): GitProviderManager {
-            return managerMap[settingsManager.getGitProvider()]?.invoke(context, settingsManager.getGitDomain())
+            return managerMap[settingsManager.getGitProvider()]?.invoke(context)
                 ?: throw IllegalArgumentException("No manager found")
         }
     }
