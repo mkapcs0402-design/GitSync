@@ -31,23 +31,23 @@ class OnboardingController(
 
 
     fun show() {
-        activity.runOnUiThread {
-            val authCreds = settingsManager.getGitAuthCredentials()
-            if (authCreds.first != "" && authCreds.second != "") {
-                settingsManager.setOnboardingStep(3)
-            }
-            if (settingsManager.getGitDirUri() != null) {
-                settingsManager.setOnboardingStep(4)
-            }
-            if (settingsManager.getApplicationObserverEnabled()) {
-                settingsManager.setOnboardingStep(-1)
-            }
+        val authCreds = settingsManager.getGitAuthCredentials()
+        if (authCreds.first != "" && authCreds.second != "") {
+            settingsManager.setOnboardingStep(3)
+        }
+        if (settingsManager.getGitDirUri() != null) {
+            settingsManager.setOnboardingStep(4)
+        }
+        if (settingsManager.getApplicationObserverEnabled()) {
+            settingsManager.setOnboardingStep(-1)
+        }
 
-            when (settingsManager.getOnboardingStep()) {
-                0 -> getWelcomeDialog().show()
-                1 -> showAlmostThereOrSkip()
-                2 -> getAuthDialog().show()
-                3 -> {
+        when (settingsManager.getOnboardingStep()) {
+            0 -> getWelcomeDialog().show()
+            1 -> showAlmostThereOrSkip()
+            2 -> getAuthDialog().show()
+            3 -> {
+                activity.runOnUiThread {
                     if (!cloneRepoFragment.isAdded) {
                         cloneRepoFragment.show(
                             activity.supportFragmentManager,
@@ -55,8 +55,8 @@ class OnboardingController(
                         )
                     }
                 }
-                4 -> getEnableAutoSyncDialog().show()
             }
+            4 -> getEnableAutoSyncDialog().show()
         }
     }
 
@@ -126,21 +126,21 @@ class OnboardingController(
 
     private fun getAlmostThereDialog(): AlertDialog {
         activity.runOnUiThread {
-        currentDialog = AlertDialog.Builder(context, R.style.AlertDialogTheme)
-            .setCancelable(false)
-            .setTitle(context.getString(R.string.almost_there_dialog_title))
-            .setView(getAlmostThereDialogLink())
-            .setMessage(context.getString(R.string.almost_there_dialog_message))
-            .setPositiveButton(context.getString(android.R.string.ok)) { dialog, _ ->
-                dialog.dismiss()
-                settingsManager.setOnboardingStep(2)
-                getAuthDialog().show()
-            }
-            .setNegativeButton(
-                context.getString(android.R.string.cancel)
-            ) { dialog, _ ->
-                dialog.dismiss()
-            }.create()
+            currentDialog = AlertDialog.Builder(context, R.style.AlertDialogTheme)
+                .setCancelable(false)
+                .setTitle(context.getString(R.string.almost_there_dialog_title))
+                .setView(getAlmostThereDialogLink())
+                .setMessage(context.getString(R.string.almost_there_dialog_message))
+                .setPositiveButton(context.getString(android.R.string.ok)) { dialog, _ ->
+                    dialog.dismiss()
+                    settingsManager.setOnboardingStep(2)
+                    getAuthDialog().show()
+                }
+                .setNegativeButton(
+                    context.getString(android.R.string.cancel)
+                ) { dialog, _ ->
+                    dialog.dismiss()
+                }.create()
         }
         return currentDialog!!
     }
@@ -153,23 +153,23 @@ class OnboardingController(
 
     private fun getEnableAllFilesDialog(): AlertDialog {
         activity.runOnUiThread {
-        currentDialog = AlertDialog.Builder(context, R.style.AlertDialogTheme)
-            .setCancelable(false)
-            .setTitle(context.getString(R.string.all_files_access_dialog_title))
-            .setMessage(context.getString(R.string.all_files_access_dialog_message))
-            .setPositiveButton(context.getString(android.R.string.ok)) { _, _ -> }
-            .create().apply {
-                setOnShowListener {
-                    getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
-                        checkAndRequestStoragePermission {
-                            dismiss()
-                            showAlmostThereOrSkip()
+            currentDialog = AlertDialog.Builder(context, R.style.AlertDialogTheme)
+                .setCancelable(false)
+                .setTitle(context.getString(R.string.all_files_access_dialog_title))
+                .setMessage(context.getString(R.string.all_files_access_dialog_message))
+                .setPositiveButton(context.getString(android.R.string.ok)) { _, _ -> }
+                .create().apply {
+                    setOnShowListener {
+                        getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+                            checkAndRequestStoragePermission {
+                                dismiss()
+                                showAlmostThereOrSkip()
+                            }
+                            this.getButton(AlertDialog.BUTTON_POSITIVE).text =
+                                context.getString(R.string.done)
                         }
-                        this.getButton(AlertDialog.BUTTON_POSITIVE).text =
-                            context.getString(R.string.done)
                     }
                 }
-            }
         }
         return currentDialog!!
     }

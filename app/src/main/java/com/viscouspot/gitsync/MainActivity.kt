@@ -724,9 +724,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun refreshAll() {
-        runOnUiThread {
-            refreshRecentCommits()
+        refreshRecentCommits()
 
+        runOnUiThread {
             if (settingsManager.getSyncMessageEnabled()) {
                 settingsManager.setSyncMessageEnabled(false)
                 if (settingsManager.getOnboardingStep() != 0) {
@@ -740,17 +740,21 @@ class MainActivity : AppCompatActivity() {
                 syncMessageButton.setIconResource(R.drawable.notify_off)
                 syncMessageButton.setIconTintResource(R.color.text_primary)
             }
+        }
 
-            refreshAuthButton()
-            refreshGitRepo()
+        refreshAuthButton()
+        refreshGitRepo()
 
+        runOnUiThread {
             settingsManager.getGitDirUri()?.let {
                 gitDirPath.setText(Helper.getPathFromUri(this, it))
             }
+        }
 
-            val applicationObserverEnabled = settingsManager.getApplicationObserverEnabled()
-            updateApplicationObserver(applicationObserverEnabled)
+        val applicationObserverEnabled = settingsManager.getApplicationObserverEnabled()
+        updateApplicationObserver(applicationObserverEnabled)
 
+        runOnUiThread {
             syncAppOpened.isChecked = settingsManager.getSyncOnAppOpened()
             syncAppClosed.isChecked = settingsManager.getSyncOnAppClosed()
         }
@@ -816,27 +820,33 @@ class MainActivity : AppCompatActivity() {
                 recentCommitsAdapter.notifyItemRemoved(mergeConflictIndex)
             }
 
+        }
 
-            val gitDirUri = settingsManager.getGitDirUri()
-            gitDirUri?.let {
-                val recentCommitsReferences = recentCommits.map { commit -> commit.reference }
-                log(settingsManager.getGitDirUri())
-                val newRecentCommits = gitManager.getRecentCommits(Helper.getPathFromUri(this, it))
-                    .filter { commit -> !recentCommitsReferences.contains(commit.reference) }
-                if (newRecentCommits.isNotEmpty()) {
+        val gitDirUri = settingsManager.getGitDirUri()
+        gitDirUri?.let {
+            val recentCommitsReferences = recentCommits.map { commit -> commit.reference }
+            log(settingsManager.getGitDirUri())
+            val newRecentCommits = gitManager.getRecentCommits(Helper.getPathFromUri(this, it))
+                .filter { commit -> !recentCommitsReferences.contains(commit.reference) }
+            if (newRecentCommits.isNotEmpty()) {
+                runOnUiThread {
                     recentCommits.addAll(0, newRecentCommits)
                     recentCommitsAdapter.notifyItemRangeInserted(0, newRecentCommits.size)
                     recentCommitsRecycler.smoothScrollToPosition(0);
                 }
             }
+        }
 
-            if (gitManager.getConflicting(settingsManager.getGitDirUri()).isNotEmpty()) {
+        if (gitManager.getConflicting(settingsManager.getGitDirUri()).isNotEmpty()) {
+            runOnUiThread {
                 forceSyncButton.isEnabled = false
 
                 recentCommits.add(0, Commit("", "", 0L, RecentCommitsAdapter.MERGE_CONFLICT, 0, 0))
                 recentCommitsAdapter.notifyItemInserted(0)
                 recentCommitsRecycler.smoothScrollToPosition(0);
-            } else {
+            }
+        } else {
+            runOnUiThread {
                 forceSyncButton.isEnabled = true
             }
         }
@@ -907,8 +917,9 @@ class MainActivity : AppCompatActivity() {
 
             applicationObserverSwitch.isEnabled = true
 
-            refreshRecentCommits()
         }
+
+        refreshRecentCommits()
     }
 
     private fun refreshAuthButton() {
