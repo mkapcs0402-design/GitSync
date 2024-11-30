@@ -31,7 +31,7 @@
         android:id="@+id/author"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="ViscousPotential"
+        android:text="ViscousPot"
         android:textColor="@color/text_secondary"
         android:textSize="@dimen/text_size_sm"
         app:layout_constraintBottom_toBottomOf="parent"

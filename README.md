@@ -46,7 +46,7 @@ Give us a ⭐ if you like our work. Much appreciated!
 
 ## Build Instructions
 
-If you just want to try the app out, feel free to use a pre-built release from the [Releases](https://github.com/ViscousPotential/GitSync/releases) page
+If you just want to try the app out, feel free to use a pre-built release from the [Releases](https://github.com/ViscousPot/GitSync/releases) page
 
 ### 1. Setup 
 - Clone the project
