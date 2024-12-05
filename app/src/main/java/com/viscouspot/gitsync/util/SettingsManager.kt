@@ -125,18 +125,6 @@ class SettingsManager internal constructor(private val context: Context) {
         }
     }
 
-    fun getGitSshPrivateKey(): String {
-        return settingsSharedPref.getString("gitSshKey", "").toString()
-    }
-
-    fun setGitSshPrivateKey(gitSshKey: String) {
-        with(settingsSharedPref.edit()) {
-            putString("gitSshKey", gitSshKey)
-            apply()
-        }
-    }
-
-
     fun getApplicationObserverEnabled(): Boolean {
         return settingsSharedPref.getBoolean("applicationObserverEnabled", false)
     }

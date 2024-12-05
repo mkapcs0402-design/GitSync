@@ -34,10 +34,7 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.IOException
 import java.io.InputStreamReader
-import java.security.SecureRandom
-import java.util.Base64
 import kotlin.random.Random
-
 
 object Helper {
     const val CONFLICT_NOTIFICATION_ID = 1756
@@ -269,7 +266,6 @@ object Helper {
     }
 
     fun isValidGitRepo(url: String): String? {
-        return null
         val validDomains = listOf(defaultDomainMap.values)
         val regex = Regex("^https?://([a-zA-Z0-9.-]+)/(\\S+)/(\\S+)\$")
 

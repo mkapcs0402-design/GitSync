@@ -84,7 +84,6 @@ class GitManager(private val context: Context, private val settingsManager: Sett
                     setURI(repoUrl)
                     setProgressMonitor(monitor)
                     setDirectory(File(Helper.getPathFromUri(context, userStorageUri)))
-                    log("test6")
                     setCredentialsProvider(UsernamePasswordCredentialsProvider(username, token))
                 }
 
