@@ -1,8 +1,8 @@
 package com.viscouspot.gitsync
 
 import com.viscouspot.gitsync.util.Helper.isValidGitRepo
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Test
 
 class IsValidGitRepoTest {
@@ -15,7 +15,7 @@ class IsValidGitRepoTest {
         )
 
         validUrls.forEach { url ->
-            assertTrue("Expected true for $url", isValidGitRepo(url))
+            assertNull("Expected true for $url", isValidGitRepo(url))
         }
     }
 
@@ -33,7 +33,7 @@ class IsValidGitRepoTest {
         )
 
         invalidUrls.forEach { url ->
-            assertFalse("Expected false for $url", isValidGitRepo(url))
+            assertNotNull("Expected false for $url", isValidGitRepo(url))
         }
     }
 }

@@ -5,6 +5,7 @@ import android.net.Uri
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import com.viscouspot.gitsync.R
+import com.viscouspot.gitsync.util.provider.GitProviderManager
 
 class SettingsManager internal constructor(private val context: Context) {
     private val masterKey = MasterKey.Builder(context, MasterKey.DEFAULT_MASTER_KEY_ALIAS)
@@ -91,6 +92,22 @@ class SettingsManager internal constructor(private val context: Context) {
         }
     }
 
+    fun getGitProvider(): GitProviderManager.Companion.Provider {
+        val gitProviderString = settingsSharedPref.getString("gitProvider", "").toString()
+        val providerEntry = GitProviderManager.detailsMap.firstNotNullOf {
+            it.takeIf { it.value.first == gitProviderString }
+        }
+
+        return providerEntry.key
+    }
+
+    fun setGitProvider(provider: GitProviderManager.Companion.Provider) {
+        with(settingsSharedPref.edit()) {
+            putString("gitProvider", GitProviderManager.detailsMap[provider]?.first)
+            apply()
+        }
+    }
+
     fun getGitAuthCredentials(): Pair<String, String> {
         return Pair(
             settingsSharedPref.getString("gitAuthUsername", "")!!,
@@ -98,10 +115,10 @@ class SettingsManager internal constructor(private val context: Context) {
         )
     }
 
-    fun setGitAuthCredentials(username: String, token: String) {
+    fun setGitAuthCredentials(username: String, accessToken: String) {
         with(settingsSharedPref.edit()) {
             putString("gitAuthUsername", username)
-            putString("gitAuthToken", token)
+            putString("gitAuthToken", accessToken)
             apply()
         }
     }

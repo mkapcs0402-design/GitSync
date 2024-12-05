@@ -1,5 +1,6 @@
 package com.viscouspot.gitsync.util
 
+import android.app.Dialog
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
@@ -12,7 +13,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
-import com.viscouspot.gitsync.BuildConfig
 import com.viscouspot.gitsync.R
 import com.viscouspot.gitsync.ui.fragment.CloneRepoFragment
 
@@ -20,15 +20,14 @@ class OnboardingController(
     private val context: Context,
     private val activity: AppCompatActivity,
     private val settingsManager: SettingsManager,
-    private val gitManager: GitManager,
+    private val authDialog: Dialog?,
     private val cloneRepoFragment: CloneRepoFragment,
     private val updateApplicationObserver: (isChecked: Boolean) -> Unit,
     private val checkAndRequestNotificationPermission: (onGranted: (() -> Unit)?) -> Unit,
     private val checkAndRequestStoragePermission: (onGranted: (() -> Unit)?) -> Unit
-    ) {
+) {
     var hasSkipped = false
     private var currentDialog: AlertDialog? = null
-
 
     fun show() {
         val authCreds = settingsManager.getGitAuthCredentials()
@@ -96,7 +95,7 @@ class OnboardingController(
                 .setMessage(context.getString(R.string.auth_dialog_message))
                 .setPositiveButton(context.getString(android.R.string.ok)) { dialog, _ ->
                     dialog.dismiss()
-                    gitManager.launchGithubOAuthFlow()
+                    authDialog?.show()
                 }
                 .setNegativeButton(
                     context.getString(R.string.skip)

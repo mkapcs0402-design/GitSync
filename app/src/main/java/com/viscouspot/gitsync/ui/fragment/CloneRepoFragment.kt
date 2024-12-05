@@ -25,6 +25,7 @@ import com.google.android.material.button.MaterialButton
 import com.viscouspot.gitsync.R
 import com.viscouspot.gitsync.ui.adapter.RepoListAdapter
 import com.viscouspot.gitsync.util.GitManager
+import com.viscouspot.gitsync.util.provider.GitProviderManager
 import com.viscouspot.gitsync.util.Helper
 import com.viscouspot.gitsync.util.LogType
 import com.viscouspot.gitsync.util.Logger.log
@@ -77,8 +78,12 @@ class CloneRepoFragment(
         invalidRepoError.text = ""
         setLoadingRepos(true)
 
-        gitManager.getGithubRepos(settingsManager.getGitAuthCredentials().second, ::addRepos) {
+        val repoListSupported = GitProviderManager.getManager(requireContext(), settingsManager).getRepos(settingsManager.getGitAuthCredentials().second, ::addRepos) {
             loadNextRepos = it
+        }
+
+        if (!repoListSupported) {
+            repoListRecycler.visibility = View.GONE
         }
 
         repoUrlEditText.doOnTextChanged { _, _, _, _ ->

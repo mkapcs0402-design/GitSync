@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@drawable/input_bg_md"
+    android:backgroundTint="@color/card_bg"
+    android:padding="@dimen/space_md"
+    android:layout_margin="@dimen/space_lg"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/auth"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/text_size_lg"
+        android:textColor="@color/text_primary"
+        android:textAllCaps="true"
+        android:textAlignment="center"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@id/authMessage"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:text="@string/auth"/>
+
+    <TextView
+        android:id="@+id/authMessage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/text_size_md"
+        android:layout_marginTop="@dimen/space_xs"
+        android:textColor="@color/text_secondary"
+        android:textAlignment="center"
+        app:layout_constraintBottom_toTopOf="@id/gitProvider"
+        android:layout_marginHorizontal="@dimen/space_xxs"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@id/auth"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:text="Select your git provider and authenticate"/>
+
+    <RelativeLayout
+        android:id="@+id/gitProvider"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/input_bg_md"
+        android:backgroundTint="@color/card_secondary_bg"
+        android:clipToOutline="true"
+        android:layout_marginTop="@dimen/space_md"
+        app:layout_constraintTop_toBottomOf="@id/authMessage"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+        <Spinner
+            android:id="@+id/gitProviderSpinner"
+            android:layout_width="match_parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:backgroundTint="@color/text_secondary"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:spinnerMode="dropdown"
+            tools:listitem="@layout/item_git_provider"
+            android:layout_height="wrap_content"/>
+    </RelativeLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/oAuthButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_lg"
+        android:layout_marginBottom="@dimen/space_md"
+        android:background="@drawable/input_bg_md"
+        android:backgroundTint="@color/card_secondary_bg"
+        android:clipToOutline="true"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        android:text="oauth"
+        android:textColor="@color/primary_light"
+        android:textSize="@dimen/text_size_md"
+        android:visibility="visible"
+        app:backgroundTint="@null"
+        app:icon="@drawable/open_external"
+        app:iconPadding="@dimen/space_sm"
+        app:iconSize="@dimen/text_size_md"
+        app:iconTint="@color/auth_green"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/gitProvider" />
+</androidx.constraintlayout.widget.ConstraintLayout>
