@@ -96,9 +96,7 @@ class SettingsManager internal constructor(private val context: Context) {
     fun getGitProvider(): GitProviderManager.Companion.Provider {
         val gitProviderString = settingsSharedPref.getString("gitProvider", "").toString()
         if (gitProviderString.isEmpty()) return GitProviderManager.Companion.Provider.GITHUB
-        log(gitProviderString)
         val providerEntry = GitProviderManager.detailsMap.firstNotNullOf {
-            log(it.value.first)
             it.takeIf { it.value.first == gitProviderString }
         }
 

@@ -253,6 +253,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        System.setProperty("org.eclipse.jgit.util.Debug", "true")
+        System.setProperty("org.apache.sshd.common.util.logging.level", "DEBUG")
+
         Thread.setDefaultUncaughtExceptionHandler { _, paramThrowable ->
             log(this, LogType.Global, paramThrowable)
         }
