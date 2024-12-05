@@ -5,6 +5,7 @@ import android.net.Uri
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import com.viscouspot.gitsync.R
+import com.viscouspot.gitsync.util.Logger.log
 import com.viscouspot.gitsync.util.provider.GitProviderManager
 
 class SettingsManager internal constructor(private val context: Context) {
@@ -94,6 +95,7 @@ class SettingsManager internal constructor(private val context: Context) {
 
     fun getGitProvider(): GitProviderManager.Companion.Provider {
         val gitProviderString = settingsSharedPref.getString("gitProvider", "").toString()
+        if (gitProviderString.isEmpty()) return GitProviderManager.Companion.Provider.GITHUB
         val providerEntry = GitProviderManager.detailsMap.firstNotNullOf {
             it.takeIf { it.value.first == gitProviderString }
         }

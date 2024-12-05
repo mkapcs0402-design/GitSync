@@ -15,14 +15,14 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.eclipse.jgit.api.RebaseCommand
 import org.eclipse.jgit.api.ResetCommand
-import org.eclipse.jgit.api.errors.CheckoutConflictException
 import org.eclipse.jgit.api.errors.GitAPIException
 import org.eclipse.jgit.api.errors.InvalidRemoteException
 import org.eclipse.jgit.api.errors.JGitInternalException
-import org.eclipse.jgit.api.errors.TransportException
 import org.eclipse.jgit.api.errors.WrongRepositoryStateException
 import org.eclipse.jgit.diff.DiffFormatter
+import org.eclipse.jgit.errors.CheckoutConflictException
 import org.eclipse.jgit.errors.NotSupportedException
+import org.eclipse.jgit.errors.TransportException
 import org.eclipse.jgit.internal.JGitText
 import org.eclipse.jgit.internal.storage.file.FileRepository
 import org.eclipse.jgit.lib.BatchingProgressMonitor
@@ -44,7 +44,8 @@ import java.time.Duration
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-class GitManager(private val context: Context) {
+
+class GitManager(private val context: Context, private val settingsManager: SettingsManager) {
     fun cloneRepository(repoUrl: String, userStorageUri: Uri, username: String, token: String, taskCallback: (action: String) -> Unit, progressCallback: (progress: Int) -> Unit, failureCallback: (error: String) -> Unit, successCallback: () -> Unit) {
         if (!Helper.isNetworkAvailable(context)) {
             return
@@ -96,6 +97,10 @@ class GitManager(private val context: Context) {
                 failureCallback(context.getString(R.string.invalid_remote))
                 return@launch
             } catch (e: TransportException) {
+                e.printStackTrace()
+                log(e)
+                log(e.localizedMessage)
+                log(e.cause)
                 failureCallback(e.localizedMessage ?: context.getString(R.string.clone_failed))
                 return@launch
             } catch (e: GitAPIException) {
@@ -157,7 +162,8 @@ class GitManager(private val context: Context) {
                     setCredentialsProvider(cp)
                     remote = "origin"
                 }
-                if (result.mergeResult.failingPaths != null && result.mergeResult.failingPaths.containsValue(ResolveMerger.MergeFailureReason.DIRTY_WORKTREE)) {
+                if (result.mergeResult.failingPaths != null && result.mergeResult.failingPaths.containsValue(
+                        ResolveMerger.MergeFailureReason.DIRTY_WORKTREE)) {
                     log(LogType.PullFromRepo, "Merge conflict")
                     return false
                 }
