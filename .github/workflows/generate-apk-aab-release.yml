@@ -108,6 +108,7 @@ jobs:
         with:
           artifacts: "${{ steps.signed_file_path_1.outputs.value }}"
           body: ${{ steps.changelog.outputs.changelog }}
+          draft: true
           name: Release ${{ github.ref_name }}
           token: ${{ secrets.GITHUB_TOKEN }}
      
