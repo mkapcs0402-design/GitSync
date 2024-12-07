@@ -266,7 +266,7 @@ object Helper {
     }
 
     fun isValidGitRepo(url: String): String? {
-        val validDomains = listOf(defaultDomainMap.values)
+        val validDomains = defaultDomainMap.values.toList()
         val regex = Regex("^https?://([a-zA-Z0-9.-]+)/(\\S+)/(\\S+)\$")
 
         return when {
