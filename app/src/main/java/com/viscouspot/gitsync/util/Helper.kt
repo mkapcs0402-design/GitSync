@@ -266,12 +266,10 @@ object Helper {
     }
 
     fun isValidGitRepo(url: String): String? {
-        val validDomains = defaultDomainMap.values.toList()
         val regex = Regex("^https?://([a-zA-Z0-9.-]+)/(\\S+)/(\\S+)\$")
 
         return when {
             !regex.matches(url) -> "URL must be an HTTP or HTTPS URL and follow the format 'https://domain/user/repo'"
-            !validDomains.any { url.startsWith("https://$it") || url.startsWith("http://$it") } -> "URL domain is not allowed"
             else -> null
         }
     }

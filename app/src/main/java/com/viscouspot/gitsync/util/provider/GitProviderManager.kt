@@ -21,12 +21,6 @@ interface GitProviderManager {
             Provider.HTTPS to Pair("HTTP/S", R.drawable.provider_https),
         )
 
-        val defaultDomainMap: Map<Provider, String> = mapOf(
-            Provider.GITHUB to "github.com",
-            Provider.GITEA to "gitea.com",
-            Provider.HTTPS to "",
-        )
-
         private val managerMap: Map<Provider, (Context) -> GitProviderManager> = mapOf(
             Provider.GITHUB to { context -> GithubManager(context) },
             Provider.GITEA to { context -> GiteaManager(context) },

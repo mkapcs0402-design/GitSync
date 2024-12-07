@@ -8,7 +8,6 @@ import com.viscouspot.gitsync.Secrets
 import com.viscouspot.gitsync.util.Helper
 import com.viscouspot.gitsync.util.LogType
 import com.viscouspot.gitsync.util.Logger.log
-import com.viscouspot.gitsync.util.provider.GitProviderManager.Companion.defaultDomainMap
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.MediaType.Companion.toMediaType
@@ -29,7 +28,7 @@ class GiteaManager(private val context: Context) : GitProviderManager {
     override val oAuthSupport = true
 
     companion object {
-        private val DOMAIN = defaultDomainMap[GitProviderManager.Companion.Provider.GITEA]
+        private const val DOMAIN = "gitea.com"
         private const val REDIRECT_URI = "gitsync://auth"
         private const val CODE_VERIFIER_LENGTH = 128
     }
