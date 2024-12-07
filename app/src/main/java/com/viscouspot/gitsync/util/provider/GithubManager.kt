@@ -129,7 +129,7 @@ class GithubManager(private val context: Context) : GitProviderManager {
                 val link = response.headers["link"] ?: ""
 
                 if (link != "") {
-                    val regex = "<(.*?)>; rel=\"next\"".toRegex()
+                    val regex = "<([^>]+)>; rel=\"next\"".toRegex()
 
                     val match = regex.find(link)
                     val result = match?.groups?.get(1)?.value
