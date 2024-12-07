@@ -53,7 +53,7 @@
     <string name="notification_dialog_message">\nYou can use GitSync without granting notification permissions, but we recommend enabling them for the best experience.\n\nThe app uses notifications for \n  • popup sync messages\n  • bug reports\n</string>
 
     <string name="all_files_access_dialog_title">Enable \"All Files Access\"</string>
-    <string name="all_files_access_dialog_message">\nYou can use GitSync without granting \"All files access\" permissions, but we recommend enabling it for the best experience.\n\nThe app uses \"All files access\" for syncing your repository more consistently to a less limited range of directories on the device.\n</string>
+    <string name="all_files_access_dialog_message">\nYou cannot use GitSync without granting \"All files access\" permissions! Please enable it for the best experience.\n\nThe app uses \"All files access\" for syncing your repository to the selected directory on the device. The app does not attempt to access any file outside the selected directory.\n</string>
 
     <string name="almost_there_dialog_title">Almost there!</string>
     <string name="almost_there_dialog_message">\nSoon, we\'ll authenticate and clone your repo to your device, preparing it for syncing.\n\nOnce that\'s set, there are several ways to trigger a sync:\n\n  • The GitSync quick tile\n  • The in-app \"Sync Now\" button\n  • Auto Sync\n  • A custom intent (advanced)\n</string>
