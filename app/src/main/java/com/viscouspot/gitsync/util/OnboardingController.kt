@@ -150,7 +150,7 @@ class OnboardingController(
         getAlmostThereDialog().show()
     }
 
-    private fun getEnableAllFilesDialog(): AlertDialog {
+    private fun getEnableAllFilesDialog(standalone: Boolean = false): AlertDialog {
         activity.runOnUiThread {
             currentDialog = AlertDialog.Builder(context, R.style.AlertDialogTheme)
                 .setCancelable(false)
@@ -162,6 +162,7 @@ class OnboardingController(
                         getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
                             checkAndRequestStoragePermission {
                                 dismiss()
+                                if (standalone) return@checkAndRequestStoragePermission
                                 showAlmostThereOrSkip()
                             }
                             this.getButton(AlertDialog.BUTTON_POSITIVE).text =
@@ -173,18 +174,22 @@ class OnboardingController(
         return currentDialog!!
     }
 
-    private fun showAllFilesAccessOrNext() {
+    private fun showAllFilesAccessOrNext(standalone: Boolean = false): Boolean {
         val hasPermissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) Environment.isExternalStorageManager() else
             ContextCompat.checkSelfPermission(context, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
 
         if (!hasPermissions) {
-            getEnableAllFilesDialog().show()
-        } else {
-            showAlmostThereOrSkip()
+            getEnableAllFilesDialog(standalone).show()
+            return true
         }
+
+        if (standalone) return false
+
+        showAlmostThereOrSkip()
+        return false
     }
 
-    private fun getEnableNotificationsDialog(): AlertDialog {
+    private fun getEnableNotificationsDialog(standalone: Boolean = false): AlertDialog {
         activity.runOnUiThread {
         currentDialog = AlertDialog.Builder(context, R.style.AlertDialogTheme)
             .setCancelable(false)
@@ -196,6 +201,7 @@ class OnboardingController(
                     getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
                         checkAndRequestNotificationPermission {
                             dismiss()
+                            if (standalone) return@checkAndRequestNotificationPermission
                             showAllFilesAccessOrNext()
                         }
                         getButton(AlertDialog.BUTTON_POSITIVE).text =
@@ -207,11 +213,12 @@ class OnboardingController(
         return currentDialog!!
     }
 
-    private fun showNotificationsOrNext() {
+    fun showNotificationsOrNext(standalone: Boolean = false): Boolean {
         if (!NotificationManagerCompat.from(context).areNotificationsEnabled()) {
-            getEnableNotificationsDialog().show()
+            getEnableNotificationsDialog(standalone).show()
+            return true
         } else {
-            showAllFilesAccessOrNext()
+            return showAllFilesAccessOrNext(standalone)
         }
     }
 

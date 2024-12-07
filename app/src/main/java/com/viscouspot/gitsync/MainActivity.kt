@@ -235,14 +235,25 @@ class MainActivity : AppCompatActivity() {
             requestedPermission = false
             if (NotificationManagerCompat.from(this).areNotificationsEnabled()) {
                 settingsManager.setSyncMessageEnabled(true)
+            } else {
+                if (onboardingController.showNotificationsOrNext(true)) return
             }
+
             if (checkAccessibilityPermission()) {
                 settingsManager.setApplicationObserverEnabled(true)
+            } else {
+                if (onboardingController.showNotificationsOrNext(true)) return
             }
         } else {
             if (settingsManager.getOnboardingStep() != -1) {
                 onboardingController.show()
                 return
+            }
+
+            val hasAllFilesAccess = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) Environment.isExternalStorageManager() else
+                ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+            if (!hasAllFilesAccess || !NotificationManagerCompat.from(this).areNotificationsEnabled()) {
+                if (onboardingController.showNotificationsOrNext(true)) return
             }
         }
 
