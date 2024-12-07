@@ -167,7 +167,7 @@ class GiteaManager(private val context: Context) : GitProviderManager {
                 val link = response.headers["link"] ?: ""
 
                 if (link.isNotEmpty()) {
-                    val regex = "<(.*?)>; rel=\"next\"".toRegex()
+                    val regex = "<([^>]+)>; rel=\"next\"".toRegex()
                     val match = regex.find(link)
                     val nextLink = match?.groups?.get(1)?.value.orEmpty()
 
