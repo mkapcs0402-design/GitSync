@@ -76,15 +76,6 @@ If you just want to try the app out, feel free to use a pre-built release from t
 - Fill `Secrets.kt` with the new OAuth App ID and SECRET
 
 ### 3. Build & Run
-- There are two flavors of GitSync
-  - The base variant
-    - Includes all the base functionality of GitSync, but doesn't have access to some files and folders on the device
-    - Equivalent to the version available on the PlayStore
-  - The all-files variant
-    - Includes all the functionality of the base variant + an extra permission to give the app full access to the device files and folders
-    - This is useful if you already have a repository cloned on your device
-    - GitSync does not access any files outside of the directory selected in the app nor is anything stored or sent from the selected directory
-- Select a build variant (base is the default)
 - Build from within Android Studio
 
 ## Support
