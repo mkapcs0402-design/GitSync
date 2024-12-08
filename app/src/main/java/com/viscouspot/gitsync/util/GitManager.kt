@@ -40,10 +40,10 @@ import org.eclipse.jgit.util.io.DisabledOutputStream
 import java.io.File
 import java.io.FileWriter
 import java.io.IOException
-import java.time.Duration
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 
 class GitManager(private val context: Context, private val settingsManager: SettingsManager) {
     fun cloneRepository(repoUrl: String, userStorageUri: Uri, username: String, token: String, taskCallback: (action: String) -> Unit, progressCallback: (progress: Int) -> Unit, failureCallback: (error: String) -> Unit, successCallback: () -> Unit) {
@@ -230,8 +230,10 @@ class GitManager(private val context: Context, private val settingsManager: Sett
                 }.call()
 
                 log(LogType.PushToRepo, "Getting current time")
-                val currentDateTime = LocalDateTime.now()
-                val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+
+                val formattedDate: String = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).apply {
+                    timeZone = TimeZone.getTimeZone("UTC")
+                }.format(Date())
 
                 log(LogType.PushToRepo, "Committing changes")
                 val config: StoredConfig = git.repository.config
@@ -243,7 +245,7 @@ class GitManager(private val context: Context, private val settingsManager: Sett
 
                 git.commit().apply {
                     setCommitter(committerName, committerEmail ?: "")
-                    message = syncMessage.format(currentDateTime.format(formatter))
+                    message = syncMessage.format(formattedDate)
                 }.call()
 
                 returnResult = true
