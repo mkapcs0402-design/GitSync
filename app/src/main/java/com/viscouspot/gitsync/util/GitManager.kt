@@ -4,6 +4,8 @@ import android.content.Context
 import android.net.Uri
 import android.os.Looper
 import android.widget.Toast
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.Session
 import com.viscouspot.gitsync.R
 import com.viscouspot.gitsync.ui.adapter.Commit
 import com.viscouspot.gitsync.util.Helper.sendCheckoutConflictNotification
@@ -36,92 +38,45 @@ import org.eclipse.jgit.lib.StoredConfig
 import org.eclipse.jgit.merge.ResolveMerger
 import org.eclipse.jgit.revwalk.RevSort
 import org.eclipse.jgit.revwalk.RevWalk
+import org.eclipse.jgit.transport.JschConfigSessionFactory
+import org.eclipse.jgit.transport.OpenSshConfig
 import org.eclipse.jgit.transport.RemoteRefUpdate
 import org.eclipse.jgit.transport.SshSessionFactory
 import org.eclipse.jgit.transport.SshTransport
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider
 import org.eclipse.jgit.util.io.DisabledOutputStream
-import java.io.ByteArrayInputStream
 import java.io.File
-import java.io.FileOutputStream
 import java.io.FileWriter
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
-import java.util.UUID
 
 class GitManager(private val context: Context, private val settingsManager: SettingsManager) {
     private fun applyCredentials(command: TransportCommand<*, *>) {
+        log(settingsManager.getGitProvider())
         if (settingsManager.getGitProvider() == GitProviderManager.Companion.Provider.SSH) {
-////            log(settingsManager.getGitSshPrivateKey())
-////            log(System.getProperty("user.home"));
-////            log(settingsManager.getGitSshPrivateKey())
-//
-//            val privateKeyContent = settingsManager.getGitSshPrivateKey()
-//            val passphrase: String? = null
-////
-//            val keyPairs = SecurityUtils.loadKeyPairIdentities(null, null, ByteArrayInputStream(privateKeyContent.toByteArray()),
-//            ) { _, _, _ -> passphrase }
-////
-////            val temporaryDirectory: Path
-////            try {
-////                temporaryDirectory = Files.createTempDirectory("ssh-temp-dir")
-////            } catch (e: IOException) {
-////                throw RuntimeException("Failed to create temporary directory", e)
-////            }
-//
-//
-//            val sshDir = File(context.filesDir, ".ssh")
-//            if (!sshDir.exists()) {
-//                log("created dir")
-//                sshDir.mkdir()
-//            }
-//            val fileName = UUID.randomUUID().toString() + "_private_key"
-//            val file = File(sshDir, fileName)
-//            FileOutputStream(file).use { it.write(privateKeyContent.toByteArray()) }
-//
-////            val test = SshSessionFactory
-//
-//            val sshSessionFactory = SshdSessionFactoryBuilder()
-//                .setPreferredAuthentications("publickey")
-//                .setDefaultKeysProvider { _ -> keyPairs }
-//                .setHomeDirectory(context.filesDir)
-//                .setSshDirectory(context.filesDir)
-////                .setServerKeyDatabase { ignoredHomeDir: File?, ignoredSshDir: File? ->
-////                    object : ServerKeyDatabase {
-////                        override fun lookup(
-////                            connectAddress: String,
-////                            remoteAddress: InetSocketAddress,
-////                            config: ServerKeyDatabase.Configuration
-////                        ): List<PublicKey> {
-////                            return emptyList()
-////                        }
-////
-////                        override fun accept(
-////                            connectAddress: String,
-////                            remoteAddress: InetSocketAddress,
-////                            serverKey: PublicKey,
-////                            config: ServerKeyDatabase.Configuration,
-////                            provider: CredentialsProvider
-////                        ): Boolean {
-////                            return true
-////                        }
-////                    }
-////                }
-//                .build(JGitKeyCache())
-//
-////            command.setTransportConfigCallback {
-////                val sshTransport = it as SshTransport
-////                sshTransport.sshSessionFactory = sshSessionFactory
-////            }
-//
-//            SshSessionFactory.setInstance(sshSessionFactory)
-//            command.setTransportConfigCallback {
-//                val sshTransport = it as SshTransport
-//                sshTransport.sshSessionFactory = sshSessionFactory
-//            }
+            val sshSessionFactory = object : JschConfigSessionFactory() {
+                override fun configure(host: OpenSshConfig.Host, session: Session) {
+                    session.setConfig("StrictHostKeyChecking", "no")
+                    session.setConfig("PreferredAuthentications", "publickey,password")
+                    session.setConfig("kex", "diffie-hellman-group-exchange-sha256")
+                }
+
+                override fun createDefaultJSch(fs: org.eclipse.jgit.util.FS?): JSch {
+                    val jsch = super.createDefaultJSch(fs)
+                    jsch.addIdentity("key", settingsManager.getGitSshPrivateKey().toByteArray(), null, null)
+                    return jsch
+                }
+            }
+
+            SshSessionFactory.setInstance(sshSessionFactory)
+            command.setTransportConfigCallback { transport ->
+                if (transport is SshTransport) {
+                    transport.sshSessionFactory = sshSessionFactory
+                }
+            }
         } else {
             val authCredentials = settingsManager.getGitAuthCredentials()
             command.setCredentialsProvider(UsernamePasswordCredentialsProvider(authCredentials.first, authCredentials.second))
@@ -183,6 +138,10 @@ class GitManager(private val context: Context, private val settingsManager: Sett
                 failureCallback(e.localizedMessage ?: context.getString(R.string.clone_failed))
                 return@launch
             } catch (e: GitAPIException) {
+                e.printStackTrace()
+                log(e)
+                log(e.localizedMessage)
+                log(e.cause)
                 failureCallback(context.getString(R.string.clone_failed))
                 return@launch
             }

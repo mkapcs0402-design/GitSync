@@ -161,7 +161,6 @@ class GitSyncService : Service() {
         isSyncing = true
 
         val job = CoroutineScope(Dispatchers.Default).launch {
-            val authCredentials = settingsManager.getGitAuthCredentials()
             val gitDirUri = settingsManager.getGitDirUri()
 
             if (gitDirUri == null) {
@@ -181,8 +180,6 @@ class GitSyncService : Service() {
             log(LogType.Sync, "Start Pull Repo")
             val pullResult = gitManager.downloadChanges(
                 gitDirUri,
-                authCredentials.first,
-                authCredentials.second,
                 ::scheduleNetworkSync,
             ) {
                 synced = true
@@ -207,8 +204,6 @@ class GitSyncService : Service() {
             val pushResult = gitManager.uploadChanges(
                 gitDirUri,
                 settingsManager.getSyncMessage(),
-                authCredentials.first,
-                authCredentials.second,
                 ::scheduleNetworkSync,
             ) {
                 if (!synced) {
@@ -266,8 +261,6 @@ class GitSyncService : Service() {
             val pushResult = gitManager.uploadChanges(
                 settingsManager.getGitDirUri()!!,
                 settingsManager.getSyncMessage(),
-                authCredentials.first,
-                authCredentials.second,
                 ::scheduleNetworkSync,
             ) {
                 Handler(Looper.getMainLooper()).post {
