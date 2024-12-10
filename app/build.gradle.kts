@@ -54,6 +54,10 @@ android {
     }
 }
 
+configurations.all {
+    exclude(module = "httpclient")
+}
+
 dependencies {
     implementation(libs.security.crypto)
     implementation(libs.squareup.okhttp3)
