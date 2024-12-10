@@ -9,6 +9,7 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.InsetDrawable
 import android.view.View
+import android.view.WindowManager
 import android.widget.AdapterView
 import android.widget.EditText
 import android.widget.Spinner
@@ -23,7 +24,8 @@ import com.viscouspot.gitsync.util.Helper
 import com.viscouspot.gitsync.util.SettingsManager
 import com.viscouspot.gitsync.util.provider.GitProviderManager
 
-class AuthDialog(private val context: Context, private val settingsManager: SettingsManager, private val setGitCredentials: (username: String?, toke: String?) -> Unit) : AlertDialog(context, R.style.AlertDialogMinTheme) {
+
+class AuthDialog(private val context: Context, private val settingsManager: SettingsManager, private val setGitCredentials: (username: String?, token: String?) -> Unit) : AlertDialog(context, R.style.AlertDialogMinTheme) {
     private val providers = GitProviderManager.detailsMap
     private lateinit var oAuthContainer: ConstraintLayout
     private lateinit var oAuthButton: MaterialButton
@@ -66,13 +68,15 @@ class AuthDialog(private val context: Context, private val settingsManager: Sett
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
                 val provider = providers.keys.toList()[position]
                 settingsManager.setGitProvider(provider)
+                settingsManager.setGitAuthCredentials("", "")
+                settingsManager.setGitSshPrivateKey("")
                 updateInputs(provider)
             }
 
             override fun onNothingSelected(parent: AdapterView<*>) {}
         }
 
-
+        window?.clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM)
         val inset = InsetDrawable(
             ColorDrawable(Color.TRANSPARENT),
             0
@@ -151,7 +155,7 @@ class AuthDialog(private val context: Context, private val settingsManager: Sett
                         generateKeyButton.isEnabled = false
                         generateKeyButton.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.auth_green_secondary))
                     } else {
-                        settingsManager.setGitSshPrivateKey(key!!)
+                        setGitCredentials(null, key!!)
                         dismiss()
                     }
                 }

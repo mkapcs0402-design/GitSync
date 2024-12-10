@@ -256,7 +256,7 @@ class GitSyncService : Service() {
     private fun merge() {
         CoroutineScope(Dispatchers.Default).launch {
             val authCredentials = settingsManager.getGitAuthCredentials()
-            if (settingsManager.getGitDirUri() == null || authCredentials.first == "" || authCredentials.second == "") return@launch
+            if (settingsManager.getGitDirUri() == null || authCredentials.first == "" || authCredentials.second == "" || settingsManager.getGitSshPrivateKey() == "") return@launch
 
             val pushResult = gitManager.uploadChanges(
                 settingsManager.getGitDirUri()!!,
