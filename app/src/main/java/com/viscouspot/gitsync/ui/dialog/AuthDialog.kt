@@ -138,7 +138,7 @@ class AuthDialog(private val context: Context, private val settingsManager: Sett
                 oAuthContainer.visibility = View.GONE
 
                 var key: String? = null
-                pKeyButton.text = context.getString(R.string.token_example)
+                pKeyButton.text = context.getString(R.string.ssh_key_example)
                 pKeyButton.isEnabled = false
                 pKeyButton.icon = AppCompatResources.getDrawable(context, R.drawable.copy_to_clipboard)
                 pKeyButton.setIconTintResource(R.color.primary_light)
