@@ -247,7 +247,7 @@
             android:inputType="textNoSuggestions"
             app:icon="@drawable/copy_to_clipboard"
             app:iconGravity="end"
-            android:text="@string/token_example"
+            android:text="ssh-rsa AABBCCDDEEFF112233445566"
             android:enabled="false"
             app:iconTint="@color/primary_light"
             app:iconSize="@dimen/text_size_lg"
