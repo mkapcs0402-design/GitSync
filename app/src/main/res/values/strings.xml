@@ -7,7 +7,7 @@
     <string name="auth">AUTH</string>
     <string name="git_repo_url_hint">https://git.abc/xyz.git</string>
     <string name="git_dir_path_hint">/storage/emulated/0/…</string>
-    <string name="token_example">ghp_1234abcd5678efgh</string>
+    <string name="example_token">ghp_1234abcd5678efgh</string>
     <string name="ssh_key_example">ssh-rsa AABBCCDDEEFF112233445566</string>
 
     <string name="enable_application_observer">Auto Sync Settings</string>
@@ -116,4 +116,34 @@
     <string name="git_merge_head_path">.git/MERGE_HEAD</string>
     <string name="git_merge_msg_path">.git/MERGE_MSG</string>
     <string name="git_info_exclude_path">.git/info/exclude</string>
+    <string name="confirm_key_saved">confirm key saved</string>
+    <string name="copied_text">Copied text!</string>
+    <string name="beta">%s (beta)</string>
+    <string name="deselect_repository_directory">deselect repository directory</string>
+    <string name="select_repository_directory">select repository directory</string>
+    <string name="select_your_git_provider_and_authenticate">Select your git provider and authenticate</string>
+    <string name="oauth">oauth</string>
+    <string name="ensure_token_scope">Ensure your token includes the \"repo\" scope for full functionality.</string>
+    <string name="user">user</string>
+    <string name="token">token</string>
+    <string name="login">login</string>
+    <string name="key">key</string>
+    <string name="generate_key">generate key</string>
+    <string name="example_user">JohnSmith12</string>
+    <string name="merge_conflict">merge conflict</string>
+    <string name="merge_dialog_message">Use the editor to resolve the merge conflicts</string>
+    <string name="example_filepath">examplefile.md</string>
+    <string name="abort_merge">abort merge</string>
+    <string name="gitignore">.GitIgnore</string>
+    <string name="gitignore_description">list files or folders to ignore on all devices</string>
+    <string name="gitignore_hint">.trash/\n./…</string>
+    <string name="git_info_exclude">Git/info/exclude</string>
+    <string name="git_info_exclude_description">list files or folders to ignore on this device</string>
+    <string name="git_info_exclude_hint">.trash/\n./…</string>
+    <string name="invalid_repo_url_format_message">URL must be a valid Git URL (HTTP/S, SSH, or git@) and follow the format</string>
+    <string name="i_have_a_local_repository">I have a local repository</string>
+    <string name="keep_changes">Keep changes</string>
+    <string name="local">local</string>
+    <string name="both">both</string>
+    <string name="remote">remote</string>
 </resources>

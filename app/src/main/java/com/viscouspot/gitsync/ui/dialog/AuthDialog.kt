@@ -151,7 +151,7 @@ class AuthDialog(private val context: Context, private val settingsManager: Sett
                         pKeyButton.text = keyPair.second
 
                         pKeyButton.isEnabled = true
-                        generateKeyButton.text = "confirm key saved"
+                        generateKeyButton.text = context.getString(R.string.confirm_key_saved)
                         generateKeyButton.isEnabled = false
                         generateKeyButton.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.auth_green_secondary))
                     } else {
@@ -165,7 +165,7 @@ class AuthDialog(private val context: Context, private val settingsManager: Sett
                     pKeyButton.setIconTintResource(R.color.auth_green)
 
                     val clipboard: ClipboardManager? = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?
-                    val clip = ClipData.newPlainText("Copied text!", pKeyButton.text)
+                    val clip = ClipData.newPlainText(context.getString(R.string.copied_text), pKeyButton.text)
                     clipboard?.setPrimaryClip(clip)
 
                     generateKeyButton.isEnabled = true

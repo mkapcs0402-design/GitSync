@@ -64,22 +64,9 @@
         android:textSize="@dimen/text_size_md"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/syncAppOpened"
-        app:layout_constraintBottom_toTopOf="@id/dummy0"
+        app:layout_constraintBottom_toTopOf="@id/selectApplication"
         app:layout_constraintVertical_bias="0.0"
         tools:ignore="UseSwitchCompatOrMaterialXml" />
-
-    <EditText
-        style="@style/SingleLineEditText"
-        android:id="@+id/dummy0"
-        android:layout_width="1px"
-        android:visibility="gone"
-        android:enabled="false"
-        android:layout_marginVertical="@dimen/space_md"
-        android:layout_height="wrap_content"
-        android:paddingVertical="@dimen/space_sm"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/syncAppClosed"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/applicationRecycler"
@@ -100,11 +87,14 @@
         style="@style/ApplicationSelectButton"
         android:id="@+id/selectApplication"
         android:layout_width="wrap_content"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:backgroundTint="@color/card_secondary_bg"
         android:enabled="true"
         android:insetTop="0dp"
         android:insetBottom="0dp"
+        android:visibility="gone"
+        android:layout_marginVertical="@dimen/space_md"
+        android:paddingVertical="@dimen/space_md"
         android:foreground="?android:attr/selectableItemBackground"
         android:clipToOutline="true"
         android:text=""
@@ -113,9 +103,8 @@
         android:background="@drawable/input_bg_md"
         app:icon="@drawable/circle_xmark"
         app:iconSize="@dimen/application_icon_size"
-        app:layout_constraintBottom_toBottomOf="@+id/dummy0"
-        app:layout_constraintStart_toEndOf="@+id/dummy0"
-        app:layout_constraintTop_toTopOf="@+id/dummy0" />
-
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/syncAppClosed" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

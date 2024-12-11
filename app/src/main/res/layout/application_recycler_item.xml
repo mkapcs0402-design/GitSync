@@ -8,6 +8,7 @@
         android:id="@+id/icon"
         android:layout_width="0dp"
         android:layout_height="match_parent"
+        android:contentDescription="@string/application_not_set"
         android:src="@drawable/circle_xmark"
         app:layout_constraintTop_toTopOf="parent"
         android:padding="@dimen/space_sm"

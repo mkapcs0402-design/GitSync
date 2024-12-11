@@ -19,10 +19,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/space_sm"
-            android:text="Keep changes"
+            android:text="@string/keep_changes"
             android:textAllCaps="true"
             android:textColor="@color/text_primary"
-            android:textSize="@dimen/space_sm"
+            android:textSize="@dimen/text_size_sm"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="@id/local"
             app:layout_constraintTop_toTopOf="parent" />
@@ -40,7 +40,7 @@
             android:padding="0dp"
             android:paddingHorizontal="@dimen/space_xs"
             android:paddingVertical="@dimen/space_xxs"
-            android:text="local"
+            android:text="@string/local"
             android:textColor="@color/card_secondary_bg"
             android:textSize="@dimen/text_size_sm"
             app:backgroundTint="@null"
@@ -57,7 +57,7 @@
             android:backgroundTint="@color/text_secondary"
             android:foreground="?android:attr/selectableItemBackground"
             android:padding="0dp"
-            android:text="both"
+            android:text="@string/both"
             android:textColor="@color/card_secondary_bg"
             android:textSize="@dimen/text_size_sm"
             app:backgroundTint="@null"
@@ -74,7 +74,7 @@
             android:backgroundTint="@color/deletions"
             android:foreground="?android:attr/selectableItemBackground"
             android:padding="0dp"
-            android:text="remote"
+            android:text="@string/remote"
             android:textColor="@color/card_secondary_bg"
             android:textSize="@dimen/text_size_sm"
             app:backgroundTint="@null"
@@ -95,8 +95,7 @@
         android:textSize="@dimen/text_size_md"
         android:textAlignment="viewEnd"
         android:textStyle="bold"
-        android:textColor="@color/text_secondary"
-        android:text="1" />
+        android:textColor="@color/text_secondary" />
 
     <TextView
         app:layout_constraintTop_toTopOf="@id/lineNumberLocal"
@@ -107,8 +106,7 @@
         android:layout_height="wrap_content"
         android:textSize="@dimen/text_size_md"
         android:textStyle="bold"
-        android:textColor="@color/additions"
-        android:text="test" />
+        android:textColor="@color/additions" />
 
     <TextView
         app:layout_constraintTop_toBottomOf="@id/lineLocal"
@@ -122,8 +120,7 @@
         android:layout_height="wrap_content"
         android:textSize="@dimen/text_size_md"
         android:textStyle="bold"
-        android:textColor="@color/text_secondary"
-        android:text="2" />
+        android:textColor="@color/text_secondary" />
 
     <TextView
         app:layout_constraintTop_toTopOf="@id/lineNumberRemote"
@@ -134,8 +131,7 @@
         android:layout_height="wrap_content"
         android:textSize="@dimen/text_size_md"
         android:textStyle="bold"
-        android:textColor="@color/deletions"
-        android:text="test 123" />
+        android:textColor="@color/deletions" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

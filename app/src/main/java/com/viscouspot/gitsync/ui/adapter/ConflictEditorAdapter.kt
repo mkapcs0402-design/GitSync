@@ -10,6 +10,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
 import com.viscouspot.gitsync.R
+import java.util.Locale
 
 class ConflictEditorAdapter (
     private val context: Context,
@@ -39,7 +40,7 @@ class ConflictEditorAdapter (
     }
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        return when (viewType) {
+        when (viewType) {
             1 -> {
                 val view = LayoutInflater.from(viewGroup.context).inflate(R.layout.merge_conflict_lines, viewGroup, false)
                 return ConflictViewHolder(view)
@@ -56,7 +57,7 @@ class ConflictEditorAdapter (
             0 -> {
                 holder as BasicViewHolder
                 holder.line.text = dataSet[position]
-                holder.lineNumber.text = (position + 1).toPaddedString()
+                holder.lineNumber.text = position.toPaddedString()
             }
             1 -> {
                 holder as ConflictViewHolder
@@ -113,14 +114,12 @@ class ConflictEditorAdapter (
                     onAction()
                 }
             }
-            else -> {
-                "Unimplemented"
-            }
+            else -> { }
         }
     }
 
     private fun Int.toPaddedString(): String {
-        return this.toString().padStart(dataSet.joinToString("\n").split("\n").size.toString().length, '0')
+        return String.format(Locale.ROOT, "%d", this + 1).padStart(String.format(Locale.ROOT, "%d", dataSet.joinToString("\n").split("\n").size).length, '0')
     }
 
     override fun getItemCount() = dataSet.size

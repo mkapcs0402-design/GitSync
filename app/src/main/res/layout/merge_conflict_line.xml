@@ -14,8 +14,7 @@
         android:textSize="@dimen/text_size_md"
         android:textAlignment="viewEnd"
         android:textStyle="bold"
-        android:textColor="@color/text_secondary"
-        android:text="1" />
+        android:textColor="@color/text_secondary" />
     <TextView
         app:layout_constraintTop_toTopOf="@id/lineNumber"
         app:layout_constraintStart_toEndOf="@+id/lineNumber"
@@ -25,6 +24,5 @@
         android:layout_height="wrap_content"
         android:textSize="@dimen/text_size_md"
         android:textStyle="bold"
-        android:textColor="@color/text_secondary"
-        android:text="test" />
+        android:textColor="@color/text_secondary" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -146,7 +146,7 @@ class SettingsManager internal constructor(private val context: Context) {
         }
     }
 
-    fun getApplicationPackage(): String {
+    private fun getApplicationPackage(): String {
         return settingsSharedPref.getString("packageName", "")!!
     }
 

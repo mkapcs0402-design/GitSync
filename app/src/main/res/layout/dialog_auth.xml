@@ -38,7 +38,7 @@
         app:layout_constraintTop_toBottomOf="@id/auth"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:text="Select your git provider and authenticate"/>
+        android:text="@string/select_your_git_provider_and_authenticate"/>
 
     <RelativeLayout
         android:id="@+id/gitProvider"
@@ -79,7 +79,7 @@
             android:backgroundTint="@color/card_secondary_bg"
             android:insetTop="0dp"
             android:insetBottom="0dp"
-            android:text="oauth"
+            android:text="@string/oauth"
             android:textColor="@color/card_bg"
             android:textSize="@dimen/text_size_md"
             app:backgroundTint="@color/auth_green"
@@ -110,7 +110,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/space_md"
-            android:text="Ensure your token includes the &quot;repo&quot; scope for full functionality."
+            android:text="@string/ensure_token_scope"
             android:textAlignment="center"
             android:textColor="@color/text_secondary"
             android:textSize="@dimen/text_size_md"
@@ -126,7 +126,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/space_md"
-            android:text="user"
+            android:text="@string/user"
             android:textColor="@color/primary_light"
             android:fontFeatureSettings="smcp"
             android:textStyle="bold"
@@ -135,6 +135,7 @@
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@id/usernameInput" />
+
         <EditText
             android:id="@+id/usernameInput"
             style="@style/SingleLineEditText"
@@ -142,8 +143,9 @@
             android:layout_height="wrap_content"
             android:background="@drawable/input_bg_sm"
             android:backgroundTint="@color/card_secondary_bg"
-            android:hint="JohnSmith12"
+            android:hint="@string/example_user"
             android:inputType="textNoSuggestions"
+            android:importantForAutofill="no"
             android:focusable="true"
             android:focusableInTouchMode="true"
             android:layout_marginTop="@dimen/space_lg"
@@ -160,7 +162,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/space_md"
-            android:text="token"
+            android:text="@string/token"
             android:fontFeatureSettings="smcp"
             android:textColor="@color/primary_light"
             android:textStyle="bold"
@@ -169,6 +171,7 @@
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@id/tokenInput" />
+
         <EditText
             android:id="@+id/tokenInput"
             style="@style/SingleLineEditText"
@@ -176,9 +179,10 @@
             android:layout_height="wrap_content"
             android:background="@drawable/input_bg_sm"
             android:backgroundTint="@color/card_secondary_bg"
-            android:hint="@string/token_example"
+            android:hint="@string/example_token"
             android:inputType="textNoSuggestions"
             android:focusable="true"
+            android:importantForAutofill="no"
             android:focusableInTouchMode="true"
             android:paddingHorizontal="@dimen/space_md"
             android:paddingVertical="@dimen/space_md"
@@ -201,7 +205,7 @@
             android:foreground="?android:attr/selectableItemBackground"
             android:insetTop="0dp"
             android:insetBottom="0dp"
-            android:text="login"
+            android:text="@string/login"
             android:textColor="@color/card_bg"
             android:textSize="@dimen/text_size_md"
             android:visibility="visible"
@@ -226,7 +230,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/space_md"
-            android:text="key"
+            android:text="@string/key"
             android:textColor="@color/primary_light"
             android:fontFeatureSettings="smcp"
             android:textStyle="bold"
@@ -271,7 +275,7 @@
             android:backgroundTint="@color/card_secondary_bg"
             android:insetTop="0dp"
             android:insetBottom="0dp"
-            android:text="generate key"
+            android:text="@string/generate_key"
             android:textColor="@color/card_bg"
             android:textSize="@dimen/text_size_md"
             app:backgroundTint="@color/auth_green"

@@ -210,7 +210,7 @@ class MainActivity : AppCompatActivity() {
         val adapter = recyclerView.adapter ?: return
 
         val viewHolder = adapter.createViewHolder(recyclerView, adapter.getItemViewType(0))
-        viewHolder.itemView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+        viewHolder.itemView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
 
         val itemHeight = (viewHolder.itemView.layoutParams as ViewGroup.MarginLayoutParams).topMargin + viewHolder.itemView.measuredHeight
 
@@ -231,7 +231,7 @@ class MainActivity : AppCompatActivity() {
 
         try {
             unregisterReceiver(broadcastReceiver)
-        } catch (e: Exception) { }
+        } catch (_: Exception) { }
     }
 
     override fun onResume() {
@@ -718,23 +718,26 @@ class MainActivity : AppCompatActivity() {
 
             override fun onQueryTextChange(newText: String?): Boolean {
                 if ((newText == null) or (newText == "")) {
+                    val prevSize = filteredDevicePackageNames.size
                     filteredDevicePackageNames.clear()
+                    adapter.notifyItemRangeRemoved(0, prevSize)
                     filteredDevicePackageNames.addAll(devicePackageNames)
-                    adapter.notifyDataSetChanged()
+                    adapter.notifyItemRangeInserted(0, devicePackageNames.size)
                 } else {
+                    val prevSize = filteredDevicePackageNames.size
                     filteredDevicePackageNames.clear()
-                    filteredDevicePackageNames.addAll(
-                        devicePackageNames.filter {
-                            packageManager.getApplicationLabel(
-                                packageManager.getApplicationInfo(it, 0)
-                            ).toString()
-                                .lowercase(Locale.getDefault())
-                                .contains(
-                                    newText.toString().lowercase(Locale.getDefault())
-                                )
-                        }
-                    )
-                    adapter.notifyDataSetChanged()
+                    adapter.notifyItemRangeRemoved(0, prevSize)
+                    val filteredPackageNames = devicePackageNames.filter {
+                        packageManager.getApplicationLabel(
+                            packageManager.getApplicationInfo(it, 0)
+                        ).toString()
+                            .lowercase(Locale.getDefault())
+                            .contains(
+                                newText.toString().lowercase(Locale.getDefault())
+                            )
+                    }
+                    filteredDevicePackageNames.addAll(filteredPackageNames)
+                    adapter.notifyItemRangeInserted(0, filteredPackageNames.size)
                 }
                 return true
             }
@@ -819,9 +822,11 @@ class MainActivity : AppCompatActivity() {
 
                         applicationRecycler.visibility = View.VISIBLE
                         val iconList = packageNames.map { packageManager.getApplicationIcon(it) }
+                        val prevSize = applicationList.size
                         applicationList.clear()
+                        applicationListAdapter.notifyItemRangeRemoved(0, prevSize)
                         applicationList.addAll(iconList)
-                        applicationListAdapter.notifyDataSetChanged()
+                        applicationListAdapter.notifyItemRangeInserted(0, iconList.size)
                     }
                 }
             } else {
@@ -855,7 +860,7 @@ class MainActivity : AppCompatActivity() {
                 runOnUiThread {
                     recentCommits.addAll(0, newRecentCommits)
                     recentCommitsAdapter.notifyItemRangeInserted(0, newRecentCommits.size)
-                    recentCommitsRecycler.smoothScrollToPosition(0);
+                    recentCommitsRecycler.smoothScrollToPosition(0)
                 }
             }
         }
@@ -866,7 +871,7 @@ class MainActivity : AppCompatActivity() {
 
                 recentCommits.add(0, Commit("", "", 0L, RecentCommitsAdapter.MERGE_CONFLICT, 0, 0))
                 recentCommitsAdapter.notifyItemInserted(0)
-                recentCommitsRecycler.smoothScrollToPosition(0);
+                recentCommitsRecycler.smoothScrollToPosition(0)
             }
         } else {
             runOnUiThread {
@@ -886,7 +891,7 @@ class MainActivity : AppCompatActivity() {
                     val fileContents = gitConfigFile.readText()
 
                     val gitConfigUrlRegex = "url = (.*?)\\n".toRegex()
-                    var gitConfigUrlResult = gitConfigUrlRegex.find(fileContents)
+                    val gitConfigUrlResult = gitConfigUrlRegex.find(fileContents)
                     val url = gitConfigUrlResult?.groups?.get(1)?.value
 
                     val gitRepoNameRegex = ".*/([^/]+?)(\\.git)?$".toRegex()
@@ -948,7 +953,7 @@ class MainActivity : AppCompatActivity() {
     private fun refreshAuthButton() {
         runOnUiThread {
             if (settingsManager.getGitAuthCredentials().second != "" || settingsManager.getGitSshPrivateKey() != "") {
-                gitAuthButton.icon = getDrawable(R.drawable.circle_check)
+                gitAuthButton.icon = ContextCompat.getDrawable(this, R.drawable.circle_check)
                 gitAuthButton.setIconTintResource(R.color.auth_green)
 
                 selectDirButton.isEnabled = true
@@ -957,7 +962,7 @@ class MainActivity : AppCompatActivity() {
                 return@runOnUiThread
             }
 
-            gitAuthButton.icon = getDrawable(R.drawable.circle_xmark)
+            gitAuthButton.icon = ContextCompat.getDrawable(this, R.drawable.circle_xmark)
             gitAuthButton.setIconTintResource(R.color.auth_red)
 
             selectDirButton.isEnabled = false
@@ -967,7 +972,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun checkAccessibilityPermission(): Boolean {
         val am = getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
-        val enabledServices = am.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_ALL_MASK);
+        val enabledServices = am.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_ALL_MASK)
 
         return enabledServices.any {
             it.resolveInfo.serviceInfo.packageName == packageName &&
@@ -1002,8 +1007,16 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
-        intent.putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
+        val intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+                putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
+            }
+        } else {
+            Intent().apply {
+                action = "android.settings.APP_NOTIFICATION_SETTINGS"
+                putExtra("app_package", packageName)
+            }
+        }
 
         requestedPermission = true
         requestNotificationPermission.launch(intent)

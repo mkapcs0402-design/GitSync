@@ -106,6 +106,7 @@ class OnboardingController(
         return currentDialog!!
     }
 
+    @Suppress("DEPRECATION")
     private fun getAlmostThereDialogLink(): TextView {
         return TextView(context).apply {
             movementMethod = LinkMovementMethod.getInstance()

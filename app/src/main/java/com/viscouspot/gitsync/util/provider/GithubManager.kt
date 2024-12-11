@@ -88,7 +88,7 @@ class GithubManager(private val context: Context) : GitProviderManager {
             }
 
             override fun onResponse(call: Call, response: Response) {
-                val json = JSONObject(response.body?.string())
+                val json = JSONObject(response.body?.string().toString())
                 val username = json.getString("login")
 
                 log(LogType.GithubAuthCredentials, "Username Retrieved")

@@ -6,7 +6,7 @@ import com.viscouspot.gitsync.R
 import com.viscouspot.gitsync.util.SettingsManager
 
 interface GitProviderManager {
-    val oAuthSupport: Boolean;
+    val oAuthSupport: Boolean
 
     companion object {
         enum class Provider {
