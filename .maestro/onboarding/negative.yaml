@@ -1,0 +1,148 @@
+appId: com.viscouspot.gitsync
+---
+
+- runFlow: ../common/disable_all_files_access.yaml
+- runFlow: ../common/clear_state.yaml
+- runFlow: ../common/kill.yaml
+
+- runFlow: ../common/launch_stls_no_perms.yaml
+- runFlow: flows/welcome_dialog/assert.yaml
+- runFlow: ../common/kill.yaml
+
+- runFlow: ../common/launch_stls_no_perms.yaml
+- runFlow: flows/welcome_dialog/assert.yaml
+- runFlow: flows/welcome_dialog/negative.yaml
+- runFlow: flows/notifications_dialog/assert.yaml
+- runFlow: ../common/kill.yaml
+
+- runFlow: ../common/launch_stls_no_perms.yaml
+- runFlow: flows/welcome_dialog/assert.yaml
+- runFlow: flows/welcome_dialog/positive.yaml
+- runFlow: flows/notifications_dialog/assert.yaml
+- runFlow: ../common/kill.yaml
+
+- runFlow: ../common/launch_stls_no_perms.yaml
+- runFlow: flows/welcome_dialog/assert.yaml
+- runFlow: flows/welcome_dialog/positive.yaml
+- runFlow: flows/notifications_dialog/assert.yaml
+- runFlow: flows/notifications_dialog/positive.yaml
+- runFlow: flows/notifications_permission/assert.yaml
+- runFlow: ../common/back.yaml
+- runFlow: flows/notifications_dialog/assert.yaml
+- runFlow: ../common/kill.yaml
+
+- runFlow: ../common/launch_stls_no_perms.yaml
+- runFlow: flows/welcome_dialog/assert.yaml
+- runFlow: flows/welcome_dialog/positive.yaml
+- runFlow: flows/notifications_dialog/assert.yaml
+- runFlow: flows/notifications_dialog/positive.yaml
+- runFlow: flows/notifications_permission/assert.yaml
+- runFlow: ../common/back.yaml
+- runFlow: flows/notifications_dialog/assert.yaml
+- runFlow: flows/notifications_dialog/positive.yaml
+- runFlow: flows/notifications_permission/assert.yaml
+- runFlow: flows/notifications_permission/enable.yaml
+- runFlow: ../common/back.yaml
+- runFlow: ../common/kill.yaml
+
+
+- runFlow: ../common/launch_notif_perm.yaml
+- runFlow: flows/welcome_dialog/assert.yaml
+- runFlow: flows/welcome_dialog/positive.yaml
+- runFlow: flows/all_files_dialog/assert.yaml
+- runFlow: flows/all_files_dialog/positive.yaml
+- runFlow: flows/all_files_permission/assert.yaml
+- runFlow: ../common/back.yaml
+- runFlow: flows/all_files_dialog/assert.yaml
+- runFlow: ../common/kill.yaml
+
+- runFlow: ../common/launch_notif_perm.yaml
+- runFlow: flows/welcome_dialog/assert.yaml
+- runFlow: flows/welcome_dialog/positive.yaml
+- runFlow: flows/all_files_dialog/assert.yaml
+- runFlow: flows/all_files_dialog/positive.yaml
+- runFlow: flows/all_files_permission/assert.yaml
+- runFlow: ../common/back.yaml
+- runFlow: flows/all_files_dialog/assert.yaml
+- runFlow: flows/all_files_dialog/positive.yaml
+- runFlow: flows/all_files_permission/assert.yaml
+- runFlow: flows/all_files_permission/enable.yaml
+- runFlow: ../common/back.yaml
+- runFlow: flows/all_files_dialog/assert.yaml
+- runFlow: flows/all_files_dialog/positive_secondary.yaml
+- runFlow: flows/almost_there_dialog/assert.yaml
+- runFlow: ../common/kill.yaml
+
+
+- runFlow: ../common/launch_notif_perm.yaml
+- runFlow: flows/almost_there_dialog/assert.yaml
+- runFlow: ../common/kill.yaml
+
+- runFlow: ../common/launch_notif_perm.yaml
+- runFlow: flows/almost_there_dialog/assert.yaml
+- runFlow: flows/almost_there_dialog/negative.yaml
+- runFlow: flows/almost_there_dialog/assert_not.yaml
+- runFlow: ../common/kill.yaml
+
+- runFlow: ../common/launch_notif_perm.yaml
+- runFlow: flows/almost_there_dialog/assert.yaml
+- runFlow: flows/almost_there_dialog/positive.yaml
+- runFlow: flows/pre_auth_dialog/assert.yaml
+- runFlow: ../common/kill.yaml
+
+
+- runFlow: ../common/launch_notif_perm.yaml
+- runFlow: flows/pre_auth_dialog/assert.yaml
+- runFlow: ../common/kill.yaml
+
+- runFlow: ../common/launch_notif_perm.yaml
+- runFlow: flows/pre_auth_dialog/assert.yaml
+- runFlow: flows/pre_auth_dialog/negative.yaml
+- runFlow: flows/pre_auth_dialog/assert_not.yaml
+- runFlow: ../common/kill.yaml
+
+- runFlow: ../common/launch_notif_perm.yaml
+- runFlow: flows/pre_auth_dialog/assert.yaml
+- runFlow: flows/pre_auth_dialog/positive.yaml
+- runFlow: ../auth/flows/assert.yaml
+- runFlow: ../common/kill.yaml
+
+- runFlow: ../common/launch_notif_perm.yaml
+- runFlow: flows/pre_auth_dialog/assert.yaml
+- runFlow: flows/pre_auth_dialog/positive.yaml
+- runFlow: ../auth/flows/assert.yaml
+- runFlow: ../auth/flows/github/start.yaml
+- runFlow: ../auth/flows/github/assert.yaml
+- runFlow: ../common/kill.yaml
+
+- runFlow: ../common/launch_notif_perm.yaml
+- runFlow: flows/pre_auth_dialog/assert.yaml
+- runFlow: flows/pre_auth_dialog/positive.yaml
+- runFlow: ../auth/flows/assert.yaml
+- runFlow: ../auth/flows/github/start.yaml
+- runFlow: ../auth/flows/github/assert.yaml
+- runFlow: ../common/back.yaml
+- runFlow: flows/pre_auth_dialog/assert.yaml
+- runFlow: ../common/kill.yaml
+
+- runFlow: ../common/launch_notif_perm.yaml
+- runFlow: flows/pre_auth_dialog/assert.yaml
+- runFlow: flows/pre_auth_dialog/positive.yaml
+- runFlow: ../auth/flows/assert.yaml
+- runFlow: ../auth/flows/github/start.yaml
+- runFlow: ../auth/flows/github/assert.yaml
+- runFlow: ../auth/flows/github/auth.yaml
+- runFlow: ../clone/flows/assert.yaml
+- runFlow: ../common/kill.yaml
+
+
+- runFlow: ../common/launch_notif_perm.yaml
+- runFlow: ../clone/flows/list/assert.yaml
+- runFlow: ../common/kill.yaml
+
+- runFlow: ../common/launch_notif_perm.yaml
+- runFlow: ../clone/flows/list/assert.yaml
+- runFlow: ../clone/flows/list/positive.yaml
+- runFlow: ../common/kill.yaml
+
+

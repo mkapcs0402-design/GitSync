@@ -1,0 +1,55 @@
+
+appId: com.viscouspot.gitsync
+clearState: false
+---
+
+- runFlow: ../common/disable_all_files_access.yaml
+- clearState
+- killApp
+
+- runFlow: ../common/launch_stls_no_perms.yaml
+
+- runFlow: ./flows/positive.yaml
+
+- assertVisible: "Enable Notifications"
+- tapOn: "OK"
+- assertVisible: "You haven't allowed notifications from this app"
+- tapOn: "All Git Sync notifications"
+- back
+- assertVisible: "Enable Notifications"
+- tapOn: "DONE"
+- assertVisible: 'Enable "All Files Access"'
+- tapOn: "OK"
+- assertVisible: "Allow access to manage all files"
+- tapOn: "Allow access to manage all files"
+- back
+- assertVisible: "Almost there!"
+- tapOn: "OK"
+- assertVisible: "Authenticate with Github.com"
+- tapOn: "OK"
+- assertVisible: "Use a different account"
+- tapOn: "Continue"
+- assertVisible: "Clone remote repository"
+- assertVisible: "TestObsidianVault"
+- tapOn: "TestObsidianVault"
+- assertVisible: "Select a folder to clone into"
+- tapOn: "SELECT"
+- assertVisible: "USE THIS FOLDER"
+- tapOn: "Documents"
+- tapOn:
+    point: 65%,5%
+- evalScript: ${output.randomDirName = Math.random()}
+- inputText: ${output.randomDirName}
+- assertVisible: "OK"
+- tapOn: "OK"
+- assertVisible: ${output.randomDirName}
+- tapOn: ${output.randomDirName}
+- assertVisible: "USE THIS FOLDER"
+- tapOn: "USE THIS FOLDER"
+- assertVisible: "ALLOW"
+- tapOn: "ALLOW"
+- assertVisible: "Enable Auto Sync"
+- assertVisible: "SKIP"
+- tapOn: "SKIP"
+- assertNotVisible: "Enable Auto Sync"
+- killApp
