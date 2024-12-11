@@ -1,7 +1,6 @@
-
 appId: com.viscouspot.gitsync
 ---
 
 - launchApp:
     permissions:
-      notifications: allow
+      all: allow

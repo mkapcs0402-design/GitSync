@@ -242,13 +242,11 @@ class MainActivity : AppCompatActivity() {
             if (NotificationManagerCompat.from(this).areNotificationsEnabled()) {
                 settingsManager.setSyncMessageEnabled(true)
             } else {
-                if (onboardingController.showNotificationsOrNext(true)) return
+                if (onboardingController.showNotificationsOrNext()) return
             }
 
             if (checkAccessibilityPermission()) {
                 settingsManager.setApplicationObserverEnabled(true)
-            } else {
-                if (onboardingController.showNotificationsOrNext(true)) return
             }
         } else {
             if (settingsManager.getOnboardingStep() != -1 && !authDialog.isShowing && prominentDisclosure?.isShowing != true) {

@@ -1,0 +1,11 @@
+appId: com.viscouspot.gitsync
+---
+
+- runFlow: ./assert.yaml
+- tapOn: "SELECT APP(S)"
+- inputText: "OBSIDIAN"
+- tapOn: "OBSIDIAN"
+- tapOn: "SAVE"
+- assertVisible: "OBSIDIAN"
+- tapOn: "Sync on app(s) opened"
+- tapOn: "Sync on app(s) closed"

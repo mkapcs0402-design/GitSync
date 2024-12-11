@@ -1,0 +1,31 @@
+appId: com.viscouspot.gitsync
+---
+
+- runFlow: ../common/disable_all_files_access.yaml
+- runFlow: ../common/clear_state.yaml
+- runFlow: ../common/kill.yaml
+
+- runFlow: ../common/launch_stls_no_perms.yaml
+- runFlow: flows/welcome_dialog/positive.yaml
+- runFlow: flows/notifications_dialog/positive.yaml
+- runFlow: flows/notifications_permission/enable.yaml
+- runFlow: ../common/back.yaml
+- runFlow: flows/notifications_dialog/positive_secondary.yaml
+- runFlow: flows/all_files_dialog/positive.yaml
+- runFlow: flows/all_files_permission/enable.yaml
+- runFlow: ../common/back.yaml
+- runFlow: flows/almost_there_dialog/positive.yaml
+- runFlow: flows/pre_auth_dialog/positive.yaml
+- runFlow: ../auth/flows/github/start.yaml
+- runFlow: ../auth/flows/github/assert.yaml
+- runFlow: ../auth/flows/github/auth.yaml
+- runFlow: ../clone/flows/url/positive.yaml
+- runFlow: ../clone/flows/select_folder_dialog/positive.yaml
+- runFlow: ../clone/flows/select_folder/positive.yaml
+- runFlow: ../clone/flows/select_folder/assert_not.yaml
+- runFlow: ../clone/flows/select_folder_dialog/assert_not.yaml
+- runFlow: flows/auto_sync_dialog/negative.yaml
+- runFlow: flows/auto_sync_dialog/assert_not.yaml
+- runFlow: ../common/kill.yaml
+
+
