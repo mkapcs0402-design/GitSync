@@ -5,12 +5,12 @@ appId: com.viscouspot.gitsync
 - tapOn: "Documents"
 - tapOn:
     point: 65%,5%
-- evalScript: ${output.randomDirName = Math.random()}
-- inputText: ${output.randomDirName}
+- evalScript: ${output.randomNumber = (Math.floor(Math.random() * 10000) + 1).toString()}
+- inputText: ${output.randomNumber}
 - assertVisible: "OK"
 - tapOn: "OK"
-- assertVisible: ${output.randomDirName}
-- tapOn: ${output.randomDirName}
+- assertVisible: ${output.randomNumber}
+- tapOn: ${output.randomNumber}
 - assertVisible: "USE THIS FOLDER"
 - tapOn: "USE THIS FOLDER"
 - assertVisible: "ALLOW"

@@ -3,8 +3,11 @@ extern crate serde_yaml;
 
 use serde::{Deserialize, Serialize};
 use serde_yaml::Value;
+use std::env as env_internal;
 use std::fs::File;
 use std::io::Write;
+use std::process::{Command, Stdio};
+mod env;
 
 #[path = "../onboarding/src/mod.rs"]
 mod onboarding;
@@ -110,6 +113,9 @@ fn create_yaml(input: &Input, output_file: &str) -> Result<(), Box<dyn std::erro
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let args: Vec<String> = env_internal::args().collect();
+    env::setup();
+
     create_yaml(&onboarding::negative::get_input(), "onboarding/negative")?;
     create_yaml(&onboarding::positive::get_input(), "onboarding/positive")?;
 
@@ -117,6 +123,28 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     create_yaml(&auth::gitea::get_input(), "auth/gitea")?;
     create_yaml(&auth::https::get_input(), "auth/https")?;
     create_yaml(&auth::ssh::get_input(), "auth/ssh")?;
+
+    let path = if args.len() > 1 {
+        &args[1]
+    } else {
+        &".".to_string()
+    };
+
+    let output = Command::new("maestro")
+        .arg("test")
+        .arg(path)
+        .stdout(Stdio::inherit())
+        .output()
+        .expect("Failed to execute command");
+
+    if output.status.success() {
+        println!("Command executed successfully!",);
+    } else {
+        eprintln!(
+            "Command failed:\n{}",
+            String::from_utf8_lossy(&output.stderr)
+        );
+    }
 
     Ok(())
 }

@@ -1,0 +1,24 @@
+appId: com.viscouspot.gitsync
+---
+
+- openLink: 
+    link: https://github.com/settings/keys
+    browser: true
+- scrollUntilVisible: 
+    element: "New SSH Key"
+    direction: DOWN
+- tapOn: "New SSH Key"
+- scrollUntilVisible: 
+    element: "Add SSH Key"
+    direction: DOWN
+- tapOn: "Title"
+- inputRandomNumber
+- hideKeyboard
+- tapOn: "Key"
+- longPressOn:
+    text: "Key"
+- tapOn: "Paste"
+- hideKeyboard
+- tapOn: "Add SSH Key"
+- assertVisible: "You have successfully added the key.*"
+- stopApp: com.android.chrome

@@ -12,3 +12,4 @@ Secrets.kt
 *.aab
 *.apk
 .maestro/target/
+env.rs
