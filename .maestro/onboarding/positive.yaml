@@ -19,7 +19,7 @@ appId: com.viscouspot.gitsync
 - runFlow: ../auth/flows/github/start.yaml
 - runFlow: ../auth/flows/github/assert.yaml
 - runFlow: ../auth/flows/github/auth.yaml
-- runFlow: ../clone/flows/url/positive.yaml
+- runFlow: ../clone/flows/list/positive.yaml
 - runFlow: ../clone/flows/select_folder_dialog/positive.yaml
 - runFlow: ../clone/flows/select_folder/positive.yaml
 - runFlow: ../clone/flows/select_folder/assert_not.yaml

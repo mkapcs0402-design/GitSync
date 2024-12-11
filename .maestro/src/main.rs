@@ -9,6 +9,9 @@ use std::io::Write;
 #[path = "../onboarding/src/mod.rs"]
 mod onboarding;
 
+#[path = "../auth/src/mod.rs"]
+mod auth;
+
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(bound(deserialize = "'de: 'static"))]
 struct Input {
@@ -93,26 +96,27 @@ fn create_yaml(input: &Input, output_file: &str) -> Result<(), Box<dyn std::erro
         yaml_data.push(Value::String("".to_string()));
     }
 
-    let mut file = File::create(output_file)?;
+    let mut file = File::create(format!("{}.yaml", output_file))?;
     for item in yaml_data {
         writeln!(file, "{}", item.as_str().unwrap())?;
     }
 
-    println!("YAML file generated successfully! {}", output_file);
+    println!(
+        "YAML file generated successfully! {}",
+        format!("{}.yaml", output_file)
+    );
 
     Ok(())
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    create_yaml(
-        &onboarding::negative::get_input(),
-        "onboarding/negative.yaml",
-    )?;
+    create_yaml(&onboarding::negative::get_input(), "onboarding/negative")?;
+    create_yaml(&onboarding::positive::get_input(), "onboarding/positive")?;
 
-    create_yaml(
-        &onboarding::positive::get_input(),
-        "onboarding/positive.yaml",
-    )?;
+    create_yaml(&auth::github::get_input(), "auth/github")?;
+    create_yaml(&auth::gitea::get_input(), "auth/gitea")?;
+    create_yaml(&auth::https::get_input(), "auth/https")?;
+    create_yaml(&auth::ssh::get_input(), "auth/ssh")?;
 
     Ok(())
 }

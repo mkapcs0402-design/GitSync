@@ -1,0 +1,9 @@
+appId: com.viscouspot.gitsync
+---
+
+- runFlow: ./assert.yaml
+- tapOn: JohnSmith12
+- inputText: "ViscousTests"
+- tapOn: ghp_1234abcd5678efgh
+- inputText: "ghp_1234abcd5678efgh"
+- tapOn: "LOGIN"

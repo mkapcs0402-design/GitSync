@@ -19,7 +19,7 @@ pub fn get_input() -> Input {
             "../auth/flows/github/start",
             "../auth/flows/github/assert",
             "../auth/flows/github/auth",
-            "../clone/flows/url/positive",
+            "../clone/flows/list/positive",
             "../clone/flows/select_folder_dialog/positive",
             "../clone/flows/select_folder/positive",
             "../clone/flows/select_folder/assert_not",

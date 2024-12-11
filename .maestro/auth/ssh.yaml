@@ -1,0 +1,15 @@
+appId: com.viscouspot.gitsync
+---
+
+- runFlow: ../onboarding/positive.yaml
+- runFlow: ../common/kill.yaml
+
+- runFlow: ../common/launch_notif_perm.yaml
+- runFlow: flows/open_auth/positive.yaml
+- runFlow: flows/ssh/start.yaml
+- runFlow: flows/ssh/auth.yaml
+- runFlow: ../clone/flows/assert.yaml
+- runFlow: ../clone/flows/list/assert_not.yaml
+- runFlow: ../common/kill.yaml
+
+

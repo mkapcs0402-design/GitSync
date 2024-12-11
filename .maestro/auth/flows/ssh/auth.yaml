@@ -1,0 +1,9 @@
+appId: com.viscouspot.gitsync
+---
+
+- runFlow: ./assert.yaml
+- tapOn: "GENERATE KEY"
+- assertVisible: "CONFIRM KEY SAVED"
+- tapOn: 
+    above: "CONFIRM KEY SAVED"
+- tapOn: "CONFIRM KEY SAVED"
