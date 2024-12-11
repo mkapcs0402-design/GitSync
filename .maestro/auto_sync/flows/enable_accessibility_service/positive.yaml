@@ -1,0 +1,12 @@
+appId: com.viscouspot.gitsync
+---
+
+- runFlow: ./assert.yaml
+- scrollUntilVisible: 
+    element: "Git Sync"
+    direction: DOWN
+- tapOn: "Git Sync"
+- assertVisible: "Use Git Sync"
+- tapOn: "Use Git Sync"
+- tapOn: "Allow"
+- back

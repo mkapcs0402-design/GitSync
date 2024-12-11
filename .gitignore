@@ -11,3 +11,4 @@ local.properties
 Secrets.kt
 *.aab
 *.apk
+.maestro/target/

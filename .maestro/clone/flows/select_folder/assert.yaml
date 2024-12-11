@@ -1,0 +1,5 @@
+appId: com.viscouspot.gitsync
+---
+
+- assertVisible: "USE THIS FOLDER"
+- assertVisible: "Documents"
