@@ -2,4 +2,4 @@ appId: com.viscouspot.gitsync
 ---
 
 - runFlow: ./assert.yaml
-- tapOn: "TestObsidianVault"
+- tapOn: ${MAESTRO_GITHUB_LIST_REPO_NAME}

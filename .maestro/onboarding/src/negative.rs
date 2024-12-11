@@ -60,10 +60,7 @@ pub fn get_input() -> Input {
                 ],
             ],
             vec![
-                vec![
-                    vec!["../clone/flows/url/negative"],
-                    vec!["../clone/flows/url/positive"],
-                ],
+                vec![vec!["../clone/flows/list/github"]],
                 vec![
                     vec![
                         "../clone/flows/select_folder_dialog/negative",

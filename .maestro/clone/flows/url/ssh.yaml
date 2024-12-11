@@ -3,5 +3,5 @@ appId: com.viscouspot.gitsync
 
 - runFlow: ./assert.yaml
 - tapOn: "https://git.abc/xyz.git"
-- inputText: "https://github.com/ViscousTests/TestObsidianVault"
+- inputText: ${MAESTRO_SSH_CLONE_URL}
 - tapOn: "PULL"

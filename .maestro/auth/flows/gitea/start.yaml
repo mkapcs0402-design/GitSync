@@ -1,0 +1,8 @@
+appId: com.viscouspot.gitsync
+---
+
+- runFlow: ../assert.yaml
+- tapOn: "GITHUB"
+- assertVisible: "GITEA"
+- tapOn: "GITEA"
+- tapOn: "OAUTH"
