@@ -28,7 +28,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/info"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:layout_marginEnd="@dimen/space_sm"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/additions"
@@ -43,7 +43,6 @@
             android:text="@string/example_user"
             android:textColor="@color/text_secondary"
             android:textSize="@dimen/text_size_sm"
-            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/committed"
             app:layout_constraintHorizontal_bias="0.0"
@@ -58,10 +57,9 @@
             android:text="@string/committed"
             android:textColor="@color/text_secondary"
             android:textSize="@dimen/text_size_sm"
-            app:layout_constraintBottom_toBottomOf="@id/author"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toEndOf="@id/author"
-            app:layout_constraintTop_toTopOf="@id/author" />
+            app:layout_constraintStart_toEndOf="@id/author"/>
 
         <Chronometer
             android:id="@+id/commitDate"
@@ -70,11 +68,10 @@
             android:layout_marginStart="@dimen/space_xxxs"
             android:textColor="@color/text_secondary"
             android:textSize="@dimen/text_size_sm"
-            app:layout_constraintBottom_toBottomOf="@id/author"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toEndOf="@id/committed"
-            app:layout_constraintTop_toTopOf="@id/author" />
+            app:layout_constraintStart_toEndOf="@id/committed"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.google.android.material.button.MaterialButton
