@@ -71,7 +71,7 @@
         app:layout_constraintStart_toStartOf="@id/repoUrlEditText"
         android:layout_marginTop="@dimen/space_xxs"
         android:layout_marginStart="@dimen/space_md"
-        android:text="@string/invalid_repo_url_format_message"/>
+        android:text="@string/example_filepath"/>
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/pullButton"
@@ -81,7 +81,7 @@
         android:backgroundTint="@color/card_bg"
         android:insetTop="0dp"
         android:insetBottom="0dp"
-        android:textColor="@color/text_primary"
+        android:textColor="@color/primary_light"
         android:textStyle="bold"
         android:paddingHorizontal="@dimen/space_md"
         android:paddingVertical="@dimen/space_md"
@@ -114,7 +114,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="64dp"
         android:backgroundTint="@color/card_bg"
-        android:textColor="@color/text_primary"
+        android:textColor="@color/primary_light"
         android:text="@string/i_have_a_local_repository"
         android:textSize="14sp"
         app:cornerRadius="16dp"
@@ -125,7 +125,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:iconSize="14sp"
         app:iconGravity="end"
-        app:iconTint="@color/text_primary"
+        app:iconTint="@color/primary_light"
         app:icon="@drawable/folder_open"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

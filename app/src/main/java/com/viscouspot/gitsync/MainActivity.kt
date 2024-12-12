@@ -375,7 +375,7 @@ class MainActivity : AppCompatActivity() {
             } else {
                 settingsManager.setSyncMessageEnabled(false)
                 syncMessageButton.setIconResource(R.drawable.notify_off)
-                syncMessageButton.setIconTintResource(R.color.text_primary)
+                syncMessageButton.setIconTintResource(R.color.primary_light)
             }
         }
 
@@ -764,7 +764,7 @@ class MainActivity : AppCompatActivity() {
                 }
             } else {
                 syncMessageButton.setIconResource(R.drawable.notify_off)
-                syncMessageButton.setIconTintResource(R.color.text_primary)
+                syncMessageButton.setIconTintResource(R.color.primary_light)
             }
         }
 

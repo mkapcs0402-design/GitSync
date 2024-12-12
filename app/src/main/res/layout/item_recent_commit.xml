@@ -20,8 +20,6 @@
         android:text="@string/sync_message"
         android:layout_marginEnd="@dimen/space_xs"
         android:singleLine="true"
-        android:maxLines="1"
-        android:lines="1"
         android:ellipsize="none"
         android:requiresFadingEdge="horizontal"
         android:scrollHorizontally="true"
