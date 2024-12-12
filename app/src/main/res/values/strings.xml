@@ -1,18 +1,63 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Git Sync</string>
 
-    <string name="force_sync">Sync Now</string>
+    <!--    Common-->
+    <string name="dismiss">Dismiss</string>
+    <string name="skip">Skip</string>
+    <string name="done">Done</string>
+
+    <!--    Paths-->
+    <string name="gitignore_path">.gitignore</string>
+    <string name="git_path">.git</string>
+    <string name="git_config_path">.git/config</string>
+    <string name="git_lock_path">.git/index.lock</string>
+    <string name="git_merge_head_path">.git/MERGE_HEAD</string>
+    <string name="git_merge_msg_path">.git/MERGE_MSG</string>
+    <string name="git_info_exclude_path">.git/info/exclude</string>
+
+    <!--    Toast Messages-->
+    <string name="sync_start_pull">Syncing changes…</string>
+    <string name="sync_start_push">Syncing local changes…</string>
+    <string name="sync_not_required">Sync not required!</string>
+    <string name="sync_complete">Sync complete!</string>
+
+    <string name="enable_accessibility_service">Please enable Git Sync under "Installed apps"</string>
+    <string name="network_unavailable">Network unavailable!\nGitSync will retry when reconnected</string>
+
+    <!--    Bug Notification-->
+    <string name="report_bug">&lt;GitSync Error&gt; Tap to send a bug report</string>
+    <string name="enable_notifications">Enable notifications permission to see more.</string>
+    <string name="select_email_client">Send email using: </string>
+
+    <string name="out_of_memory">Application ran out of memory!</string>
+    <string name="invalid_remote">Invalid remote!</string>
+    <string name="large_file">Singular files larger than 50MB not supported!</string>
+    <string name="clone_failed">Failed to clone repository!</string>
+    <string name="inaccessible_directory_message">Inaccessible directory! Please select a different location.</string>
+    <string name="auto_rebase_failed_exception">Remote is further ahead than local and we could not automatically rebase for you, as it would cause non fast-forward update.</string>
+    <string name="non_existing_exception">Remote ref didn\'t exist.</string>
+    <string name="rejected_nodelete_exception">Remote ref update was rejected, because remote side doesn\'t support/allow deleting refs.</string>
+    <string name="rejected_exception">Remote ref update was rejected.</string>
+    <string name="rejection_with_reason_exception">Remote ref update was rejected because %s.</string>
+    <string name="remote_changed_exception">Remote ref update was rejected, because old object id on remote repository wasn\'t the same as defined expected old object.</string>
+    <string name="merging_exception_message">MERGING</string>
+
+
+    <!--    Home Screen-->
+    <string name="repo_not_found">No repo found…</string>
+
     <string name="committed">committed</string>
+    <string name="additions">%s ++</string>
+    <string name="deletions" tools:ignore="TypographyDashes">%s --</string>
+
+    <string name="force_sync">Sync Now</string>
 
     <string name="auth">AUTH</string>
-    <string name="git_repo_url_hint">https://git.abc/xyz.git</string>
     <string name="git_dir_path_hint">/storage/emulated/0/…</string>
-    <string name="token_example">ghp_1234abcd5678efgh</string>
-    <string name="ssh_key_example">ssh-rsa AABBCCDDEEFF112233445566</string>
+    <string name="deselect_repository_directory">deselect repository directory</string>
+    <string name="select_repository_directory">select repository directory</string>
 
     <string name="enable_application_observer">Auto Sync Settings</string>
-    <string name="enable_accessibility_service">Please enable Git Sync under "Installed apps"</string>
-    <string name="accessibility_service_description">To enhance your experience, GitSync uses Android’s Accessibility Service to detect when apps are opened or closed. This helps us provide tailored features without storing or sharing any data. \n\n Key Points: \n Purpose: We use this service solely to improve your app experience. \n Privacy: No data is stored or sent elsewhere. \n Control: You can disable these permissions at any time in your device settings.</string>
     <string name="application_not_set">Select App(s)</string>
     <string name="select_application">Select application(s)</string>
     <string name="multiple_application_selected">Selected (%s)</string>
@@ -20,36 +65,97 @@
     <string name="sync_on_app_closed">Sync on app(s) closed</string>
     <string name="sync_on_app_opened">Sync on app(s) opened</string>
 
-    <string name="pull">pull</string>
-    <string name="clone_repo">Clone remote repository</string>
-    <string name="invalid_repository_url">Invalid repository URL!</string>
-
-    <string name="sync_start_pull">Syncing changes…</string>
-    <string name="sync_start_push">Syncing local changes…</string>
-    <string name="sync_not_required">Sync not required!</string>
-    <string name="sync_complete">Sync complete!</string>
-
-    <string name="report_bug">&lt;GitSync Error&gt; Tap to send a bug report</string>
-    <string name="enable_notifications">Enable notifications permission to see more.</string>
-    <string name="select_email_client">Send email using: </string>
-    <string name="dismiss">Dismiss</string>
-
     <string name="docs_link">https://github.com/ViscousPot/GitSync/blob/master/Documentation.md</string>
     <string name="documentation_html_link"><![CDATA[<a href=\"%s\">DOCUMENTATION</a>]]></string>
 
-    <string name="search_hint">Search…</string>
+    <!--    Clone Screen-->
+    <string name="clone_repo">Clone remote repository</string>
+
+    <string name="pull">pull</string>
+    <string name="git_repo_url_hint">https://git.abc/xyz.git</string>
+    <string name="invalid_repository_url">Invalid repository URL!</string>
+    <string name="i_have_a_local_repository">I have a local repository</string>
 
     <string name="cloning_repository">Cloning repository…</string>
     <string name="clone_message">\nThis may take a while depending on the size of your repo\n\n</string>
 
+    <string name="clone_repo_title">Select a repository</string>
+    <string name="select_clone_directory">Select a folder to clone into</string>
+    <string name="repository_not_found">Repository not found!</string>
+
+
+    <!--    Merge Conflict Dialog-->
+    <string name="merge_conflict_item_title">MERGE CONFLICT</string>
+    <string name="merge_conflict_item_message">There is a merge conflict! Tap to resolve</string>
+
+    <string name="merge_conflict">merge conflict</string>
+    <string name="merge_dialog_message">Use the editor to resolve the merge conflicts</string>
+    <string name="example_filepath">examplefile.md</string>
+
+    <string name="abort_merge">abort merge</string>
+    <string name="keep_changes">Keep changes</string>
+    <string name="local">local</string>
+    <string name="both">both</string>
+    <string name="remote">remote</string>
+
+    <string name="merge">Merge</string>
+    <string name="merging">Merging…</string>
+    <string name="resolving_merge">Resolving merge…</string>
+
+    <string name="conflict_start"><![CDATA[<<<<<<<]]></string>
+    <string name="conflict_separator">=======</string>
+    <string name="conflict_end"><![CDATA[>>>>>>>]]></string>
+
+    <!--    Settings Dialog-->
+    <string name="settings">Settings</string>
+
+    <string name="sync_message_label">Sync Message</string>
+    <string name="sync_message_description">use %s for the date and time</string>
+    <string name="sync_message">Last Sync: %s (Mobile)</string>
+
+    <string name="gitignore">.GitIgnore</string>
+    <string name="gitignore_description">list files or folders to ignore on all devices</string>
+    <string name="gitignore_hint">.trash/\n./…</string>
+    <string name="git_info_exclude">Git/info/exclude</string>
+    <string name="git_info_exclude_description">list files or folders to ignore on this device</string>
+    <string name="git_info_exclude_hint">.trash/\n./…</string>
+
+    <!--    Auth Dialogs-->
+    <string name="select_your_git_provider_and_authenticate">Select your git provider and authenticate</string>
+
+    <string name="oauth">oauth</string>
+
+    <string name="beta">%s (beta)</string>
+
+    <string name="ensure_token_scope">Ensure your token includes the \"repo\" scope for full functionality.</string>
+    <string name="user">user</string>
+    <string name="example_user">JohnSmith12</string>
+    <string name="token">token</string>
+    <string name="example_token">ghp_1234abcd5678efgh</string>
+    <string name="login">login</string>
+
+    <string name="key">key</string>
+    <string name="ssh_key_example">ssh-rsa AABBCCDDEEFF112233445566</string>
+    <string name="generate_key">generate key</string>
+    <string name="confirm_key_saved">confirm key saved</string>
+    <string name="copied_text">Copied text!</string>
+
+    <!--    Auto Sync Dialogs-->
+    <string name="accessibility_service_disclosure_title">Accessibility Service Disclosure</string>
+    <string name="accessibility_service_disclosure_message">To enhance your experience,\nGitSync uses Android’s Accessibility Service to detect when apps are opened or closed.\n\nThis helps us provide tailored features without storing or sharing any data.\n\nᴘʟᴇᴀsᴇ ᴇɴᴀʙʟᴇ ɢɪᴛsʏɴᴄ ᴏɴ ᴛʜᴇ ɴᴇxᴛ sᴄʀᴇᴇɴ</string>
+    <string name="accessibility_service_description">To enhance your experience, GitSync uses Android’s Accessibility Service to detect when apps are opened or closed. This helps us provide tailored features without storing or sharing any data. \n\n Key Points: \n Purpose: We use this service solely to improve your app experience. \n Privacy: No data is stored or sent elsewhere. \n Control: You can disable these permissions at any time in your device settings.</string>
+
+    <string name="search_hint">Search…</string>
+    <string name="lg_3_apps_selected_text">4+</string>
+    <string name="select">select</string>
+
+
+    <!--    Onboarding Dialogs-->
     <string name="welcome">Welcome!</string>
     <string name="welcome_message">\nIt looks like this is your first time here.\n\nWould you like to go through a quick setup to get started?\n</string>
-
     <string name="welcome_positive">Let\'s go</string>
     <string name="welcome_neutral">Skip</string>
     <string name="welcome_negative">I\'m familiar</string>
-    <string name="skip">Skip</string>
-    <string name="done">Done</string>
 
     <string name="notification_dialog_title">Enable Notifications</string>
     <string name="notification_dialog_message">\nPlease enable notification permissions for the best experience.\n\nThe app uses notifications for \n  • popup sync messages (optional)\n  • bug reports\n</string>
@@ -66,54 +172,4 @@
     <string name="enable_autosync_title">Enable Auto Sync</string>
     <string name="enable_autosync_message">Keep your data up-to-date effortlessly. Turn on Auto Sync to automatically sync in the background whenever apps are opened or closed.</string>
 
-    <string name="accessibility_service_disclosure_title">Accessibility Service Disclosure</string>
-    <string name="accessibility_service_disclosure_message">To enhance your experience,\nGitSync uses Android’s Accessibility Service to detect when apps are opened or closed.\n\nThis helps us provide tailored features without storing or sharing any data.\n\nᴘʟᴇᴀsᴇ ᴇɴᴀʙʟᴇ ɢɪᴛsʏɴᴄ ᴏɴ ᴛʜᴇ ɴᴇxᴛ sᴄʀᴇᴇɴ</string>
-
-    <string name="clone_repo_title">Select a repository</string>
-    <string name="select_clone_directory">Select a folder to clone into</string>
-    <string name="repository_not_found">Repository not found!</string>
-
-    <string name="lg_3_apps_selected_text">4+</string>
-    <string name="select">select</string>
-    <string name="additions">%s ++</string>
-    <string name="deletions" tools:ignore="TypographyDashes">%s --</string>
-
-    <string name="sync_message">Last Sync: %s (Mobile)</string>
-
-    <string name="network_unavailable">Network unavailable!\nGitSync will retry when reconnected</string>
-    <string name="out_of_memory">Application ran out of memory!</string>
-    <string name="invalid_remote">Invalid remote!</string>
-    <string name="large_file">Singular files larger than 50MB not supported!</string>
-    <string name="clone_failed">Failed to clone repository!</string>
-    <string name="inaccessible_directory_message">Inaccessible directory! Please select a different location.</string>
-    <string name="repo_not_found">No repo found…</string>
-    <string name="auto_rebase_failed_exception">Remote is further ahead than local and we could not automatically rebase for you, as it would cause non fast-forward update.</string>
-    <string name="non_existing_exception">Remote ref didn\'t exist.</string>
-    <string name="rejected_nodelete_exception">Remote ref update was rejected, because remote side doesn\'t support/allow deleting refs.</string>
-    <string name="rejected_exception">Remote ref update was rejected.</string>
-    <string name="rejection_with_reason_exception">Remote ref update was rejected because %s.</string>
-    <string name="remote_changed_exception">Remote ref update was rejected, because old object id on remote repository wasn\'t the same as defined expected old object.</string>
-    <string name="merging_exception_message">MERGING</string>
-
-    <string name="settings">Settings</string>
-    <string name="sync_message_label">Sync Message</string>
-    <string name="sync_message_description">use %s for the date and time</string>
-
-    <string name="merge_conflict_item_title">MERGE CONFLICT</string>
-    <string name="merge_conflict_item_message">There is a merge conflict! Tap to resolve</string>
-    <string name="merge">Merge</string>
-    <string name="merging">Merging…</string>
-    <string name="resolving_merge">Resolving merge…</string>
-
-    <string name="conflict_start"><![CDATA[<<<<<<<]]></string>
-    <string name="conflict_separator">=======</string>
-    <string name="conflict_end"><![CDATA[>>>>>>>]]></string>
-
-    <string name="gitignore_path">.gitignore</string>
-    <string name="git_path">.git</string>
-    <string name="git_config_path">.git/config</string>
-    <string name="git_lock_path">.git/index.lock</string>
-    <string name="git_merge_head_path">.git/MERGE_HEAD</string>
-    <string name="git_merge_msg_path">.git/MERGE_MSG</string>
-    <string name="git_info_exclude_path">.git/info/exclude</string>
 </resources>

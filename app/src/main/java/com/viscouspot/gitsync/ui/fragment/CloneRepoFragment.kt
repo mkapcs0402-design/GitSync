@@ -73,7 +73,6 @@ class CloneRepoFragment(
         val repoUrlEditText = view.findViewById<EditText>(R.id.repoUrlEditText)
         val invalidRepoError = view.findViewById<TextView>(R.id.invalidRepoError)
         val pullButton = view.findViewById<MaterialButton>(R.id.pullButton)
-        val divider = view.findViewById<View>(R.id.divider)
         val localRepo = view.findViewById<MaterialButton>(R.id.localRepo)
         repoListRecycler.setLayoutManager(GridLayoutManager(context, 1))
 

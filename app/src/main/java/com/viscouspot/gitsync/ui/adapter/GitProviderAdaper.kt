@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import com.viscouspot.gitsync.R
 
 class GitProviderAdapter(private val context: Context, private val items: List<Pair<String, Int>>) : ArrayAdapter<Pair<String, Int>>(context, R.layout.item_git_provider, items) {
@@ -26,9 +27,9 @@ class GitProviderAdapter(private val context: Context, private val items: List<P
         val item = items[position]
         textView.text = item.first
         if (listOf("HTTP/S", "SSH").contains(item.first)) {
-            textView.text = "${item.first} (beta)"
+            textView.text = context.getString(R.string.beta).format(item.first)
         }
-        val drawable = context.getDrawable(item.second)?.mutate()
+        val drawable = ContextCompat.getDrawable(context, item.second)?.mutate()
         drawable?.setBounds(0, 0, context.resources.getDimensionPixelSize(R.dimen.text_size_lg), context.resources.getDimensionPixelSize(R.dimen.text_size_lg))
         textView.setCompoundDrawables(drawable, null, null, null)
         textView.compoundDrawablePadding = context.resources.getDimensionPixelOffset(R.dimen.space_sm)

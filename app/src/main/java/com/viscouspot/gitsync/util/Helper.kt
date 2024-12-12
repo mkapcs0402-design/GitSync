@@ -1,6 +1,7 @@
 package com.viscouspot.gitsync.util
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -40,6 +41,7 @@ import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
 import kotlin.random.Random
 
+
 object Helper {
     const val CONFLICT_NOTIFICATION_ID = 1756
 
@@ -76,6 +78,7 @@ object Helper {
         }
     }
 
+    @Suppress("DEPRECATION")
     fun isNetworkAvailable(context: Context, toastMessage: String = "Network unavailable!\nRetry when reconnected"): Boolean {
         val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -176,6 +179,7 @@ object Helper {
             }
         }
     }
+    @SuppressLint("ObsoleteSdkInt")
     fun getPathFromUri(context: Context, uri: Uri): String {
         val docUriTree = DocumentsContract.buildDocumentUriUsingTree(
             uri,
@@ -231,9 +235,9 @@ object Helper {
                 }
             }
             "content".equals(docUriTree.scheme, ignoreCase = true) -> {
-                when {
-                    isGooglePhotosUri(docUriTree) -> return uri.lastPathSegment ?: ""
-                    else -> return getDataColumn(context, docUriTree, null, null)
+                return when {
+                    isGooglePhotosUri(docUriTree) -> uri.lastPathSegment ?: ""
+                    else -> getDataColumn(context, docUriTree, null, null)
                 }
             }
             "file".equals(docUriTree.scheme, ignoreCase = true) -> {
@@ -284,7 +288,7 @@ object Helper {
     }
 
     fun isValidGitRepo(url: String): String? {
-        val regex = Regex("^(https?|ssh://|git@)[a-zA-Z0-9.-]+(:|/)(\\S+)/(\\S+)(\\.git)?\$")
+        val regex = Regex("^(https?|ssh://|git@)[a-zA-Z0-9.-]+([:/])(\\S+)/(\\S+)(\\.git)?$")
 
         return when {
             !regex.matches(url) -> "URL must be a valid Git URL (HTTP/S, SSH, or git@) and follow the format"

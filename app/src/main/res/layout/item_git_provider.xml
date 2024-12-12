@@ -13,6 +13,5 @@
     android:textSize="@dimen/text_size_sm"
     android:padding="@dimen/space_md"
     android:layout_height="wrap_content"
-    android:textStyle="bold"
-    android:text="GitHub" />
+    android:textStyle="bold"/>
 

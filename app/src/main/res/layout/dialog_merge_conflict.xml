@@ -22,7 +22,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:text="merge conflict"/>
+        android:text="@string/merge_conflict"/>
 
     <TextView
         android:id="@+id/mergeConflictMessage"
@@ -38,7 +38,7 @@
         app:layout_constraintTop_toBottomOf="@id/mergeConflict"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:text="Use the editor to resolve the merge conflicts"/>
+        android:text="@string/merge_dialog_message"/>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         app:layout_constraintBottom_toTopOf="@id/merge"
@@ -73,7 +73,7 @@
             app:icon="@drawable/open_external"
             android:background="@drawable/input_bg_sm"
             app:iconSize="@dimen/text_size_md"
-            android:text="examplefile.md"
+            android:text="@string/example_filepath"
             android:textColor="@color/primary_light"
             android:clipToOutline="true"
             android:textAlignment="viewStart"
@@ -163,7 +163,7 @@
         android:minHeight="1dp"
         android:paddingHorizontal="@dimen/space_sm"
         android:paddingVertical="@dimen/space_sm"
-        android:text="abort merge"
+        android:text="@string/abort_merge"
         android:textColor="@color/primary_light"
         android:textSize="@dimen/text_size_sm"
         app:backgroundTint="@null"

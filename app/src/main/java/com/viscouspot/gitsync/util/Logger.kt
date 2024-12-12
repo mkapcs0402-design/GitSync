@@ -19,8 +19,6 @@ import com.viscouspot.gitsync.R
 import java.io.PrintWriter
 import java.io.StringWriter
 import java.text.SimpleDateFormat
-import java.time.Instant
-import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
@@ -137,8 +135,7 @@ object Logger {
         }.format(Date())
 
         val emailIntent = Intent(Intent.ACTION_SEND).apply {
-            data = Uri.parse("mailto:$recipient")
-            type = "message/rfc822"
+            setDataAndType(Uri.parse("mailto:$recipient"), "message/rfc822")
             putExtra(Intent.EXTRA_EMAIL, arrayOf(recipient))
             putExtra(Intent.EXTRA_SUBJECT, "Bug Report: Git Sync - [$formattedDate]")
             putExtra(Intent.EXTRA_TEXT, "App logs are attached! \n $last5LogsString \n $version \n $model \n $appVersion \n\n\n")
