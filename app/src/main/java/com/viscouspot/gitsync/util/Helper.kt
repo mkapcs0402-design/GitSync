@@ -180,71 +180,84 @@ object Helper {
         }
     }
     @SuppressLint("ObsoleteSdkInt")
-    fun getPathFromUri(context: Context, uri: Uri): String {
-        val docUriTree = DocumentsContract.buildDocumentUriUsingTree(
-            uri,
-            DocumentsContract.getTreeDocumentId(uri)
-        )
+    fun getPathFromUri(context: Context, uri: Uri, failureCallback: (() -> Unit)? = null): String {
+        try {
+            val docUriTree = DocumentsContract.buildDocumentUriUsingTree(
+                uri,
+                DocumentsContract.getTreeDocumentId(uri)
+            )
 
-        when {
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && DocumentsContract.isDocumentUri(context, docUriTree) -> {
-                when {
-                    isExternalStorageDocument(docUriTree) -> {
-                        val docId = DocumentsContract.getDocumentId(docUriTree)
-                        val split = docId.split(":")
-                        val type = split[0]
+            when {
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && DocumentsContract.isDocumentUri(
+                    context,
+                    docUriTree
+                ) -> {
+                    when {
+                        isExternalStorageDocument(docUriTree) -> {
+                            val docId = DocumentsContract.getDocumentId(docUriTree)
+                            val split = docId.split(":")
+                            val type = split[0]
 
-                        if ("primary".equals(type, ignoreCase = true)) {
-                            return "${Environment.getExternalStorageDirectory()}/${split[1]}"
-                        } else {
-                            val externalStorageVolumes = context.getExternalFilesDirs(null)
-                            for (externalFile in externalStorageVolumes) {
-                                val path = externalFile.absolutePath
-                                if (path.contains(type)) {
-                                    val subPath = path.substringBefore("/Android")
-                                    return "$subPath/${split[1]}"
+                            if ("primary".equals(type, ignoreCase = true)) {
+                                return "${Environment.getExternalStorageDirectory()}/${split[1]}"
+                            } else {
+                                val externalStorageVolumes = context.getExternalFilesDirs(null)
+                                for (externalFile in externalStorageVolumes) {
+                                    val path = externalFile.absolutePath
+                                    if (path.contains(type)) {
+                                        val subPath = path.substringBefore("/Android")
+                                        return "$subPath/${split[1]}"
+                                    }
                                 }
                             }
                         }
-                    }
-                    isDownloadsDocument(docUriTree) -> {
-                        val id = DocumentsContract.getDocumentId(docUriTree)
-                        val contentUri = ContentUris.withAppendedId(
-                            Uri.parse("content://downloads/public_downloads"), id.toLong()
-                        )
 
-                        return getDataColumn(context, contentUri, null, null)
-                    }
-                    isMediaDocument(docUriTree) -> {
-                        val docId = DocumentsContract.getDocumentId(docUriTree)
-                        val split = docId.split(":")
-                        val type = split[0]
+                        isDownloadsDocument(docUriTree) -> {
+                            val id = DocumentsContract.getDocumentId(docUriTree)
+                            val contentUri = ContentUris.withAppendedId(
+                                Uri.parse("content://downloads/public_downloads"), id.toLong()
+                            )
 
-                        var contentUri: Uri? = null
-                        when (type) {
-                            "image" -> contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-                            "video" -> contentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
-                            "audio" -> contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+                            return getDataColumn(context, contentUri, null, null)
                         }
 
-                        val selection = "_id=?"
-                        val selectionArgs = arrayOf(split[1])
+                        isMediaDocument(docUriTree) -> {
+                            val docId = DocumentsContract.getDocumentId(docUriTree)
+                            val split = docId.split(":")
+                            val type = split[0]
 
-                        return getDataColumn(context, contentUri, selection, selectionArgs)
+                            var contentUri: Uri? = null
+                            when (type) {
+                                "image" -> contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+                                "video" -> contentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+                                "audio" -> contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+                            }
+
+                            val selection = "_id=?"
+                            val selectionArgs = arrayOf(split[1])
+
+                            return getDataColumn(context, contentUri, selection, selectionArgs)
+                        }
                     }
                 }
-            }
-            "content".equals(docUriTree.scheme, ignoreCase = true) -> {
-                return when {
-                    isGooglePhotosUri(docUriTree) -> uri.lastPathSegment ?: ""
-                    else -> getDataColumn(context, docUriTree, null, null)
+
+                "content".equals(docUriTree.scheme, ignoreCase = true) -> {
+                    return when {
+                        isGooglePhotosUri(docUriTree) -> uri.lastPathSegment ?: ""
+                        else -> getDataColumn(context, docUriTree, null, null)
+                    }
+                }
+
+                "file".equals(docUriTree.scheme, ignoreCase = true) -> {
+                    return docUriTree.path ?: ""
                 }
             }
-            "file".equals(docUriTree.scheme, ignoreCase = true) -> {
-                return docUriTree.path ?: ""
-            }
+        } catch (e: Throwable) {
+            failureCallback?.invoke()
+            return ""
         }
 
+        failureCallback?.invoke()
         return ""
     }
 
