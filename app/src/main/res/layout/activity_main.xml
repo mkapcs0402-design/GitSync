@@ -317,6 +317,7 @@
         android:textSize="@dimen/text_size_md"
         app:cornerRadius="@dimen/corner_radius_md"
         app:icon="@drawable/docs"
+        android:contentDescription="@string/documentation_html_link"
         app:iconPadding="0dp"
         app:iconSize="@dimen/text_size_lg"
         app:iconGravity="textEnd"
