@@ -25,46 +25,57 @@
         android:scrollHorizontally="true"
         app:layout_constraintEnd_toStartOf="@id/commitRef"/>
 
-    <TextView
-        android:id="@+id/author"
-        android:layout_width="wrap_content"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/info"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="@string/example_user"
-        android:textColor="@color/text_secondary"
-        android:textSize="@dimen/text_size_sm"
+        android:layout_marginEnd="@dimen/space_sm"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintEnd_toStartOf="@id/additions"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/commitMessage"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintVertical_bias="1.0">
+        <TextView
+            android:id="@+id/author"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:text="@string/example_user"
+            android:textColor="@color/text_secondary"
+            android:textSize="@dimen/text_size_sm"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/committed"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintWidth_default="wrap" />
 
-    <TextView
-        android:id="@+id/committed"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/committed"
-        android:textColor="@color/text_secondary"
-        android:textSize="@dimen/text_size_sm"
-        android:layout_marginStart="@dimen/space_xxxs"
-        app:layout_constraintBottom_toBottomOf="@id/author"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@id/author"
-        app:layout_constraintTop_toTopOf="@id/author" />
+        <TextView
+            android:id="@+id/committed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/space_xxxs"
+            android:text="@string/committed"
+            android:textColor="@color/text_secondary"
+            android:textSize="@dimen/text_size_sm"
+            app:layout_constraintBottom_toBottomOf="@id/author"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@id/author"
+            app:layout_constraintTop_toTopOf="@id/author" />
 
-    <Chronometer
-        android:id="@+id/commitDate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@color/text_secondary"
-        android:textSize="@dimen/text_size_sm"
-        android:layout_marginStart="@dimen/space_xxxs"
-        app:layout_constraintBottom_toBottomOf="@id/author"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@id/committed"
-        app:layout_constraintTop_toTopOf="@id/author" />
+        <Chronometer
+            android:id="@+id/commitDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/space_xxxs"
+            android:textColor="@color/text_secondary"
+            android:textSize="@dimen/text_size_sm"
+            app:layout_constraintBottom_toBottomOf="@id/author"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@id/committed"
+            app:layout_constraintTop_toTopOf="@id/author" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/commitRef"
