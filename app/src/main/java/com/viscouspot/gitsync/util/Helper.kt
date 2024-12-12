@@ -291,7 +291,7 @@ object Helper {
         val regex = Regex("^(https?|ssh://|git@)[a-zA-Z0-9.-]+([:/])(\\S+)/(\\S+)(\\.git)?$")
 
         return when {
-            !regex.matches(url) -> context.getString(R.string.invalid_repo_url_format_message)
+            !regex.matches(url) -> "URL must be a valid Git URL (HTTP/S, SSH, or git@) and follow the format"
             else -> null
         }
     }
