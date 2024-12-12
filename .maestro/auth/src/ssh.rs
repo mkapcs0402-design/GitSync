@@ -15,7 +15,15 @@ pub fn get_input() -> Input {
             ]],
             vec![
                 vec![
-                    "../clone/flows/url/ssh",
+                    "../clone/flows/url/ssh_at",
+                    "../clone/flows/select_folder_dialog/positive",
+                    "../clone/flows/select_folder/positive",
+                    "../clone/flows/select_folder/assert_not",
+                    "../clone/flows/select_folder_dialog/assert_not",
+                    "../home/flows/deselect_repo/positive",
+                ],
+                vec![
+                    "../clone/flows/url/ssh_protocol",
                     "../clone/flows/select_folder_dialog/positive",
                     "../clone/flows/select_folder/positive",
                     "../clone/flows/select_folder/assert_not",

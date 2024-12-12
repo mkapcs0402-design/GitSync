@@ -112,9 +112,43 @@ fn create_yaml(input: &Input, output_file: &str) -> Result<(), Box<dyn std::erro
     Ok(())
 }
 
+fn validate_url_format(key: &str, url: &str) -> bool {
+    if key.ends_with("_PROTOCOL_URL") {
+        let protocol_url_pattern =
+            regex::Regex::new(r"^ssh://[\w.-]+(?:\.[\w\.-]+)+[/\w\.-]+\.git$").unwrap();
+        protocol_url_pattern.is_match(url)
+    } else if key.ends_with("_AT_URL") {
+        let at_url_pattern = regex::Regex::new(r"^git@[\w.-]+:[\w\.-]+/[\w\.-]+\.git$").unwrap();
+        at_url_pattern.is_match(url)
+    } else if key.ends_with("_URL") {
+        let url_pattern = regex::Regex::new(r"^https://[\w.-]+(?:\.[\w\.-]+)+[/\w\.-]*$").unwrap();
+        url_pattern.is_match(url)
+    } else {
+        false
+    }
+}
+
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args: Vec<String> = env_internal::args().collect();
-    env::setup();
+    let env_vars = env::setup();
+
+    println!();
+    for (key, value) in &env_vars {
+        println!("{}={}", key, value);
+    }
+    println!();
+
+    for (key, value) in &env_vars {
+        if key.ends_with("_URL") {
+            if !validate_url_format(key, value) {
+                return Err(format!("Invalid URL format for {}: {}", key, value).into());
+            }
+        }
+    }
+
+    for (key, value) in &env_vars {
+        env_internal::set_var(key, value);
+    }
 
     create_yaml(&onboarding::negative::get_input(), "onboarding/negative")?;
     create_yaml(&onboarding::positive::get_input(), "onboarding/positive")?;

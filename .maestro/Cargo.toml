@@ -2,5 +2,6 @@
 name = "tests"
 
 [dependencies]
+regex = "1.7"
 serde = { version = "1.0", features = ["derive"] }
 serde_yaml = "0.9"

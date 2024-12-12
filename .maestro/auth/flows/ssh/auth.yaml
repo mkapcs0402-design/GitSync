@@ -7,8 +7,4 @@ appId: com.viscouspot.gitsync
 - tapOn: "ssh-rsa.*"
 - runFlow: ./save_key.yaml
 - assertVisible: "CONFIRM KEY SAVED"
-- copyTextFrom:
-    id: "pKeyButton"
-- tapOn: 
-    above: "CONFIRM KEY SAVED"
 - tapOn: "CONFIRM KEY SAVED"
