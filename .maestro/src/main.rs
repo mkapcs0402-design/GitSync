@@ -115,7 +115,7 @@ fn create_yaml(input: &Input, output_file: &str) -> Result<(), Box<dyn std::erro
 fn validate_url_format(key: &str, url: &str) -> bool {
     if key.ends_with("_PROTOCOL_URL") {
         let protocol_url_pattern =
-            regex::Regex::new(r"^ssh://[\w.-]+(?:\.[\w\.-]+)+[/\w\.-]+\.git$").unwrap();
+            regex::Regex::new(r"^ssh://[^@]+@[\w.-]+(?:\.[\w\.-]+)+[/\w\.-]+\.git$").unwrap();
         protocol_url_pattern.is_match(url)
     } else if key.ends_with("_AT_URL") {
         let at_url_pattern = regex::Regex::new(r"^git@[\w.-]+:[\w\.-]+/[\w\.-]+\.git$").unwrap();
