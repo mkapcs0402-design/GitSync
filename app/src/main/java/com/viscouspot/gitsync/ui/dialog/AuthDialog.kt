@@ -64,12 +64,12 @@ class AuthDialog(private val context: Context, private val settingsManager: Sett
         pKeyButton = findViewById(R.id.pKeyButton)
         generateKeyButton = findViewById(R.id.generateKeyButton)
 
+        spinner.setSelection(providers.keys.toList().indexOf(settingsManager.getGitProvider()))
+
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
                 val provider = providers.keys.toList()[position]
                 settingsManager.setGitProvider(provider)
-                settingsManager.setGitAuthCredentials("", "")
-                settingsManager.setGitSshPrivateKey("")
                 updateInputs(provider)
             }
 
