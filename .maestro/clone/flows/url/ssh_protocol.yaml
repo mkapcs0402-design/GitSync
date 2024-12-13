@@ -3,5 +3,5 @@ appId: com.viscouspot.gitsync
 
 - runFlow: ./assert.yaml
 - tapOn: "https://git.abc/xyz.git"
-- inputText: ${MAESTRO_SSH_CLONE_URL}
+- inputText: ${MAESTRO_SSH_CLONE_PROTOCOL_URL}
 - tapOn: "PULL"
