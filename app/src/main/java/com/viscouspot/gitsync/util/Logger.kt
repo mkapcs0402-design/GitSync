@@ -18,10 +18,8 @@ import com.viscouspot.gitsync.BuildConfig
 import com.viscouspot.gitsync.R
 import java.io.PrintWriter
 import java.io.StringWriter
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
-import java.util.TimeZone
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 import kotlin.random.Random
 
 enum class LogType(val type: String) {
@@ -49,7 +47,7 @@ enum class LogType(val type: String) {
 }
 
 object Logger {
-    private val last5Logs = mutableListOf<Pair<LogType, String>>()
+    private val lastLogs = mutableListOf<Pair<LogType, String>>()
     private const val ERROR_NOTIFICATION_ID = 1757
 
     fun log(context: Context, type: LogType, e: Throwable) {
@@ -57,25 +55,25 @@ object Logger {
         val pw = PrintWriter(sw)
         e.printStackTrace(pw)
         log(type, "Error: $sw")
-        addToLast5Logs(type, "Error: $sw")
+        addToLastLogs(type, "Error: $sw")
 
         sendBugReportNotification(context)
     }
 
     fun log(type: LogType, message: String) {
         Log.d("///Git Sync//${type.type}", message)
-        addToLast5Logs(type, message)
+        addToLastLogs(type, message)
     }
 
     fun log(message: Any?) {
         Log.d("///Git Sync//${LogType.TEST.type}", message?.toString() ?: "null")
-        addToLast5Logs(LogType.TEST, message?.toString() ?: "null")
+        addToLastLogs(LogType.TEST, message?.toString() ?: "null")
     }
 
-    private fun addToLast5Logs(type: LogType, message: String) {
-        last5Logs.add(Pair(type, message))
-        if (last5Logs.size > 5) {
-            last5Logs.removeAt(0)
+    private fun addToLastLogs(type: LogType, message: String) {
+        lastLogs.add(Pair(type, message))
+        if (lastLogs.size > 10) {
+            lastLogs.removeAt(0)
         }
     }
 
@@ -93,13 +91,14 @@ object Logger {
         val manager = context.getSystemService(NotificationManager::class.java)
         manager?.createNotificationChannel(channel)
 
-        val emailIntent = createBugReportEmailIntent(context)
-        val buttonPendingIntent = PendingIntent.getActivity(context, Random.nextInt(0, 100), emailIntent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+//        val emailIntent = createBugReportEmailIntent(context)
+        val githubIssueIntent = createGitHubIssueIntent()
+        val buttonPendingIntent = PendingIntent.getActivity(context, Random.nextInt(0, 100), githubIssueIntent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
 
         val builder = NotificationCompat.Builder(context, channelId)
             .setSmallIcon(R.drawable.bug)
             .setContentTitle(context.getString(R.string.report_bug))
-            .setContentText(last5Logs.last().second.substringBefore("\n"))
+            .setContentText(lastLogs.last().second.substringBefore("\n"))
             .setContentIntent(buttonPendingIntent)
             .setAutoCancel(true)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
@@ -115,33 +114,30 @@ object Logger {
         }
     }
 
-    private fun createBugReportEmailIntent(context: Context): Intent {
-        val recipient = "bugs.viscouspotential@gmail.com"
-        val last5LogsString = last5Logs.joinToString(separator = "\n") { (first, second) -> "$first: $second" }
-        val androidVersion = Build.VERSION.RELEASE  // e.g., "11"
-        val sdkVersion = Build.VERSION.SDK_INT      // e.g., 30
-        val deviceModel = Build.MODEL               // e.g., "Pixel 4"
-        val manufacturer = Build.MANUFACTURER       // e.g., "Google"
+    private fun urlEncode(str: String): String{
+        return URLEncoder.encode(str, StandardCharsets.UTF_8.toString())
+    }
 
-        val appVersionName = BuildConfig.VERSION_NAME  // e.g., "1.205"
-        val appVersionCode = BuildConfig.VERSION_CODE  // e.g., 1205
+    private fun createGitHubIssueIntent(): Intent {
+        val lastLogsString = lastLogs.joinToString(separator = "\n") { (first, second) -> "$first: $second" }
+        var url = "https://github.com/ViscousPot/GitSync/issues/new?"
+        url += "body="
+        url += urlEncode("""
 
-        val version = "Android Version: $androidVersion (SDK: $sdkVersion)"
-        val model = "Device Model: $manufacturer $deviceModel"
-        val appVersion = "App Version: $appVersionName (Code: $appVersionCode)"
 
-        val formattedDate: String = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US).apply {
-            timeZone = TimeZone.getTimeZone("UTC")
-        }.format(Date())
+<!-- PROVIDE ERROR REPRO STEPS -->
 
-        val emailIntent = Intent(Intent.ACTION_SEND).apply {
-            setDataAndType(Uri.parse("mailto:$recipient"), "message/rfc822")
-            putExtra(Intent.EXTRA_EMAIL, arrayOf(recipient))
-            putExtra(Intent.EXTRA_SUBJECT, "Bug Report: Git Sync - [$formattedDate]")
-            putExtra(Intent.EXTRA_TEXT, "App logs are attached! \n $last5LogsString \n $version \n $model \n $appVersion \n\n\n")
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        }
+---
 
-        return Intent.createChooser(emailIntent, context.getString(R.string.select_email_client))
+**Android Version:** ${Build.VERSION.RELEASE} (SDK ${Build.VERSION.SDK_INT})
+**Device Model:** ${Build.MANUFACTURER} ${Build.MODEL}
+**App Version:** ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})
+
+$lastLogsString
+        """.trimIndent())
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+
+        return intent
     }
 }
