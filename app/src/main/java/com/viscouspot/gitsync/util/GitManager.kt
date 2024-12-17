@@ -449,15 +449,15 @@ class GitManager(private val context: Context, private val settingsManager: Sett
 
                 var additions = 0
                 var deletions = 0
-                try {
                     for (diff in diffs) {
-                        val editList = diffFormatter.toFileHeader(diff).toEditList()
-                        for (edit in editList) {
-                            additions += edit.endB - edit.beginB
-                            deletions += edit.endA - edit.beginA
-                        }
+                        try {
+                            val editList = diffFormatter.toFileHeader(diff).toEditList()
+                            for (edit in editList) {
+                                additions += edit.endB - edit.beginB
+                                deletions += edit.endA - edit.beginA
+                            }
+                        } catch (e: NullPointerException) { log(e.message) }
                     }
-                } catch (e: NullPointerException) { log(e.message) }
 
                 commits.add(
                     Commit(
