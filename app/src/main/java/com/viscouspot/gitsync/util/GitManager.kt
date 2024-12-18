@@ -25,6 +25,7 @@ import org.eclipse.jgit.api.errors.JGitInternalException
 import org.eclipse.jgit.api.errors.WrongRepositoryStateException
 import org.eclipse.jgit.diff.DiffFormatter
 import org.eclipse.jgit.errors.CheckoutConflictException
+import org.eclipse.jgit.api.errors.CheckoutConflictException as ApiCheckoutConflictException
 import org.eclipse.jgit.errors.NotSupportedException
 import org.eclipse.jgit.errors.TransportException
 import org.eclipse.jgit.internal.JGitText
@@ -226,7 +227,10 @@ class GitManager(private val context: Context, private val settingsManager: Sett
         } catch (e: CheckoutConflictException) {
             log(LogType.PullFromRepo, e.stackTraceToString())
             return false
-        } catch (e: WrongRepositoryStateException) {
+        }catch (e: ApiCheckoutConflictException) {
+            log(LogType.PullFromRepo, e.stackTraceToString())
+            return false
+        }  catch (e: WrongRepositoryStateException) {
             if (e.message?.contains(context.getString(R.string.merging_exception_message)) == true) {
                 log(LogType.PullFromRepo, "Merge conflict")
                 return false
