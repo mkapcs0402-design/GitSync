@@ -12,13 +12,13 @@
     <a href="https://github.com/sponsors/ViscousPot"><img src="https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86" alt="sponsor"></a>
   </p>
 
-  <p align="center">
-    <a href="https://github.com/ViscousPot/GitSync/blob/master/Documentation.md">Documentation</a>
-  </p>
   <br />
   <a href="https://play.google.com/store/apps/details?id=com.viscouspot.gitsync" target="_blank"><img src="https://github.com/user-attachments/assets/168cb841-392d-493a-bc47-a9e3e8a61a62" alt="Get it on Google Play" style="width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
   
   <br />
+  <p align="center">
+    <a href="https://github.com/ViscousPot/GitSync/blob/master/Documentation.md">Documentation</a>
+  </p>
   <br />
 
 </div>
