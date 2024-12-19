@@ -38,8 +38,7 @@ class AuthDialog(private val context: Context, private val settingsManager: Sett
         super.onStart()
         setContentView(R.layout.dialog_auth)
 
-        val spinner = findViewById<Spinner>(R.id.gitProviderSpinner)
-
+        val spinner = findViewById<Spinner>(R.id.gitProviderSpinner) ?: return
         val adapter = GitProviderAdapter(context, providers.values.toList())
 
         spinner.adapter = adapter
@@ -47,17 +46,17 @@ class AuthDialog(private val context: Context, private val settingsManager: Sett
             spinner.dropDownWidth = spinner.width
         }
 
-        oAuthContainer = findViewById(R.id.oAuthContainer)
-        oAuthButton = findViewById(R.id.oAuthButton)
+        oAuthContainer = findViewById(R.id.oAuthContainer) ?: return
+        oAuthButton = findViewById(R.id.oAuthButton) ?: return
 
-        httpContainer = findViewById(R.id.httpContainer)
-        usernameInput = findViewById(R.id.usernameInput)
-        tokenInput = findViewById(R.id.tokenInput)
-        loginButton = findViewById(R.id.loginButton)
+        httpContainer = findViewById(R.id.httpContainer) ?: return
+        usernameInput = findViewById(R.id.usernameInput) ?: return
+        tokenInput = findViewById(R.id.tokenInput) ?: return
+        loginButton = findViewById(R.id.loginButton) ?: return
 
-        sshContainer = findViewById(R.id.sshContainer)
-        pKeyButton = findViewById(R.id.pKeyButton)
-        generateKeyButton = findViewById(R.id.generateKeyButton)
+        sshContainer = findViewById(R.id.sshContainer) ?: return
+        pKeyButton = findViewById(R.id.pKeyButton) ?: return
+        generateKeyButton = findViewById(R.id.generateKeyButton) ?: return
 
         spinner.setSelection(providers.keys.toList().indexOf(settingsManager.getGitProvider()))
 

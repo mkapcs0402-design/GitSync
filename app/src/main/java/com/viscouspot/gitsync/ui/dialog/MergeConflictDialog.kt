@@ -32,13 +32,13 @@ class MergeConflictDialog(private val context: Context, private val settingsMana
         val conflicts = gitManager.getConflicting(settingsManager.getGitDirUri())
         if (conflicts.isEmpty()) return
         
-        val conflictEditor = findViewById<HorizontalScrollView>(R.id.conflictEditor)
-        val conflictEditorInput = findViewById<RecyclerView>(R.id.conflictEditorInput)
-        val fileName = findViewById<MaterialButton>(R.id.fileName)
-        val filePrev = findViewById<MaterialButton>(R.id.filePrev)
-        val fileNext = findViewById<MaterialButton>(R.id.fileNext)
-        val merge = findViewById<MaterialButton>(R.id.merge)
-        val abortMerge = findViewById<MaterialButton>(R.id.abortMerge)
+        val conflictEditor = findViewById<HorizontalScrollView>(R.id.conflictEditor) ?: return
+        val conflictEditorInput = findViewById<RecyclerView>(R.id.conflictEditorInput) ?: return
+        val fileName = findViewById<MaterialButton>(R.id.fileName) ?: return
+        val filePrev = findViewById<MaterialButton>(R.id.filePrev) ?: return
+        val fileNext = findViewById<MaterialButton>(R.id.fileNext) ?: return
+        val merge = findViewById<MaterialButton>(R.id.merge) ?: return
+        val abortMerge = findViewById<MaterialButton>(R.id.abortMerge) ?: return
 
         val conflictSections = mutableListOf<String>()
 

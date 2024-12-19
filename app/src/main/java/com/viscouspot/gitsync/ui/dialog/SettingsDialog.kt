@@ -46,7 +46,7 @@ class SettingsDialog(private val context: Context, private val settingsManager: 
     }
 
     private fun setupSyncMessageSettings() {
-        val syncMessageInput = findViewById<EditText>(R.id.syncMessageInput)
+        val syncMessageInput = findViewById<EditText>(R.id.syncMessageInput) ?: return
         syncMessageInput.setText(settingsManager.getSyncMessage())
         highlightStringInFormat(syncMessageInput)
         syncMessageInput.doOnTextChanged { text, _, _, _ ->
@@ -56,8 +56,8 @@ class SettingsDialog(private val context: Context, private val settingsManager: 
     }
 
     private fun setupGitignoreSettings() {
-        val gitignoreInputWrapper = findViewById<HorizontalScrollView>(R.id.gitignoreInputWrapper)
-        val gitignoreInput = findViewById<EditText>(R.id.gitignoreInput)
+        val gitignoreInputWrapper = findViewById<HorizontalScrollView>(R.id.gitignoreInputWrapper) ?: return
+        val gitignoreInput = findViewById<EditText>(R.id.gitignoreInput) ?: return
         gitignoreInput.setText(gitManager.readGitignore(gitDirPath))
         highlightCommentsInInput(gitignoreInput)
         gitignoreInput.setOnFocusChangeListener { _, hasFocus ->
@@ -72,8 +72,8 @@ class SettingsDialog(private val context: Context, private val settingsManager: 
     }
 
     private fun setupGitInfoExcludeSettings() {
-        val gitInfoExcludeInputWrapper = findViewById<HorizontalScrollView>(R.id.gitInfoExcludeInputWrapper)
-        val gitInfoExcludeInput = findViewById<EditText>(R.id.gitInfoExcludeInput)
+        val gitInfoExcludeInputWrapper = findViewById<HorizontalScrollView>(R.id.gitInfoExcludeInputWrapper) ?: return
+        val gitInfoExcludeInput = findViewById<EditText>(R.id.gitInfoExcludeInput) ?: return
         gitInfoExcludeInput.setText(gitManager.readGitInfoExclude(gitDirPath))
         highlightCommentsInInput(gitInfoExcludeInput)
         gitInfoExcludeInput.setOnFocusChangeListener { _, hasFocus ->
