@@ -91,7 +91,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var cloneRepoButton: MaterialButton
     private lateinit var gitAuthButton: MaterialButton
 
-    private lateinit var gitDirPath: EditText
+    private lateinit var gitDirPath: TextView
     private lateinit var deselectDirButton: MaterialButton
     private lateinit var selectDirButton: MaterialButton
 
@@ -146,7 +146,7 @@ class MainActivity : AppCompatActivity() {
 
         settingsManager.setGitDirUri(dirUri.toString())
 
-        gitDirPath.setText(Helper.getPathFromUri(this, dirUri))
+        gitDirPath.text = Helper.getPathFromUri(this, dirUri)
         refreshGitRepo()
 
         settingsManager.setOnboardingStep(4)
@@ -383,12 +383,10 @@ class MainActivity : AppCompatActivity() {
             authDialog.show()
         }
 
-        gitDirPath.isEnabled = false
-
         deselectDirButton.setOnClickListener {
             settingsManager.setGitDirUri("")
 
-            gitDirPath.setText("")
+            gitDirPath.text = getString(R.string.git_dir_path_hint)
             refreshGitRepo()
             val recentCommitsSize = recentCommits.size
             recentCommits.clear()
@@ -773,7 +771,7 @@ class MainActivity : AppCompatActivity() {
 
         runOnUiThread {
             settingsManager.getGitDirUri()?.let {
-                gitDirPath.setText(Helper.getPathFromUri(this, it))
+                gitDirPath.text = Helper.getPathFromUri(this, it)
             }
         }
 
