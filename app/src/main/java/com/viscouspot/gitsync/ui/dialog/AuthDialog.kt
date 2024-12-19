@@ -1,15 +1,10 @@
 package com.viscouspot.gitsync.ui.dialog
 
-import android.app.AlertDialog
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.res.ColorStateList
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
-import android.graphics.drawable.InsetDrawable
 import android.view.View
-import android.view.WindowManager
 import android.widget.AdapterView
 import android.widget.EditText
 import android.widget.Spinner
@@ -25,7 +20,7 @@ import com.viscouspot.gitsync.util.SettingsManager
 import com.viscouspot.gitsync.util.provider.GitProviderManager
 
 
-class AuthDialog(private val context: Context, private val settingsManager: SettingsManager, private val setGitCredentials: (username: String?, token: String?) -> Unit) : AlertDialog(context, R.style.AlertDialogMinTheme) {
+class AuthDialog(private val context: Context, private val settingsManager: SettingsManager, private val setGitCredentials: (username: String?, token: String?) -> Unit) : BaseDialog(context)  {
     private val providers = GitProviderManager.detailsMap
     private lateinit var oAuthContainer: ConstraintLayout
     private lateinit var oAuthButton: MaterialButton
@@ -75,13 +70,6 @@ class AuthDialog(private val context: Context, private val settingsManager: Sett
 
             override fun onNothingSelected(parent: AdapterView<*>) {}
         }
-
-        window?.clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM)
-        val inset = InsetDrawable(
-            ColorDrawable(Color.TRANSPARENT),
-            0
-        )
-        window?.setBackgroundDrawable(inset)
     }
 
     private fun updateInputs(provider: GitProviderManager.Companion.Provider) {
