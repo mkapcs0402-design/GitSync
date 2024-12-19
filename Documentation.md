@@ -1,6 +1,19 @@
 
 # Documentation
 
+
+## Authentication Methods.
+### oAuth
+One-click browser authentication, sufficient for most users
+ - GitHub
+ - Gitea
+### Other
+Manual arbitrary authentication methods for more advanced/self-hosting users
+ - HTTP/S
+     - Username and token for auth
+ - SSH
+     - Generated RSA token pair for auth
+
 ## Sync Mechanisms
 
 ### From quick tile
@@ -10,8 +23,7 @@
 - Clicking the quick tile will trigger a sync (in the same way as the in-app sync button)
 
 ### When app opened or closed
-
-![Application observer panel](https://github.com/user-attachments/assets/141a1264-1c78-4d98-82a4-db2fa885ab01)
+![Application observer panel](https://github.com/user-attachments/assets/0943be2b-7e12-48f3-b362-366c8715b778)
 - Enable the auto sync feature
     - This will prompt you to enable the `Git Sync Accessibility Service`
     - This service is used to watch for the selected app being opened and closed (ignoring keyboards)
@@ -30,10 +42,7 @@
     - Action: `INTENT_SYNC`
 
 ## Settings
-
-![Settings button](https://github.com/user-attachments/assets/ea1e416a-03f5-44c7-9aa2-e33d724e622d)
-
-![Settings dialog](https://github.com/user-attachments/assets/225bc25c-33ed-4f4a-9d74-8dc9d2fa2b0e)
+![Settings dialog](https://github.com/user-attachments/assets/2c9cf282-335f-42cd-9bc3-aec5d5398ffa)
 
 ### Sync Message
 - Customise the commit message template that is used on sync
@@ -43,6 +52,11 @@
 - Allows editing of the repository's gitignore file
 - A list of files and folder paths that should not be synced
 - [See here for more](https://git-scm.com/docs/gitignore)
+
+### git/info/exclude
+- Allows editing of the repository's local gitignore file
+- A list of files and folder paths that should not be synced
+- [See here for more](https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files#excluding-local-files-without-creating-a-gitignore-file)
 
 ## Extra Settings
 
