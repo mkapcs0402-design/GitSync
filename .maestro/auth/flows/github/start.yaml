@@ -2,7 +2,12 @@ appId: com.viscouspot.gitsync
 ---
 
 - runFlow: ../assert.yaml
-- tapOn: "GITHUB"
-- assertVisible: "GITHUB"
-- tapOn: "GITHUB"
+- runFlow:
+    when: 
+      notVisible: "GITHUB"
+    commands:
+      - tapOn: 
+          id: "gitProviderSpinner"
+      - assertVisible: "GITHUB"
+      - tapOn: "GITHUB"
 - tapOn: "OAUTH"

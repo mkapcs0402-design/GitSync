@@ -2,6 +2,11 @@ appId: com.viscouspot.gitsync
 ---
 
 - runFlow: ../assert.yaml
-- tapOn: "GITHUB"
-- assertVisible: "SSH (BETA)"
-- tapOn: "SSH (BETA)"
+- runFlow:
+    when: 
+      notVisible: "SSH (BETA)"
+    commands:
+      - tapOn: 
+          id: "gitProviderSpinner"
+      - assertVisible: "SSH (BETA)"
+      - tapOn: "SSH (BETA)"
