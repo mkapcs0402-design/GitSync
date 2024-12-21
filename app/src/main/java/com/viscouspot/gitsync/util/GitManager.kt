@@ -481,7 +481,7 @@ class GitManager(private val context: Context, private val settingsManager: Sett
             closeRepo(repo)
 
             return commits
-        } catch (e: java.lang.Exception) {
+        } catch (e: Throwable) {
             log(context, LogType.RecentCommits, e)
         }
         return listOf()
@@ -490,10 +490,22 @@ class GitManager(private val context: Context, private val settingsManager: Sett
     fun getConflicting(gitDirUri: Uri?): MutableList<String> {
         if (gitDirUri == null) return mutableListOf()
 
-        val repo = FileRepository("${Helper.getPathFromUri(context, gitDirUri)}/${context.getString(R.string.git_path)}")
-        val git = Git(repo)
-        val status = git.status().call()
-        return status.conflicting.toMutableList()
+        try {
+            val repo = FileRepository(
+                "${
+                    Helper.getPathFromUri(
+                        context,
+                        gitDirUri
+                    )
+                }/${context.getString(R.string.git_path)}"
+            )
+            val git = Git(repo)
+            val status = git.status().call()
+            return status.conflicting.toMutableList()
+        } catch (e: Throwable) {
+            log(context, LogType.RecentCommits, e)
+        }
+        return mutableListOf()
     }
 
     fun abortMerge(gitDirUri: Uri?) {
