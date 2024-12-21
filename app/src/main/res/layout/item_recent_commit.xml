@@ -92,7 +92,7 @@
         android:backgroundTint="@color/text_secondary"
         android:insetBottom="0dp"
         android:minHeight="1dp"
-        android:maxLength="6"
+        android:maxLength="7"
         android:layout_marginBottom="@dimen/space_xxxs"
         android:minWidth="1dp"
         app:cornerRadius="@dimen/corner_radius_xs"

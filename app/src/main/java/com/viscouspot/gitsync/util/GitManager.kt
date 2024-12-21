@@ -468,7 +468,7 @@ class GitManager(private val context: Context, private val settingsManager: Sett
                         commit.shortMessage,
                         commit.authorIdent.name,
                         commit.authorIdent.`when`.time,
-                        commit.name.substring(0, 7),
+                        commit.name,
                         additions,
                         deletions
                     )
