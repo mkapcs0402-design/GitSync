@@ -1,17 +1,11 @@
 package com.viscouspot.gitsync
 
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
-import android.os.Build
-import android.os.FileObserver
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
 import android.widget.Toast
-import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.work.Constraints
@@ -32,10 +26,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
-import kotlin.random.Random
 
 class GitSyncService : Service() {
-    private lateinit var fileObserver: FileObserver
     private lateinit var gitManager: GitManager
     private lateinit var settingsManager: SettingsManager
 
@@ -44,8 +36,6 @@ class GitSyncService : Service() {
     private val debouncePeriod: Long = 10 * 1000
 
     companion object {
-        const val NOTIFICATION_CHANNEL_ID = "git_sync_service_channel"
-        const val NOTIFICATION_CHANNEL_NAME = "Git Sync Service"
         const val MERGE = "MERGE"
         const val FORCE_SYNC = "FORCE_SYNC"
         const val APPLICATION_SYNC = "APPLICATION_SYNC"
@@ -85,35 +75,6 @@ class GitSyncService : Service() {
         settingsManager = SettingsManager(this)
         gitManager = GitManager(this, settingsManager)
 
-        startForegroundService()
-    }
-
-    private fun startForegroundService() {
-        val channel = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel(
-                NOTIFICATION_CHANNEL_ID,
-                NOTIFICATION_CHANNEL_NAME,
-                NotificationManager.IMPORTANCE_MIN
-            )
-        } else {
-            TODO("VERSION.SDK_INT < O")
-        }
-        val manager = this.getSystemService(
-            NotificationManager::class.java
-        )
-        manager?.createNotificationChannel(channel)
-
-        val buttonIntent = Intent(this, GitSyncService::class.java).apply {
-            action = FORCE_SYNC
-        }
-        val buttonPendingIntent = PendingIntent.getService(this, Random.nextInt(0, 100), buttonIntent, PendingIntent.FLAG_IMMUTABLE)
-
-        val notification = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
-            .setSmallIcon(R.drawable.gitsync_notif)
-            .addAction(NotificationCompat.Action(null, getString(R.string.force_sync), buttonPendingIntent))
-            .build()
-
-        startForeground(1, notification)
     }
 
     private fun scheduleNetworkSync() {
@@ -249,6 +210,8 @@ class GitSyncService : Service() {
                     isScheduled = false
                     sync()
                 }
+            } else {
+                stopSelf()
             }
         }
     }
@@ -303,12 +266,5 @@ class GitSyncService : Service() {
 
     override fun onBind(intent: Intent?): IBinder? {
         return null
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        try {
-            fileObserver.stopWatching()
-        } catch (e: Exception) { e.printStackTrace() }
     }
 }
