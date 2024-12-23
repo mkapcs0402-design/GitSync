@@ -120,5 +120,6 @@ jobs:
           packageName: com.viscouspot.gitsync
           releaseName: ${{ github.ref_name }}
           releaseFiles: ${{ steps.signed_file_path_0.outputs.value }}
+          changesNotSentForReview: true
           track: internal
           status: draft
