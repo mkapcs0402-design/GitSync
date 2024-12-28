@@ -53,27 +53,27 @@ object Helper {
             var line: String?
             while (reader.readLine().also { line = it } != null) {
                 when {
-                    line!!.startsWith(context.getString(R.string.conflict_end)) -> {
+                    line!!.trim().startsWith(context.getString(R.string.conflict_end)) -> {
                         conflictBuilder.append(line)
-                        add(conflictBuilder.toString().trim())
+                        add(conflictBuilder.toString())
                         conflictBuilder.clear()
                         inConflict = false
                     }
                     inConflict -> {
                         conflictBuilder.append(line).append("\n")
                     }
-                    line!!.startsWith(context.getString(R.string.conflict_start)) -> {
+                    line!!.trim().startsWith(context.getString(R.string.conflict_start)) -> {
                         inConflict = true
                         conflictBuilder.append(line).append("\n")
                     }
                     else -> {
-                        add(line.toString().trim())
+                        add(line.toString())
                     }
                 }
             }
 
             if (conflictBuilder.isNotEmpty()) {
-                add(conflictBuilder.toString().trim())
+                add(conflictBuilder.toString())
             }
         }
     }
