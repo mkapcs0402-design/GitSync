@@ -32,6 +32,11 @@ import com.jcraft.jsch.KeyPair
 import com.viscouspot.gitsync.MainActivity
 import com.viscouspot.gitsync.R
 import com.viscouspot.gitsync.util.Logger.log
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.io.BufferedReader
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -41,9 +46,19 @@ import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
 import kotlin.random.Random
 
-
 object Helper {
     const val CONFLICT_NOTIFICATION_ID = 1756
+
+    fun <T> debounced(delayMillis: Long, action: (T) -> Unit): (T) -> Unit {
+        var job: Job? = null
+        return { param: T ->
+            job?.cancel()
+            job = CoroutineScope(Dispatchers.Main).launch {
+                delay(delayMillis)
+                action(param)
+            }
+        }
+    }
 
     fun extractConflictSections(context: Context, file: File, add: (text: String) -> Unit) {
         val conflictBuilder = StringBuilder()
