@@ -135,7 +135,7 @@ class MergeConflictDialog(private val context: Context, private val settingsMana
 
         if (file.exists()) {
             Helper.extractConflictSections(context, file) {
-                conflictSections.add(it.trim())
+                conflictSections.add(it)
                 conflictEditorInput.adapter?.notifyItemInserted(conflictSections.size)
             }
 

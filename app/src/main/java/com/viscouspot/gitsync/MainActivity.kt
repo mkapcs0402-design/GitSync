@@ -26,7 +26,6 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
@@ -42,6 +41,7 @@ import com.viscouspot.gitsync.ui.adapter.Commit
 import com.viscouspot.gitsync.ui.adapter.RecentCommitsAdapter
 import com.viscouspot.gitsync.ui.dialog.ApplicationSelectDialog
 import com.viscouspot.gitsync.ui.dialog.AuthDialog
+import com.viscouspot.gitsync.ui.dialog.BaseDialog
 import com.viscouspot.gitsync.ui.dialog.MergeConflictDialog
 import com.viscouspot.gitsync.ui.dialog.SettingsDialog
 import com.viscouspot.gitsync.ui.fragment.CloneRepoFragment
@@ -101,7 +101,7 @@ class MainActivity : AppCompatActivity() {
     private var requestStoragePermission: ActivityResultLauncher<Intent>? = null
 
     private lateinit var authDialog: Dialog
-    private var prominentDisclosure: Dialog? = null
+    private var prominentDisclosure: BaseDialog? = null
     private var applicationSelectDialog: Dialog? = null
 
     private var requestedPermission = false
@@ -699,14 +699,16 @@ class MainActivity : AppCompatActivity() {
 
     private fun displayProminentDisclosure() {
         prominentDisclosure?.dismiss()
-        prominentDisclosure = AlertDialog.Builder(this, R.style.AlertDialogTheme)
+
+        prominentDisclosure = BaseDialog(this)
             .setTitle(getString(R.string.accessibility_service_disclosure_title))
             .setMessage(getString(R.string.accessibility_service_disclosure_message))
             .setPositiveButton(android.R.string.ok) { _, _ ->
                 requestAccessibilityPermission()
             }
-            .setNegativeButton(android.R.string.cancel, null)
-            .show()
+            .setNegativeButton(android.R.string.cancel) { _, _ -> }
+
+        prominentDisclosure?.show()
     }
 
     private fun requestAccessibilityPermission() {
