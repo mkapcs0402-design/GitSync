@@ -16,6 +16,7 @@ import androidx.work.WorkManager
 import com.viscouspot.gitsync.util.GitManager
 import com.viscouspot.gitsync.util.Helper
 import com.viscouspot.gitsync.util.Helper.CONFLICT_NOTIFICATION_ID
+import com.viscouspot.gitsync.util.Helper.debounced
 import com.viscouspot.gitsync.util.LogType
 import com.viscouspot.gitsync.util.Logger.log
 import com.viscouspot.gitsync.util.NetworkWorker
@@ -34,6 +35,10 @@ class GitSyncService : Service() {
     private var isScheduled: Boolean = false
     private var isSyncing: Boolean = false
     private val debouncePeriod: Long = 10 * 1000
+
+    private val debouncedSyncFn = debounced<Boolean>(1000) { forced ->
+        sync(forced)
+    }
 
     companion object {
         const val MERGE = "MERGE"
@@ -101,7 +106,7 @@ class GitSyncService : Service() {
                 log(LogType.Sync, "Sync Scheduled")
                 return
             } else {
-                sync(forced)
+                debouncedSyncFn(forced)
             }
         }
     }
