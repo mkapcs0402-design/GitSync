@@ -17,6 +17,7 @@ import com.viscouspot.gitsync.util.GitManager
 import com.viscouspot.gitsync.util.Helper
 import com.viscouspot.gitsync.util.Helper.CONFLICT_NOTIFICATION_ID
 import com.viscouspot.gitsync.util.Helper.debounced
+import com.viscouspot.gitsync.util.Helper.makeToast
 import com.viscouspot.gitsync.util.LogType
 import com.viscouspot.gitsync.util.Logger.log
 import com.viscouspot.gitsync.util.NetworkWorker
@@ -114,11 +115,10 @@ class GitSyncService : Service() {
     private fun sync(forced: Boolean = false) {
         if (gitManager.getConflicting(settingsManager.getGitDirUri()).isNotEmpty()) {
             Handler(Looper.getMainLooper()).post {
-                Toast.makeText(
+                makeToast(
                     applicationContext,
-                    "Ongoing merge conflict",
-                    Toast.LENGTH_SHORT
-                ).show()
+                    "Ongoing merge conflict"
+                )
             }
             return
         }
@@ -132,11 +132,11 @@ class GitSyncService : Service() {
             if (gitDirUri == null) {
                 withContext(Dispatchers.Main) {
                     log(LogType.Sync, "Repository Not Found")
-                    Toast.makeText(
+                    makeToast(
                         applicationContext,
                         getString(R.string.repository_not_found),
                         Toast.LENGTH_LONG
-                    ).show()
+                    )
                 }
                 return@launch
             }
@@ -232,12 +232,10 @@ class GitSyncService : Service() {
                 ::scheduleNetworkSync,
             ) {
                 Handler(Looper.getMainLooper()).post {
-                    Toast.makeText(
+                    makeToast(
                         applicationContext,
                         getString(R.string.resolving_merge),
-                        Toast.LENGTH_SHORT
                     )
-                        .show()
                 }
             }
 
@@ -263,8 +261,7 @@ class GitSyncService : Service() {
     private fun displaySyncMessage(msg: String) {
         if (settingsManager.getSyncMessageEnabled()) {
             Handler(Looper.getMainLooper()).post {
-                Toast.makeText(applicationContext, msg, Toast.LENGTH_SHORT)
-                    .show()
+                makeToast(applicationContext, msg)
             }
         }
     }

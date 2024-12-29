@@ -49,6 +49,11 @@ import kotlin.random.Random
 object Helper {
     const val CONFLICT_NOTIFICATION_ID = 1756
 
+    fun makeToast(context: Context, message: String, length: Int = Toast.LENGTH_SHORT) {
+        if (!NotificationManagerCompat.from(context).areNotificationsEnabled()) return
+        Toast.makeText(context, message, length).show()
+    }
+
     fun <T> debounced(delayMillis: Long, action: (T) -> Unit): (T) -> Unit {
         var job: Job? = null
         return { param: T ->
@@ -105,7 +110,7 @@ object Helper {
                 actNw.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> true
                 actNw.hasTransport(NetworkCapabilities.TRANSPORT_BLUETOOTH) -> true
                 else -> {
-                    Toast.makeText(context, toastMessage, Toast.LENGTH_SHORT).show()
+                    makeToast(context, toastMessage)
                     false
                 }
             }
@@ -114,13 +119,14 @@ object Helper {
             if (networkInfo != null && networkInfo.isConnected) {
                 true
             } else {
-                Toast.makeText(context, toastMessage, Toast.LENGTH_SHORT).show()
+                makeToast(context, toastMessage)
                 false
             }
         }
     }
 
     fun sendCheckoutConflictNotification(context: Context) {
+        if (!NotificationManagerCompat.from(context).areNotificationsEnabled()) return
         val channelId = "git_sync_bug_channel"
         val channel = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel(
@@ -147,8 +153,8 @@ object Helper {
 
         with(NotificationManagerCompat.from(context)) {
             if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(context, "${context.getString(R.string.report_bug)} ${context.getString(
-                    R.string.enable_notifications)}", Toast.LENGTH_SHORT).show()
+                makeToast(context, "${context.getString(R.string.report_bug)} ${context.getString(
+                    R.string.enable_notifications)}")
                 return
             }
 

@@ -31,6 +31,7 @@ import com.viscouspot.gitsync.ui.dialog.ProgressDialog
 import com.viscouspot.gitsync.util.GitManager
 import com.viscouspot.gitsync.util.provider.GitProviderManager
 import com.viscouspot.gitsync.util.Helper
+import com.viscouspot.gitsync.util.Helper.makeToast
 import com.viscouspot.gitsync.util.LogType
 import com.viscouspot.gitsync.util.Logger.log
 import com.viscouspot.gitsync.util.SettingsManager
@@ -197,7 +198,7 @@ class CloneRepoFragment(
             { error ->
                 log(LogType.CloneRepo, error)
                 activity?.runOnUiThread {
-                    Toast.makeText(context, getString(R.string.clone_failed), Toast.LENGTH_SHORT).show()
+                    makeToast(requireContext(), getString(R.string.clone_failed))
                     cloneDialog.dismiss()
                     val message = if (getString(R.string.clone_failed) == error) "" else error
                     BaseDialog(requireContext())

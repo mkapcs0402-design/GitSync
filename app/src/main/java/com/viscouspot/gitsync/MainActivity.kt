@@ -48,6 +48,7 @@ import com.viscouspot.gitsync.ui.fragment.CloneRepoFragment
 import com.viscouspot.gitsync.util.GitManager
 import com.viscouspot.gitsync.util.provider.GitProviderManager
 import com.viscouspot.gitsync.util.Helper
+import com.viscouspot.gitsync.util.Helper.makeToast
 import com.viscouspot.gitsync.util.LogType
 import com.viscouspot.gitsync.util.Logger.log
 import com.viscouspot.gitsync.util.OnboardingController
@@ -127,7 +128,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun dirSelectionCallback(dirUri: Uri?) {
         if (dirUri == null) {
-            Toast.makeText(this, getString(R.string.inaccessible_directory_message), Toast.LENGTH_LONG).show()
+            makeToast(this, getString(R.string.inaccessible_directory_message), Toast.LENGTH_LONG)
             return
         }
 
@@ -715,7 +716,7 @@ class MainActivity : AppCompatActivity() {
         requestedPermission = true
         settingsManager.setOnboardingStep(-1)
         startActivity(openSettings)
-        Toast.makeText(this, getString(R.string.enable_accessibility_service), Toast.LENGTH_LONG).show()
+        makeToast(this, getString(R.string.enable_accessibility_service), Toast.LENGTH_LONG)
     }
 
     private fun checkAndRequestNotificationPermission(onGranted: (() -> Unit)? = null) {
