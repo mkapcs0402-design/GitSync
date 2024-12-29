@@ -320,7 +320,7 @@ object Helper {
         val regex = Regex(pattern)
 
         return when {
-            !regex.matches(url) -> "URL must be a valid Git URL (HTTP/S, SSH, or git@) and follow the format"
+            !regex.matches(url) -> "URL must be a valid Git URL (HTTP/S, SSH, or git@)"
             else -> null
         }
     }
