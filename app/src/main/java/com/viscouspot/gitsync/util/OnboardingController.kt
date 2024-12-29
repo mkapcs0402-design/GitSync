@@ -176,7 +176,7 @@ class OnboardingController(
         return currentDialog!!
     }
 
-    private fun showAllFilesAccessOrNext(standalone: Boolean = false): Boolean {
+    fun showAllFilesAccessOrNext(standalone: Boolean = false): Boolean {
         val hasPermissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) Environment.isExternalStorageManager() else
             ContextCompat.checkSelfPermission(context, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
 
@@ -191,19 +191,22 @@ class OnboardingController(
         return false
     }
 
-    private fun getEnableNotificationsDialog(standalone: Boolean = false): BaseDialog {
+    private fun getEnableNotificationsDialog(): BaseDialog {
         activity.runOnUiThread {
         currentDialog = BaseDialog(context)
             .setCancelable(0)
             .setTitle(context.getString(R.string.notification_dialog_title))
             .setMessage(context.getString(R.string.notification_dialog_message))
+            .setNegativeButton(R.string.skip) { dialog, _ ->
+                dialog.dismiss()
+                showAllFilesAccessOrNext()
+            }
             .setPositiveButton(android.R.string.ok) { _, _ -> }
             .apply {
                 setOnShowListener {
                     getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
                         checkAndRequestNotificationPermission {
                             dismiss()
-                            if (standalone) return@checkAndRequestNotificationPermission
                             showAllFilesAccessOrNext()
                         }
                         getButton(AlertDialog.BUTTON_POSITIVE).text =
@@ -215,12 +218,12 @@ class OnboardingController(
         return currentDialog!!
     }
 
-    fun showNotificationsOrNext(standalone: Boolean = false): Boolean {
+    private fun showNotificationsOrNext(): Boolean {
         if (!NotificationManagerCompat.from(context).areNotificationsEnabled()) {
-            getEnableNotificationsDialog(standalone).show()
+            getEnableNotificationsDialog().show()
             return true
         } else {
-            return showAllFilesAccessOrNext(standalone)
+            return showAllFilesAccessOrNext()
         }
     }
 
