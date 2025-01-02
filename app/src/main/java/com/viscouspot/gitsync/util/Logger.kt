@@ -77,7 +77,7 @@ object Logger {
         }
     }
 
-    private fun sendBugReportNotification(context: Context) {
+    fun sendBugReportNotification(context: Context) {
         val channelId = "git_sync_bug_channel"
         val channel = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel(
@@ -91,7 +91,6 @@ object Logger {
         val manager = context.getSystemService(NotificationManager::class.java)
         manager?.createNotificationChannel(channel)
 
-//        val emailIntent = createBugReportEmailIntent(context)
         val githubIssueIntent = createGitHubIssueIntent()
         val buttonPendingIntent = PendingIntent.getActivity(context, Random.nextInt(0, 100), githubIssueIntent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
 
