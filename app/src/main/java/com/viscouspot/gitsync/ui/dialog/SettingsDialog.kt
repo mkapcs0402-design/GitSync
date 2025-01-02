@@ -1,10 +1,13 @@
 package com.viscouspot.gitsync.ui.dialog
 
 import android.content.Context
+import android.net.Uri
 import android.text.Spannable
 import android.text.style.ForegroundColorSpan
+import android.view.View
 import android.widget.EditText
 import android.widget.HorizontalScrollView
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.widget.doOnTextChanged
 import com.google.android.material.button.MaterialButton
@@ -19,9 +22,10 @@ class SettingsDialog(private val context: Context, private val settingsManager: 
         super.onStart()
         setContentView(R.layout.dialog_settings)
 
+        setupSyncMessageSettings()
+        setupRemoteSetings()
         setupAuthorNameSettings()
         setupAuthorEmailSettings()
-        setupSyncMessageSettings()
         setupGitignoreSettings()
         setupGitInfoExcludeSettings()
 
@@ -57,6 +61,14 @@ class SettingsDialog(private val context: Context, private val settingsManager: 
         }
     }
 
+    private fun setupRemoteSetings() {
+        val remoteInput = findViewById<EditText>(R.id.remoteInput) ?: return
+        remoteInput.setText(settingsManager.getRemote())
+        remoteInput.doOnTextChanged { text, _, _, _ ->
+            settingsManager.setRemote(text.toString())
+        }
+    }
+
     private fun setupAuthorNameSettings() {
         val authorNameInput = findViewById<EditText>(R.id.authorNameInput) ?: return
         authorNameInput.setText(settingsManager.getAuthorName())
@@ -71,7 +83,6 @@ class SettingsDialog(private val context: Context, private val settingsManager: 
         authorEmailInput.doOnTextChanged { text, _, _, _ ->
             settingsManager.setAuthorEmail(text.toString())
         }
-
     }
 
     private fun setupSyncMessageSettings() {
