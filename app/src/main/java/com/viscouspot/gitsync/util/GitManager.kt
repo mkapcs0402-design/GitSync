@@ -266,11 +266,13 @@ class GitManager(private val context: Context, private val settingsManager: Sett
                 log(LogType.PushToRepo, "Adding Files to Stage")
 
                 git.add().apply {
-                    addFilepattern(".")
+                    status.uncommittedChanges.forEach { addFilepattern(it) }
+                    status.untracked.forEach { addFilepattern(it) }
                 }.call()
 
                 git.add().apply {
-                    addFilepattern(".")
+                    status.uncommittedChanges.forEach { addFilepattern(it) }
+                    status.untracked.forEach { addFilepattern(it) }
                     isUpdate = true
                 }.call()
 
