@@ -27,7 +27,7 @@ class GithubManager(private val context: Context) : GitProviderManager {
     }
 
     override fun launchOAuthFlow() {
-        val fullAuthUrl = "https://${DOMAIN}/login/oauth/authorize?client_id=${Secrets.GITHUB_CLIENT_ID}&scope=repo&state=${UUID.randomUUID()}"
+        val fullAuthUrl = "https://${DOMAIN}/login/oauth/authorize?client_id=${Secrets.GITHUB_CLIENT_ID}&scope=repo%20workflow&state=${UUID.randomUUID()}"
 
         log(LogType.GithubOAuthFlow, "Launching Flow")
         context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(fullAuthUrl)).apply {
