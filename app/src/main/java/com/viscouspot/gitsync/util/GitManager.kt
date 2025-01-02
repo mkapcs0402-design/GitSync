@@ -8,6 +8,7 @@ import com.jcraft.jsch.JSch
 import com.jcraft.jsch.Session
 import com.viscouspot.gitsync.R
 import com.viscouspot.gitsync.ui.adapter.Commit
+import com.viscouspot.gitsync.util.Helper.makeToast
 import com.viscouspot.gitsync.util.Helper.sendCheckoutConflictNotification
 import com.viscouspot.gitsync.util.Logger.log
 import com.viscouspot.gitsync.util.provider.GitProviderManager
@@ -124,7 +125,7 @@ class GitManager(private val context: Context, private val settingsManager: Sett
 
                 log(LogType.CloneRepo, "Repository cloned successfully")
                 withContext(Dispatchers.Main) {
-                    Toast.makeText(context, "Repository cloned successfully", Toast.LENGTH_SHORT).show()
+                    makeToast(context, "Repository cloned successfully")
                 }
 
                 successCallback.invoke()
