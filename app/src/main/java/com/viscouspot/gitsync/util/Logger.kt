@@ -16,6 +16,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.viscouspot.gitsync.BuildConfig
 import com.viscouspot.gitsync.R
+import com.viscouspot.gitsync.util.Helper.makeToast
 import java.io.PrintWriter
 import java.io.StringWriter
 import java.net.URLEncoder
@@ -78,6 +79,8 @@ object Logger {
     }
 
     fun sendBugReportNotification(context: Context) {
+        if (!NotificationManagerCompat.from(context).areNotificationsEnabled()) return
+
         val channelId = "git_sync_bug_channel"
         val channel = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel(
@@ -104,8 +107,8 @@ object Logger {
 
         with(NotificationManagerCompat.from(context)) {
             if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(context, "${context.getString(R.string.report_bug)} ${context.getString(
-                    R.string.enable_notifications)}", Toast.LENGTH_LONG).show()
+                makeToast(context, "${context.getString(R.string.report_bug)} ${context.getString(
+                    R.string.enable_notifications)}", Toast.LENGTH_LONG)
                 return
             }
 

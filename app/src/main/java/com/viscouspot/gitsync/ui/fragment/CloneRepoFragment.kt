@@ -31,6 +31,7 @@ import com.viscouspot.gitsync.ui.dialog.ProgressDialog
 import com.viscouspot.gitsync.util.GitManager
 import com.viscouspot.gitsync.util.provider.GitProviderManager
 import com.viscouspot.gitsync.util.Helper
+import com.viscouspot.gitsync.util.Helper.makeToast
 import com.viscouspot.gitsync.util.LogType
 import com.viscouspot.gitsync.util.Logger.log
 import com.viscouspot.gitsync.util.SettingsManager
@@ -73,12 +74,10 @@ class CloneRepoFragment(
 
         repoListRecycler = view.findViewById(R.id.repoList)
         val repoUrlEditText = view.findViewById<EditText>(R.id.repoUrlEditText)
-        val invalidRepoError = view.findViewById<TextView>(R.id.invalidRepoError)
         val pullButton = view.findViewById<MaterialButton>(R.id.pullButton)
         val localRepo = view.findViewById<MaterialButton>(R.id.localRepo)
         repoListRecycler.setLayoutManager(GridLayoutManager(context, 1))
 
-        invalidRepoError.text = ""
         setLoadingRepos(true)
 
         val repoListSupported = GitProviderManager.getManager(requireContext(), settingsManager).getRepos(settingsManager.getGitAuthCredentials().second, ::addRepos) {
@@ -95,15 +94,25 @@ class CloneRepoFragment(
 
         pullButton.setOnClickListener {
             val invalidRepoErrorText = Helper.isValidGitRepo(repoUrlEditText.text.toString(), settingsManager.getGitProvider() == GitProviderManager.Companion.Provider.SSH)
+
             if (invalidRepoErrorText == null) {
                 repoUrl = repoUrlEditText.text.toString()
-                invalidRepoError.text = ""
                 selectLocalDir()
-            } else {
-                repoUrlEditText.rightDrawable(R.drawable.circle_xmark)
-                TextViewCompat.setCompoundDrawableTintList(repoUrlEditText, ContextCompat.getColorStateList(requireContext(), R.color.auth_red))
-                invalidRepoError.text = invalidRepoErrorText
+                return@setOnClickListener
             }
+
+            BaseDialog(requireContext())
+                .setTitle(getString(R.string.clone_failed))
+                .setMessage(invalidRepoErrorText)
+                .setCancelable(1)
+                .setPositiveButton(android.R.string.cancel) { _, _ -> }
+                .setNegativeButton(R.string.clone_anyway) { _, _ ->
+                    repoUrl = repoUrlEditText.text.toString()
+                    selectLocalDir()
+                }
+                .show()
+            repoUrlEditText.rightDrawable(R.drawable.circle_xmark)
+            TextViewCompat.setCompoundDrawableTintList(repoUrlEditText, ContextCompat.getColorStateList(requireContext(), R.color.auth_red))
         }
 
         repoListRecycler.setAdapter(adapter)
@@ -197,7 +206,7 @@ class CloneRepoFragment(
             { error ->
                 log(LogType.CloneRepo, error)
                 activity?.runOnUiThread {
-                    Toast.makeText(context, getString(R.string.clone_failed), Toast.LENGTH_SHORT).show()
+                    makeToast(requireContext(), getString(R.string.clone_failed))
                     cloneDialog.dismiss()
                     val message = if (getString(R.string.clone_failed) == error) "" else error
                     BaseDialog(requireContext())
