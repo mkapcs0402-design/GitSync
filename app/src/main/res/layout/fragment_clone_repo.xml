@@ -62,16 +62,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/repoList" />
 
-    <TextView
-        android:id="@+id/invalidRepoError"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@color/deletions"
-        app:layout_constraintTop_toBottomOf="@id/repoUrlEditText"
-        app:layout_constraintStart_toStartOf="@id/repoUrlEditText"
-        android:layout_marginTop="@dimen/space_xxs"
-        android:layout_marginStart="@dimen/space_md"
-        android:text="@string/example_filepath"/>
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/pullButton"
