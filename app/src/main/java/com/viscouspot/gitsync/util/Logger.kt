@@ -73,12 +73,12 @@ object Logger {
 
     private fun addToLastLogs(type: LogType, message: String) {
         lastLogs.add(Pair(type, message))
-        if (lastLogs.size > 10) {
+        while (lastLogs.size > 100) {
             lastLogs.removeAt(0)
         }
     }
 
-    private fun sendBugReportNotification(context: Context) {
+    fun sendBugReportNotification(context: Context) {
         if (!NotificationManagerCompat.from(context).areNotificationsEnabled()) return
 
         val channelId = "git_sync_bug_channel"
@@ -94,7 +94,6 @@ object Logger {
         val manager = context.getSystemService(NotificationManager::class.java)
         manager?.createNotificationChannel(channel)
 
-//        val emailIntent = createBugReportEmailIntent(context)
         val githubIssueIntent = createGitHubIssueIntent()
         val buttonPendingIntent = PendingIntent.getActivity(context, Random.nextInt(0, 100), githubIssueIntent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
 

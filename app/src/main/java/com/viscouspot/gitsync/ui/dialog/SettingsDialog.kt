@@ -7,10 +7,11 @@ import android.widget.EditText
 import android.widget.HorizontalScrollView
 import androidx.core.content.ContextCompat
 import androidx.core.widget.doOnTextChanged
+import com.google.android.material.button.MaterialButton
 import com.viscouspot.gitsync.R
 import com.viscouspot.gitsync.util.GitManager
+import com.viscouspot.gitsync.util.Logger.sendBugReportNotification
 import com.viscouspot.gitsync.util.SettingsManager
-
 
 class SettingsDialog(private val context: Context, private val settingsManager: SettingsManager, private val gitManager: GitManager, private val gitDirPath: String) : BaseDialog(context) {
 
@@ -23,6 +24,15 @@ class SettingsDialog(private val context: Context, private val settingsManager: 
         setupSyncMessageSettings()
         setupGitignoreSettings()
         setupGitInfoExcludeSettings()
+
+        setupReportBugButton()
+    }
+
+    private fun setupReportBugButton() {
+        val reportBugButton = findViewById<MaterialButton>(R.id.reportBugButton) ?: return
+        reportBugButton.setOnClickListener {
+            sendBugReportNotification(context)
+        }
     }
 
     private fun highlightStringInFormat(syncMessageInput: EditText) {
