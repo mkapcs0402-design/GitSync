@@ -442,7 +442,7 @@ class GitManager(private val context: Context, private val settingsManager: Sett
             val repo = FileRepository("$gitDirPath/${context.getString(R.string.git_path)}")
             val revWalk = RevWalk(repo)
 
-            val localHead = repo.resolve(Constants.HEAD)
+            val localHead = repo.resolve(Constants.HEAD) ?: return listOf()
             revWalk.markStart(revWalk.parseCommit(localHead))
             log(LogType.RecentCommits, "HEAD parsed")
 
