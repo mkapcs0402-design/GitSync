@@ -153,6 +153,7 @@
                 android:enabled="false"
                 android:inputType="none"
                 android:lines="1"
+                android:editable="false"
                 android:paddingHorizontal="@dimen/space_md"
                 android:paddingVertical="@dimen/space_md"
                 android:scrollHorizontally="true"
