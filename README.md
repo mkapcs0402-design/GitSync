@@ -97,6 +97,6 @@ Consider [sponsoring](https://github.com/sponsors/ViscousPot)! Any help is hugel
 
 ## Acknowledgements
 
- - [KGit](https://github.com/sya-ri/KGit)
+ - [JGit](https://github.com/eclipse-jgit/jgit)
 
 
