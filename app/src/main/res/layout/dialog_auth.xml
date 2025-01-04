@@ -100,6 +100,7 @@
         android:layout_width="match_parent"
         app:layout_constraintTop_toBottomOf="@id/oAuthContainer"
         app:layout_constraintEnd_toEndOf="parent"
+        android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="@dimen/space_lg"
         android:layout_height="wrap_content">
@@ -170,7 +171,6 @@
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@id/tokenInput" />
-
         <EditText
             android:id="@+id/tokenInput"
             style="@style/SingleLineEditText"
@@ -225,22 +225,22 @@
         android:layout_marginTop="@dimen/space_lg"
         android:layout_height="wrap_content">
         <TextView
-            android:id="@+id/pKeyLabel"
+            android:id="@+id/privKeyLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/space_md"
-            android:text="@string/key"
+            android:text="@string/priv_key"
             android:textColor="@color/primary_light"
             android:fontFeatureSettings="smcp"
             android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@id/pKeyButton"
-            app:layout_constraintEnd_toStartOf="@id/pKeyButton"
+            app:layout_constraintBottom_toBottomOf="@id/privKeyButton"
+            app:layout_constraintEnd_toStartOf="@id/privKeyButton"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/pKeyButton" />
+            app:layout_constraintTop_toTopOf="@id/privKeyButton" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/pKeyButton"
+            android:id="@+id/privKeyButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:background="@drawable/input_bg_sm"
@@ -250,7 +250,7 @@
             android:inputType="textNoSuggestions"
             app:icon="@drawable/copy_to_clipboard"
             app:iconGravity="end"
-            android:text="@string/ssh_key_example"
+            android:text="@string/ssh_priv_key_example"
             android:enabled="false"
             app:iconTint="@color/primary_light"
             app:iconSize="@dimen/text_size_lg"
@@ -262,7 +262,50 @@
             android:textAlignment="viewStart"
             android:foreground="?android:attr/selectableItemBackground"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toEndOf="@id/pKeyLabel"
+            app:layout_constraintStart_toEndOf="@id/privKeyLabel"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:textSize="@dimen/text_size_md" />
+
+        <TextView
+            android:id="@+id/pubKeyLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/space_md"
+            android:text="@string/pub_key"
+            android:textColor="@color/primary_light"
+            android:fontFeatureSettings="smcp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/pubKeyButton"
+            app:layout_constraintEnd_toStartOf="@id/pubKeyButton"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/pubKeyButton" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/pubKeyButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/input_bg_sm"
+            android:backgroundTint="@color/card_secondary_bg"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:inputType="textNoSuggestions"
+            app:icon="@drawable/copy_to_clipboard"
+            app:iconGravity="end"
+            android:text="@string/ssh_pub_key_example"
+            android:enabled="false"
+            app:iconTint="@color/primary_light"
+            app:iconSize="@dimen/text_size_lg"
+            android:paddingHorizontal="@dimen/space_md"
+            android:layout_marginTop="@dimen/space_md"
+            android:paddingVertical="@dimen/space_md"
+            app:backgroundTint="@color/card_secondary_bg"
+            android:textColor="@color/primary_light"
+            android:textColorHint="@color/text_secondary"
+            android:textAlignment="viewStart"
+            android:foreground="?android:attr/selectableItemBackground"
+            app:layout_constraintTop_toBottomOf="@id/privKeyButton"
+            app:layout_constraintStart_toStartOf="@id/privKeyButton"
             app:layout_constraintEnd_toEndOf="parent"
             android:textSize="@dimen/text_size_md" />
 
@@ -270,22 +313,45 @@
             android:id="@+id/generateKeyButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_lg"
+            android:layout_marginBottom="@dimen/space_md"
             android:background="@drawable/input_bg_sm"
             android:backgroundTint="@color/card_secondary_bg"
+            android:clipToOutline="true"
+            android:foreground="?android:attr/selectableItemBackground"
             android:insetTop="0dp"
             android:insetBottom="0dp"
             android:text="@string/generate_key"
             android:textColor="@color/card_bg"
             android:textSize="@dimen/text_size_md"
             app:backgroundTint="@color/auth_green"
-            android:layout_marginTop="@dimen/space_lg"
-            android:foreground="?android:attr/selectableItemBackground"
-            android:clipToOutline="true"
-            app:layout_constraintTop_toBottomOf="@id/pKeyButton"
             app:layout_constraintBottom_toBottomOf="parent"
-            android:layout_marginBottom="@dimen/space_md"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintTop_toBottomOf="@id/pubKeyButton" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/restoreKeyButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_lg"
+            android:layout_marginBottom="@dimen/space_md"
+            android:background="@drawable/input_bg_sm"
+            android:backgroundTint="@color/card_secondary_bg"
+            android:clipToOutline="true"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:minWidth="1dp"
+            app:backgroundTint="@color/auth_green"
+            app:icon="@drawable/key"
+            app:iconPadding="0dp"
+            app:iconSize="@dimen/text_size_lg"
+            app:iconTint="@color/card_bg"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintDimensionRatio="w,1:1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/pubKeyButton" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

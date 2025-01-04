@@ -140,11 +140,22 @@
     <string name="example_token">ghp_1234abcd5678efgh</string>
     <string name="login">login</string>
 
-    <string name="key">key</string>
-    <string name="ssh_key_example">ssh-rsa AABBCCDDEEFF112233445566</string>
+    <string name="pub_key">pub key</string>
+    <string name="priv_key">priv key</string>
+    <string name="ssh_pub_key_example">ssh-rsa AABBCCDDEEFF112233445566</string>
+    <string name="ssh_priv_key_example">-----BEGIN RSA PRIVATE KEY----- AABBCCDDEEFF112233445566</string>
+
     <string name="generate_key">generate key</string>
-    <string name="confirm_key_saved">confirm key saved</string>
+    <string name="confirm_key_saved">confirm pub key saved</string>
     <string name="copied_text">Copied text!</string>
+
+    <string name="confirm_priv_key_copy">Confirm Private Key Copy</string>
+    <string name="confirm_priv_key_copy_msg">Are you sure you want to copy your private key to the clipboard? \n\nAnyone with access to this key can control your account. Ensure you paste it only in secure locations and clear your clipboard afterward.</string>
+    <string name="understood">Understood</string>
+
+    <string name="import_private_key">Import Private Key</string>
+    <string name="import_private_key_msg">Paste your private key below to use an existing account. \n\nMake sure you are pasting the key in a secure environment, as anyone with access to this key can control your account.</string>
+    <string name="import_key">import</string>
 
     <!--    Auto Sync Dialogs-->
     <string name="accessibility_service_disclosure_title">Accessibility Service Disclosure</string>

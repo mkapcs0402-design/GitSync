@@ -4,6 +4,7 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.res.ColorStateList
+import android.view.LayoutInflater
 import android.view.View
 import android.widget.AdapterView
 import android.widget.EditText
@@ -19,7 +20,6 @@ import com.viscouspot.gitsync.util.Helper
 import com.viscouspot.gitsync.util.SettingsManager
 import com.viscouspot.gitsync.util.provider.GitProviderManager
 
-
 class AuthDialog(private val context: Context, private val settingsManager: SettingsManager, private val setGitCredentials: (username: String?, token: String?) -> Unit) : BaseDialog(context)  {
     private val providers = GitProviderManager.detailsMap
     private lateinit var oAuthContainer: ConstraintLayout
@@ -31,8 +31,40 @@ class AuthDialog(private val context: Context, private val settingsManager: Sett
     private lateinit var loginButton: MaterialButton
 
     private lateinit var sshContainer: ConstraintLayout
-    private lateinit var pKeyButton: MaterialButton
+    private lateinit var pubKeyButton: MaterialButton
+    private lateinit var privKeyButton: MaterialButton
     private lateinit var generateKeyButton: MaterialButton
+    private lateinit var restoreKeyButton: MaterialButton
+
+    private val keyInput = LayoutInflater.from(context).inflate(R.layout.edittext_key, null) as ConstraintLayout
+
+    private val confirmPrivKeyCopyDialog = BaseDialog(context)
+        .setTitle(context.getString(R.string.confirm_priv_key_copy))
+        .setMessage(context.getString(R.string.confirm_priv_key_copy_msg))
+        .setCancelable(1)
+        .setPositiveButton(R.string.understood) { _, _ ->
+            privKeyButton.icon = AppCompatResources.getDrawable(context, R.drawable.confirm_clipboard)
+            privKeyButton.setIconTintResource(R.color.auth_green)
+
+            val clipboard: ClipboardManager? = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?
+            val clip = ClipData.newPlainText(context.getString(R.string.copied_text), privKeyButton.text)
+            clipboard?.setPrimaryClip(clip)
+        }
+        .setNegativeButton(android.R.string.cancel) { _, _ -> }
+
+    private val restoreKeyDialog = BaseDialog(context)
+        .setTitle(context.getString(R.string.import_private_key))
+        .setMessage(context.getString(R.string.import_private_key_msg))
+        .setCancelable(1)
+        .setView(keyInput)
+        .setPositiveButton(R.string.import_key) { _, _ ->
+            val key = keyInput.findViewById<EditText>(R.id.input).text
+            if (key == null || key.isEmpty()) return@setPositiveButton
+            setGitCredentials(null, key.toString())
+            dismiss()
+            this.dismiss()
+        }
+        .setNegativeButton(android.R.string.cancel) { _, _ -> }
 
     override fun onStart() {
         super.onStart()
@@ -55,8 +87,10 @@ class AuthDialog(private val context: Context, private val settingsManager: Sett
         loginButton = findViewById(R.id.loginButton) ?: return
 
         sshContainer = findViewById(R.id.sshContainer) ?: return
-        pKeyButton = findViewById(R.id.pKeyButton) ?: return
+        pubKeyButton = findViewById(R.id.pubKeyButton) ?: return
+        privKeyButton = findViewById(R.id.privKeyButton) ?: return
         generateKeyButton = findViewById(R.id.generateKeyButton) ?: return
+        restoreKeyButton = findViewById(R.id.restoreKeyButton) ?: return
 
         spinner.setSelection(providers.keys.toList().indexOf(settingsManager.getGitProvider()))
 
@@ -125,19 +159,29 @@ class AuthDialog(private val context: Context, private val settingsManager: Sett
                 oAuthContainer.visibility = View.GONE
 
                 var key: String? = null
-                pKeyButton.text = context.getString(R.string.ssh_key_example)
-                pKeyButton.isEnabled = false
-                pKeyButton.icon = AppCompatResources.getDrawable(context, R.drawable.copy_to_clipboard)
-                pKeyButton.setIconTintResource(R.color.primary_light)
+
+                pubKeyButton.text = context.getString(R.string.ssh_pub_key_example)
+                pubKeyButton.isEnabled = false
+                pubKeyButton.icon = AppCompatResources.getDrawable(context, R.drawable.copy_to_clipboard)
+                pubKeyButton.setIconTintResource(R.color.primary_light)
+
+                privKeyButton.text = context.getString(R.string.ssh_priv_key_example)
+                privKeyButton.isEnabled = false
+                privKeyButton.icon = AppCompatResources.getDrawable(context, R.drawable.copy_to_clipboard)
+                privKeyButton.setIconTintResource(R.color.primary_light)
 
                 generateKeyButton.setOnClickListener {
+                    restoreKeyButton.visibility = View.GONE
                     if (key == null) {
                         val keyPair = Helper.generateSSHKeyPair()
 
                         key = keyPair.first
-                        pKeyButton.text = keyPair.second
+                        privKeyButton.text = keyPair.first
+                        pubKeyButton.text = keyPair.second
 
-                        pKeyButton.isEnabled = true
+                        pubKeyButton.isEnabled = true
+                        privKeyButton.isEnabled = true
+
                         generateKeyButton.text = context.getString(R.string.confirm_key_saved)
                         generateKeyButton.isEnabled = false
                         generateKeyButton.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.auth_green_secondary))
@@ -147,17 +191,23 @@ class AuthDialog(private val context: Context, private val settingsManager: Sett
                     }
                 }
 
-                pKeyButton.setOnClickListener {
-                    pKeyButton.icon = AppCompatResources.getDrawable(context, R.drawable.confirm_clipboard)
-                    pKeyButton.setIconTintResource(R.color.auth_green)
+                restoreKeyButton.setOnClickListener {
+                    restoreKeyDialog.show()
+                }
+
+                pubKeyButton.setOnClickListener {
+                    pubKeyButton.icon = AppCompatResources.getDrawable(context, R.drawable.confirm_clipboard)
+                    pubKeyButton.setIconTintResource(R.color.auth_green)
 
                     val clipboard: ClipboardManager? = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?
-                    val clip = ClipData.newPlainText(context.getString(R.string.copied_text), pKeyButton.text)
+                    val clip = ClipData.newPlainText(context.getString(R.string.copied_text), pubKeyButton.text)
                     clipboard?.setPrimaryClip(clip)
 
                     generateKeyButton.isEnabled = true
                     generateKeyButton.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.auth_green))
                 }
+
+                privKeyButton.setOnClickListener { confirmPrivKeyCopyDialog.show() }
             }
         }
     }
