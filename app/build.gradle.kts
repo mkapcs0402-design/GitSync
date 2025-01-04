@@ -12,8 +12,8 @@ android {
         applicationId = "com.viscouspot.gitsync"
         minSdk = 21
         targetSdk = 34
-        versionCode = 1639
-        versionName  = "1.639"
+        versionCode = 1640
+        versionName  = "1.640"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
