@@ -13,6 +13,7 @@ import android.view.WindowManager
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import com.viscouspot.gitsync.R
 
@@ -30,6 +31,10 @@ open class BaseDialog(private val context: Context) : AlertDialog(context, R.sty
         return this
     }
     fun setView(view: TextView): BaseDialog {
+        super.setView(view)
+        return this
+    }
+    fun setView(view: ConstraintLayout): BaseDialog {
         super.setView(view)
         return this
     }
