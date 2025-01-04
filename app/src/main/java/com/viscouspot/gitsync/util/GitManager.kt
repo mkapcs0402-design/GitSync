@@ -3,7 +3,6 @@ package com.viscouspot.gitsync.util
 import android.content.Context
 import android.net.Uri
 import android.os.Looper
-import android.widget.Toast
 import com.jcraft.jsch.JSch
 import com.jcraft.jsch.Session
 import com.viscouspot.gitsync.R
@@ -38,8 +37,6 @@ import org.eclipse.jgit.lib.ObjectId
 import org.eclipse.jgit.lib.RepositoryState
 import org.eclipse.jgit.lib.StoredConfig
 import org.eclipse.jgit.merge.ResolveMerger
-import org.eclipse.jgit.revwalk.RevSort
-import org.eclipse.jgit.revwalk.RevWalk
 import org.eclipse.jgit.transport.JschConfigSessionFactory
 import org.eclipse.jgit.transport.OpenSshConfig
 import org.eclipse.jgit.transport.RemoteRefUpdate
@@ -440,30 +437,22 @@ class GitManager(private val context: Context, private val settingsManager: Sett
             if (gitDirPath == null || !File("$gitDirPath/${context.getString(R.string.git_path)}").exists()) return listOf()
 
             log(LogType.RecentCommits, ".git folder found")
+            val commits = mutableListOf<Commit>()
 
             val repo = FileRepository("$gitDirPath/${context.getString(R.string.git_path)}")
-            val revWalk = RevWalk(repo)
+            if (repo.isBare) return listOf()
 
-            val localHead = repo.resolve(Constants.HEAD) ?: return listOf()
-            revWalk.markStart(revWalk.parseCommit(localHead))
-            log(LogType.RecentCommits, "HEAD parsed")
+            Git(repo).let { git ->
+                val logCommits = git.log().call()
 
-            revWalk.sort(RevSort.COMMIT_TIME_DESC)
+                for (commit in logCommits.take(10)) {
+                    val diffFormatter = DiffFormatter(DisabledOutputStream.INSTANCE)
+                    diffFormatter.setRepository(repo)
+                    val parent = if (commit.parentCount > 0) commit.getParent(0) else null
+                    val diffs = if (parent != null) diffFormatter.scan(parent.tree, commit.tree) else listOf()
 
-            val commits = mutableListOf<Commit>()
-            var count = 0
-            val iterator = revWalk.iterator()
-
-            while (iterator.hasNext() && count < 10) {
-                val commit = iterator.next()
-
-                val diffFormatter = DiffFormatter(DisabledOutputStream.INSTANCE)
-                diffFormatter.setRepository(repo)
-                val parent = if (commit.parentCount > 0) commit.getParent(0) else null
-                val diffs = if (parent != null) diffFormatter.scan(parent.tree, commit.tree) else listOf()
-
-                var additions = 0
-                var deletions = 0
+                    var additions = 0
+                    var deletions = 0
                     for (diff in diffs) {
                         try {
                             val editList = diffFormatter.toFileHeader(diff).toEditList()
@@ -474,21 +463,20 @@ class GitManager(private val context: Context, private val settingsManager: Sett
                         } catch (e: NullPointerException) { log(e.message) }
                     }
 
-                commits.add(
-                    Commit(
-                        commit.shortMessage,
-                        commit.authorIdent.name,
-                        commit.authorIdent.`when`.time,
-                        commit.name,
-                        additions,
-                        deletions
+                    commits.add(
+                        Commit(
+                            commit.fullMessage,
+                            commit.authorIdent.name,
+                            commit.authorIdent.getWhen().time,
+                            commit.name,
+                            additions,
+                            deletions
+                        )
                     )
-                )
-                count++
+                }
             }
 
             log(LogType.RecentCommits, "Recent commits retrieved")
-            revWalk.dispose()
             closeRepo(repo)
 
             return commits
