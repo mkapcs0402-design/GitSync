@@ -54,6 +54,9 @@ import com.viscouspot.gitsync.util.Logger.log
 import com.viscouspot.gitsync.util.OnboardingController
 import com.viscouspot.gitsync.util.SettingsManager
 import com.viscouspot.gitsync.util.rightDrawable
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.io.File
 
 class MainActivity : AppCompatActivity() {
@@ -247,7 +250,9 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        refreshAll()
+        CoroutineScope(Dispatchers.Default).launch {
+            refreshAll()
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -494,7 +499,9 @@ class MainActivity : AppCompatActivity() {
         }
 
         val applicationObserverEnabled = settingsManager.getApplicationObserverEnabled()
-        updateApplicationObserver(applicationObserverEnabled)
+        runOnUiThread {
+            updateApplicationObserver(applicationObserverEnabled)
+        }
 
         runOnUiThread {
             syncAppOpened.isChecked = settingsManager.getSyncOnAppOpened()
