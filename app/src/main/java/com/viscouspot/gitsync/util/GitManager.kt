@@ -262,11 +262,13 @@ class GitManager(private val context: Context, private val settingsManager: Sett
 
                 log(LogType.PushToRepo, "Adding Files to Stage")
 
+                // Adds all uncommitted and untracked files to the index for staging.
                 git.add().apply {
                     status.uncommittedChanges.forEach { addFilepattern(it) }
                     status.untracked.forEach { addFilepattern(it) }
                 }.call()
 
+                // Updates the index to reflect changes in already tracked files, removing deleted files without adding untracked files.
                 git.add().apply {
                     status.uncommittedChanges.forEach { addFilepattern(it) }
                     status.untracked.forEach { addFilepattern(it) }
