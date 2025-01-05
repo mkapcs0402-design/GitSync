@@ -100,7 +100,7 @@ object Logger {
         val builder = NotificationCompat.Builder(context, channelId)
             .setSmallIcon(R.drawable.bug)
             .setContentTitle(context.getString(R.string.report_bug))
-            .setContentText(lastLogs.last().second.substringBefore("\n"))
+            .setContentText(if (lastLogs.size > 0) lastLogs.last().second.substringBefore("\n") else context.getString(R.string.unknown_error))
             .setContentIntent(buttonPendingIntent)
             .setAutoCancel(true)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
