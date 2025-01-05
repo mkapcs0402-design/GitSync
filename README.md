@@ -13,8 +13,13 @@
   </p>
 
   <br />
+
+  <p align="center">
   <a href="https://play.google.com/store/apps/details?id=com.viscouspot.gitsync" target="_blank"><img src="https://github.com/user-attachments/assets/168cb841-392d-493a-bc47-a9e3e8a61a62" alt="Get it on Google Play" style="width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
-  
+  &nbsp;&nbsp;
+  <a href="https://apt.izzysoft.de/fdroid/index/apk/com.viscouspot.gitsync" target="_blank"><img src="https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroidButtonGreyBorder_nofont.png" alt="Get it on Izzy On Droid" style="width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
+  </p>
+
   <br />
   <p align="center">
     <a href="https://github.com/ViscousPot/GitSync/blob/master/Documentation.md">Documentation</a>
