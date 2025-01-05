@@ -129,7 +129,7 @@
     <string name="sync_message_description">use %s for the date and time</string>
     <string name="sync_message">Last Sync: %s (Mobile)</string>
 
-    <string name="remote_label">remote</string>
+    <string name="remote_label">default remote</string>
     <string name="default_remote">origin</string>
 
     <string name="author_name_label">author name</string>
