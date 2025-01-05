@@ -17,9 +17,13 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.io.IOException
 import java.util.UUID
+import java.util.concurrent.TimeUnit
 
 class GithubManager(private val context: Context) : GitProviderManager {
-    private val client = OkHttpClient()
+    private val client = OkHttpClient.Builder()
+        .connectTimeout(30, TimeUnit.SECONDS)
+        .readTimeout(30, TimeUnit.SECONDS)
+        .build()
     override val oAuthSupport = true
 
     companion object {
@@ -109,50 +113,56 @@ class GithubManager(private val context: Context) : GitProviderManager {
         if (!Helper.isNetworkAvailable(context)) {
             return
         }
-        client.newCall(
-            Request.Builder()
-                .url(url)
-                .addHeader("Accept", "application/json")
-                .addHeader("Authorization", "token $accessToken")
-                .build()
-        ).enqueue(object: Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                log(context, LogType.GetRepos, e)
-            }
+        try {
+            client.newCall(
+                Request.Builder()
+                    .url(url)
+                    .addHeader("Accept", "application/json")
+                    .addHeader("Authorization", "token $accessToken")
+                    .build()
+            ).enqueue(object: Callback {
+                override fun onFailure(call: Call, e: IOException) {
+                    log(context, LogType.GetRepos, e)
+                }
 
-            override fun onResponse(call: Call, response: Response) {
-                log(LogType.GetRepos, "Repos Received")
+                override fun onResponse(call: Call, response: Response) {
+                    log(LogType.GetRepos, "Repos Received")
 
-                val jsonArray = JSONArray(response.body?.string())
-                val repoMap: MutableList<Pair<String, String>> = mutableListOf()
+                    val jsonArray = JSONArray(response.body?.string())
+                    val repoMap: MutableList<Pair<String, String>> = mutableListOf()
 
-                val link = response.headers["link"] ?: ""
+                    val link = response.headers["link"] ?: ""
 
-                if (link != "") {
-                    val regex = "<([^>]+)>; rel=\"next\"".toRegex()
+                    if (link != "") {
+                        val regex = "<([^>]+)>; rel=\"next\"".toRegex()
 
-                    val match = regex.find(link)
-                    val result = match?.groups?.get(1)?.value
+                        val match = regex.find(link)
+                        val result = match?.groups?.get(1)?.value
 
-                    val nextLink = result ?: ""
-                    if (nextLink != "") {
-                        nextPageCallback {
-                            getReposRequest(accessToken, nextLink, updateCallback, nextPageCallback)
+                        val nextLink = result ?: ""
+                        if (nextLink != "") {
+                            nextPageCallback {
+                                getReposRequest(accessToken, nextLink, updateCallback, nextPageCallback)
+                            }
+                        } else {
+                            nextPageCallback(null)
                         }
-                    } else {
-                        nextPageCallback(null)
                     }
-                }
 
-                for (i in 0..<jsonArray.length()) {
-                    val obj = jsonArray.getJSONObject(i)
-                    val name = obj.getString("name")
-                    val cloneUrl = obj.getString("clone_url")
-                    repoMap.add(Pair(name, cloneUrl))
-                }
+                    for (i in 0..<jsonArray.length()) {
+                        val obj = jsonArray.getJSONObject(i)
+                        val name = obj.getString("name")
+                        val cloneUrl = obj.getString("clone_url")
+                        repoMap.add(Pair(name, cloneUrl))
+                    }
 
-                updateCallback.invoke(repoMap)
-            }
-        })
+                    updateCallback.invoke(repoMap)
+                }
+            })
+        } catch (e: Throwable) {
+            nextPageCallback(null)
+            updateCallback.invoke(listOf());
+            log(context, LogType.GetRepos, e);
+        }
     }
 }

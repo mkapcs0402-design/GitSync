@@ -21,9 +21,13 @@ import java.io.IOException
 import java.security.MessageDigest
 import java.security.SecureRandom
 import java.util.UUID
+import java.util.concurrent.TimeUnit
 
 class GiteaManager(private val context: Context) : GitProviderManager {
-    private val client = OkHttpClient()
+    private val client = OkHttpClient.Builder()
+        .connectTimeout(30, TimeUnit.SECONDS)
+        .readTimeout(30, TimeUnit.SECONDS)
+        .build();
     private var codeVerifier: String? = null
     override val oAuthSupport = true
 
@@ -148,47 +152,58 @@ class GiteaManager(private val context: Context) : GitProviderManager {
         if (!Helper.isNetworkAvailable(context)) {
             return
         }
-        client.newCall(
-            Request.Builder()
-                .url(url)
-                .addHeader("Accept", "application/json")
-                .addHeader("Authorization", "token $accessToken")
-                .build()
-        ).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                log(context, LogType.GetRepos, e)
-            }
+        try {
+            client.newCall(
+                Request.Builder()
+                    .url(url)
+                    .addHeader("Accept", "application/json")
+                    .addHeader("Authorization", "token $accessToken")
+                    .build()
+            ).enqueue(object : Callback {
+                override fun onFailure(call: Call, e: IOException) {
+                    log(context, LogType.GetRepos, e)
+                }
 
-            override fun onResponse(call: Call, response: Response) {
-                log(LogType.GetRepos, "Repos Received")
+                override fun onResponse(call: Call, response: Response) {
+                    log(LogType.GetRepos, "Repos Received")
 
-                val jsonArray = JSONArray(response.body?.string())
-                val repoMap: MutableList<Pair<String, String>> = mutableListOf()
-                val link = response.headers["link"] ?: ""
+                    val jsonArray = JSONArray(response.body?.string())
+                    val repoMap: MutableList<Pair<String, String>> = mutableListOf()
+                    val link = response.headers["link"] ?: ""
 
-                if (link.isNotEmpty()) {
-                    val regex = "<([^>]+)>; rel=\"next\"".toRegex()
-                    val match = regex.find(link)
-                    val nextLink = match?.groups?.get(1)?.value.orEmpty()
+                    if (link.isNotEmpty()) {
+                        val regex = "<([^>]+)>; rel=\"next\"".toRegex()
+                        val match = regex.find(link)
+                        val nextLink = match?.groups?.get(1)?.value.orEmpty()
 
-                    if (nextLink.isNotEmpty()) {
-                        nextPageCallback {
-                            getReposRequest(accessToken, nextLink, updateCallback, nextPageCallback)
+                        if (nextLink.isNotEmpty()) {
+                            nextPageCallback {
+                                getReposRequest(
+                                    accessToken,
+                                    nextLink,
+                                    updateCallback,
+                                    nextPageCallback
+                                )
+                            }
+                        } else {
+                            nextPageCallback(null)
                         }
-                    } else {
-                        nextPageCallback(null)
                     }
-                }
 
-                for (i in 0 until jsonArray.length()) {
-                    val obj = jsonArray.getJSONObject(i)
-                    val name = obj.getString("name")
-                    val cloneUrl = obj.getString("clone_url")
-                    repoMap.add(Pair(name, cloneUrl))
-                }
+                    for (i in 0 until jsonArray.length()) {
+                        val obj = jsonArray.getJSONObject(i)
+                        val name = obj.getString("name")
+                        val cloneUrl = obj.getString("clone_url")
+                        repoMap.add(Pair(name, cloneUrl))
+                    }
 
-                updateCallback.invoke(repoMap)
-            }
-        })
+                    updateCallback.invoke(repoMap)
+                }
+            })
+        } catch (e: Throwable) {
+            nextPageCallback(null)
+            updateCallback.invoke(listOf());
+            log(context, LogType.GetRepos, e);
+        }
     }
 }
