@@ -81,43 +81,6 @@
                 android:text=""/>
 
             <TextView
-                android:id="@+id/remoteLabel"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="@dimen/text_size_md"
-                android:textColor="@color/text_primary"
-                android:layout_marginStart="@dimen/space_sm"
-                android:layout_marginTop="@dimen/space_lg"
-                android:textAllCaps="true"
-                android:textStyle="bold"
-                app:layout_constraintTop_toBottomOf="@+id/syncMessageInput"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                android:text="@string/remote_label"/>
-
-            <EditText
-                style="@style/SingleLineEditText"
-                android:id="@+id/remoteInput"
-                android:background="@drawable/input_bg_left"
-                android:backgroundTint="@color/card_secondary_bg"
-                android:hint="@string/default_remote"
-                android:paddingHorizontal="@dimen/space_md"
-                android:paddingVertical="@dimen/space_md"
-                android:layout_width="match_parent"
-                android:inputType="text"
-                android:importantForAutofill="no"
-                android:textColorHint="@color/text_secondary"
-                android:layout_height="wrap_content"
-                android:textSize="@dimen/text_size_md"
-                android:layout_marginTop="@dimen/space_sm"
-                android:textColor="@color/primary_light"
-                android:textStyle="bold"
-                app:layout_constraintTop_toBottomOf="@+id/remoteLabel"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                android:text=""/>
-
-            <TextView
                 android:id="@+id/authorNameLabel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -127,7 +90,7 @@
                 android:layout_marginTop="@dimen/space_lg"
                 android:textAllCaps="true"
                 android:textStyle="bold"
-                app:layout_constraintTop_toBottomOf="@+id/remoteInput"
+                app:layout_constraintTop_toBottomOf="@+id/syncMessageInput"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 android:text="@string/author_name_label"/>
@@ -192,7 +155,7 @@
                 android:text=""/>
 
             <TextView
-                android:id="@+id/gitIgnoreLabel"
+                android:id="@+id/remoteLabel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="@dimen/text_size_md"
@@ -202,6 +165,43 @@
                 android:textAllCaps="true"
                 android:textStyle="bold"
                 app:layout_constraintTop_toBottomOf="@+id/authorEmailInput"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:text="@string/remote_label"/>
+
+            <EditText
+                style="@style/SingleLineEditText"
+                android:id="@+id/remoteInput"
+                android:background="@drawable/input_bg_left"
+                android:backgroundTint="@color/card_secondary_bg"
+                android:hint="@string/default_remote"
+                android:paddingHorizontal="@dimen/space_md"
+                android:paddingVertical="@dimen/space_md"
+                android:layout_width="match_parent"
+                android:inputType="text"
+                android:importantForAutofill="no"
+                android:textColorHint="@color/text_secondary"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/text_size_md"
+                android:layout_marginTop="@dimen/space_sm"
+                android:textColor="@color/primary_light"
+                android:textStyle="bold"
+                app:layout_constraintTop_toBottomOf="@+id/remoteLabel"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:text=""/>
+
+            <TextView
+                android:id="@+id/gitIgnoreLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/text_size_md"
+                android:textColor="@color/text_primary"
+                android:layout_marginStart="@dimen/space_sm"
+                android:layout_marginTop="@dimen/space_lg"
+                android:textAllCaps="true"
+                android:textStyle="bold"
+                app:layout_constraintTop_toBottomOf="@+id/remoteInput"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 android:text="@string/gitignore"/>
