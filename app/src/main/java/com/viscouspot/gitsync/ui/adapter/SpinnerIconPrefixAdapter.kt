@@ -10,7 +10,7 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.viscouspot.gitsync.R
 
-class GitProviderAdapter(private val context: Context, private val items: List<Pair<String, Int>>) : ArrayAdapter<Pair<String, Int>>(context, R.layout.item_git_provider, items) {
+class SpinnerIconPrefixAdapter(private val context: Context, private val items: List<Pair<String, Int>>) : ArrayAdapter<Pair<String, Int>>(context, R.layout.item_spinner, items) {
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         return createCustomView(position, convertView, parent)
@@ -22,7 +22,7 @@ class GitProviderAdapter(private val context: Context, private val items: List<P
 
     private fun createCustomView(position: Int, convertView: View?, parent: ViewGroup): View {
         val inflater = LayoutInflater.from(context)
-        val view = convertView ?: inflater.inflate(R.layout.item_git_provider, parent, false)
+        val view = convertView ?: inflater.inflate(R.layout.item_spinner, parent, false)
         val textView = view.findViewById<TextView>(R.id.gitProviderName)
         val item = items[position]
         textView.text = item.first
