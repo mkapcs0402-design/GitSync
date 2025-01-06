@@ -15,7 +15,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.widget.doOnTextChanged
 import com.google.android.material.button.MaterialButton
 import com.viscouspot.gitsync.R
-import com.viscouspot.gitsync.ui.adapter.GitProviderAdapter
+import com.viscouspot.gitsync.ui.adapter.SpinnerIconPrefixAdapter
 import com.viscouspot.gitsync.util.Helper
 import com.viscouspot.gitsync.util.SettingsManager
 import com.viscouspot.gitsync.util.provider.GitProviderManager
@@ -71,7 +71,7 @@ class AuthDialog(private val context: Context, private val settingsManager: Sett
         setContentView(R.layout.dialog_auth)
 
         val spinner = findViewById<Spinner>(R.id.gitProviderSpinner) ?: return
-        val adapter = GitProviderAdapter(context, providers.values.toList())
+        val adapter = SpinnerIconPrefixAdapter(context, providers.values.toList())
 
         spinner.adapter = adapter
         spinner.post{

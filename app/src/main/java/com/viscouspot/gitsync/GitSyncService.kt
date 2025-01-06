@@ -169,7 +169,6 @@ class GitSyncService : Service() {
             log(LogType.Sync, "Start Push Repo")
             val pushResult = gitManager.uploadChanges(
                 gitDirUri,
-                settingsManager.getSyncMessage(),
                 ::scheduleNetworkSync,
             ) {
                 if (!synced) {
@@ -228,7 +227,6 @@ class GitSyncService : Service() {
 
             val pushResult = gitManager.uploadChanges(
                 settingsManager.getGitDirUri()!!,
-                settingsManager.getSyncMessage(),
                 ::scheduleNetworkSync,
             ) {
                 Handler(Looper.getMainLooper()).post {
