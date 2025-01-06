@@ -137,6 +137,10 @@ class MainActivity : AppCompatActivity() {
 
         settingsManager.setGitDirUri(dirUri.toString())
 
+        val recentCommitsSize = recentCommits.size
+        recentCommits.clear()
+        recentCommitsAdapter.notifyItemRangeRemoved(0, recentCommitsSize)
+
         gitDirPath.text = Helper.getPathFromUri(this, dirUri)
         refreshGitRepo()
 
