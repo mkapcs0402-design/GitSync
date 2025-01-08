@@ -237,7 +237,7 @@ class GitManager(private val context: Context, private val settingsManager: Sett
                 onSync.invoke()
                 val result = git.pull().apply {
                     applyCredentials(this)
-                    remote = "origin"
+                    remote = settingsManager.getRemote()
                 }.call()
 
                 if (result.mergeResult.failingPaths != null && result.mergeResult.failingPaths.containsValue(
@@ -432,7 +432,7 @@ class GitManager(private val context: Context, private val settingsManager: Sett
             log(LogType.PushToRepo, "Pushing changes")
             val pushResults = git.push().apply {
                 applyCredentials(this)
-                remote = "origin"
+                remote = settingsManager.getRemote()
             }.call()
             for (pushResult in pushResults) {
                 for (remoteUpdate in pushResult.remoteUpdates) {

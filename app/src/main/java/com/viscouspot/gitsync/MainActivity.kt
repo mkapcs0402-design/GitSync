@@ -512,9 +512,22 @@ class MainActivity : AppCompatActivity() {
                     .setView(progressBar)
                 cloneDialog.show()
                 CoroutineScope(Dispatchers.IO).launch {
-                    settingsManager.getGitDirUri()?.let {
-                        if (push) gitManager.forcePush(it) else gitManager.forcePull(it)
+                    val gitDirUri = settingsManager.getGitDirUri()
+                    if (gitDirUri == null) {
+                        runOnUiThread {
+                            log(LogType.Sync, "Repository Not Found")
+                            makeToast(
+                                applicationContext,
+                                getString(R.string.repository_not_found),
+                                Toast.LENGTH_LONG
+                            )
+                            cloneDialog.dismiss()
+                        }
+                        return@launch
                     }
+
+                    if (push) gitManager.forcePush(gitDirUri) else gitManager.forcePull(gitDirUri)
+
                     runOnUiThread {
                         refreshRecentCommits()
                         cloneDialog.dismiss()
@@ -746,7 +759,6 @@ class MainActivity : AppCompatActivity() {
 
                 applicationObserverSwitch.isChecked = false
                 applicationObserverSwitch.isEnabled = false
-                settingsButton.isEnabled = false
 
                 if (gitDirPath.text.isEmpty()) {
                     gitRepoName.rightDrawable(null)
@@ -768,7 +780,6 @@ class MainActivity : AppCompatActivity() {
 
             gitRepoName.setText(repoName)
             gitRepoName.isEnabled = true
-            settingsButton.isEnabled = true
             gitRepoName.rightDrawable(R.drawable.circle_check)
             TextViewCompat.setCompoundDrawableTintList(gitRepoName, ContextCompat.getColorStateList(this, R.color.auth_green))
             gitRepoName.compoundDrawablePadding =

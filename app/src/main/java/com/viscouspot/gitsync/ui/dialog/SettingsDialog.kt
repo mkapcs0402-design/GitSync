@@ -1,10 +1,13 @@
 package com.viscouspot.gitsync.ui.dialog
 
 import android.content.Context
+import android.net.Uri
 import android.text.Spannable
 import android.text.style.ForegroundColorSpan
+import android.view.View
 import android.widget.EditText
 import android.widget.HorizontalScrollView
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.widget.doOnTextChanged
 import com.google.android.material.button.MaterialButton
@@ -19,11 +22,14 @@ class SettingsDialog(private val context: Context, private val settingsManager: 
         super.onStart()
         setContentView(R.layout.dialog_settings)
 
+        setupSyncMessageSettings()
+        setupRemoteSetings()
         setupAuthorNameSettings()
         setupAuthorEmailSettings()
-        setupSyncMessageSettings()
-        setupGitignoreSettings()
-        setupGitInfoExcludeSettings()
+        
+        val gitDirUri = settingsManager.getGitDirUri()
+        setupGitignoreSettings(gitDirUri)
+        setupGitInfoExcludeSettings(gitDirUri)
 
         setupReportBugButton()
     }
@@ -57,6 +63,14 @@ class SettingsDialog(private val context: Context, private val settingsManager: 
         }
     }
 
+    private fun setupRemoteSetings() {
+        val remoteInput = findViewById<EditText>(R.id.remoteInput) ?: return
+        remoteInput.setText(settingsManager.getRemote())
+        remoteInput.doOnTextChanged { text, _, _, _ ->
+            settingsManager.setRemote(text.toString())
+        }
+    }
+
     private fun setupAuthorNameSettings() {
         val authorNameInput = findViewById<EditText>(R.id.authorNameInput) ?: return
         authorNameInput.setText(settingsManager.getAuthorName())
@@ -71,7 +85,6 @@ class SettingsDialog(private val context: Context, private val settingsManager: 
         authorEmailInput.doOnTextChanged { text, _, _, _ ->
             settingsManager.setAuthorEmail(text.toString())
         }
-
     }
 
     private fun setupSyncMessageSettings() {
@@ -84,9 +97,19 @@ class SettingsDialog(private val context: Context, private val settingsManager: 
         }
     }
 
-    private fun setupGitignoreSettings() {
+    private fun setupGitignoreSettings(gitDirUri: Uri?) {
+        val gitIgnoreLabel = findViewById<TextView>(R.id.gitIgnoreLabel) ?: return
+        val gitIgnoreDescription = findViewById<TextView>(R.id.gitIgnoreDescription) ?: return
         val gitignoreInputWrapper = findViewById<HorizontalScrollView>(R.id.gitignoreInputWrapper) ?: return
         val gitignoreInput = findViewById<EditText>(R.id.gitignoreInput) ?: return
+
+        if (gitDirUri == null) {
+            gitIgnoreLabel.visibility = View.GONE
+            gitIgnoreDescription.visibility = View.GONE
+            gitignoreInputWrapper.visibility = View.GONE
+            return
+        }
+
         gitignoreInput.setText(gitManager.readGitignore(gitDirPath))
         highlightCommentsInInput(gitignoreInput)
         gitignoreInput.setOnFocusChangeListener { _, hasFocus ->
@@ -100,9 +123,19 @@ class SettingsDialog(private val context: Context, private val settingsManager: 
         }
     }
 
-    private fun setupGitInfoExcludeSettings() {
+    private fun setupGitInfoExcludeSettings(gitDirUri: Uri?) {
+        val gitInfoExcludeLabel = findViewById<TextView>(R.id.gitInfoExcludeLabel) ?: return
+        val gitInfoExcludeDescription = findViewById<TextView>(R.id.gitInfoExcludeDescription) ?: return
         val gitInfoExcludeInputWrapper = findViewById<HorizontalScrollView>(R.id.gitInfoExcludeInputWrapper) ?: return
         val gitInfoExcludeInput = findViewById<EditText>(R.id.gitInfoExcludeInput) ?: return
+
+        if (gitDirUri == null) {
+            gitInfoExcludeLabel.visibility = View.GONE
+            gitInfoExcludeDescription.visibility = View.GONE
+            gitInfoExcludeInputWrapper.visibility = View.GONE
+            return
+        }
+
         gitInfoExcludeInput.setText(gitManager.readGitInfoExclude(gitDirPath))
         highlightCommentsInInput(gitInfoExcludeInput)
         gitInfoExcludeInput.setOnFocusChangeListener { _, hasFocus ->
