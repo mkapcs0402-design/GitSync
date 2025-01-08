@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.content.res.ColorStateList
 import android.graphics.PorterDuff
 import android.graphics.Rect
 import android.graphics.drawable.Drawable
@@ -20,7 +21,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.accessibility.AccessibilityManager
 import android.view.inputmethod.InputMethodManager
+import android.widget.AdapterView
 import android.widget.EditText
+import android.widget.ProgressBar
 import android.widget.Switch
 import android.widget.TextView
 import android.widget.Toast
@@ -35,14 +38,17 @@ import androidx.core.widget.TextViewCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
+import com.viscouspot.gitsync.ui.NDSpinner
 import com.viscouspot.gitsync.ui.RecyclerViewEmptySupport
 import com.viscouspot.gitsync.ui.adapter.ApplicationListAdapter
 import com.viscouspot.gitsync.ui.adapter.Commit
+import com.viscouspot.gitsync.ui.adapter.SpinnerIconPrefixAdapter
 import com.viscouspot.gitsync.ui.adapter.RecentCommitsAdapter
 import com.viscouspot.gitsync.ui.dialog.ApplicationSelectDialog
 import com.viscouspot.gitsync.ui.dialog.AuthDialog
 import com.viscouspot.gitsync.ui.dialog.BaseDialog
 import com.viscouspot.gitsync.ui.dialog.MergeConflictDialog
+import com.viscouspot.gitsync.ui.dialog.ProgressDialog
 import com.viscouspot.gitsync.ui.dialog.SettingsDialog
 import com.viscouspot.gitsync.ui.fragment.CloneRepoFragment
 import com.viscouspot.gitsync.util.GitManager
@@ -75,6 +81,9 @@ class MainActivity : AppCompatActivity() {
     private var mergeConflictDialog: Dialog? = null
 
     private lateinit var forceSyncButton: MaterialButton
+    private lateinit var syncMenuButton: MaterialButton
+    private lateinit var syncMenuSpinner: NDSpinner
+
     private lateinit var settingsButton: MaterialButton
     private lateinit var syncMessageButton: MaterialButton
 
@@ -109,6 +118,20 @@ class MainActivity : AppCompatActivity() {
     private var applicationSelectDialog: Dialog? = null
 
     private var requestedPermission = false
+
+    private val syncOptionIconMap: Map<String, Int> = mapOf(
+        Pair("Force Push", R.drawable.force_push),
+        Pair("Force Pull", R.drawable.force_pull),
+    )
+
+    val syncOptionFnMap: Map<String, () -> Unit> = mapOf(
+        Pair("Force Push") {
+            showConfirmForcePushPullDialog(true)
+        },
+        Pair("Force Pull") {
+            showConfirmForcePushPullDialog(false)
+        },
+    )
 
     companion object {
         const val REFRESH = "REFRESH"
@@ -311,6 +334,9 @@ class MainActivity : AppCompatActivity() {
         recentCommitsAdapter = RecentCommitsAdapter(this, recentCommits, ::openMergeConflictDialog)
 
         forceSyncButton = findViewById(R.id.forceSyncButton)
+        syncMenuButton = findViewById(R.id.syncMenuButton)
+        syncMenuSpinner = findViewById(R.id.syncMenuSpinner)
+
         settingsButton = findViewById(R.id.settingsButton)
         syncMessageButton = findViewById(R.id.syncMessageButton)
 
@@ -352,6 +378,32 @@ class MainActivity : AppCompatActivity() {
             val forceSyncIntent = Intent(this, GitSyncService::class.java)
             forceSyncIntent.setAction(GitSyncService.FORCE_SYNC)
             startService(forceSyncIntent)
+        }
+
+        val adapter = SpinnerIconPrefixAdapter(this, syncOptionIconMap.toList())
+
+        syncMenuSpinner.adapter = adapter
+        syncMenuSpinner.post{
+            syncMenuSpinner.dropDownWidth = syncMenuSpinner.width
+        }
+
+        var initial = false
+        syncMenuSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
+                if (!initial) {
+                    initial = true
+                    return
+                }
+
+                val syncOption = syncOptionFnMap.keys.toList()[position]
+                syncOptionFnMap[syncOption]?.invoke()
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>) {}
+        }
+
+        syncMenuButton.setOnClickListener {
+            syncMenuSpinner.performClick()
         }
 
         settingsButton.setOnClickListener {
@@ -415,6 +467,61 @@ class MainActivity : AppCompatActivity() {
             val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.docs_link)))
             startActivity(browserIntent)
         }
+    }
+
+    private fun showConfirmForcePushPullDialog(push: Boolean) {
+        val stringRes = if (push) listOf(
+            R.string.confirm_force_push,
+            R.string.confirm_force_push_msg,
+            R.string.force_push,
+            R.string.force_pushing,
+        ) else listOf(
+            R.string.confirm_force_pull,
+            R.string.confirm_force_pull_msg,
+            R.string.force_pull,
+            R.string.force_pulling,
+        )
+
+        BaseDialog(this)
+            .setTitle(getString(stringRes[0]))
+            .setMessage(getString(stringRes[1]))
+            .setCancelable(1)
+            .setPositiveButton(android.R.string.cancel) { _, _ -> }
+            .setNegativeButton(stringRes[2]) { _, _ ->
+                val progressBar =
+                    ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal).apply {
+                        max = 100
+                        isIndeterminate = true
+                        progressTintList = ColorStateList.valueOf(
+                            ContextCompat.getColor(
+                                context,
+                                R.color.auth_green
+                            )
+                        )
+                        setPadding(
+                            resources.getDimension(R.dimen.space_lg).toInt(),
+                            0,
+                            resources.getDimension(R.dimen.space_lg).toInt(),
+                            0
+                        )
+                    }
+                val cloneDialog: ProgressDialog = ProgressDialog(this)
+                    .setTitle(getString(stringRes[3]))
+                    .setMessage(getString(R.string.force_push_pull_message))
+                    .setCancelable(1)
+                    .setView(progressBar)
+                cloneDialog.show()
+                CoroutineScope(Dispatchers.IO).launch {
+                    settingsManager.getGitDirUri()?.let {
+                        if (push) gitManager.forcePush(it) else gitManager.forcePull(it)
+                    }
+                    runOnUiThread {
+                        refreshRecentCommits()
+                        cloneDialog.dismiss()
+                    }
+                }
+            }
+            .show()
     }
 
     private fun updateApplicationObserver(isChecked: Boolean) {

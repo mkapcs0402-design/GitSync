@@ -57,7 +57,7 @@
             android:backgroundTint="@color/text_secondary"
             app:layout_constraintEnd_toEndOf="parent"
             android:spinnerMode="dropdown"
-            tools:listitem="@layout/item_git_provider"
+            tools:listitem="@layout/item_spinner"
             android:layout_height="wrap_content"/>
     </RelativeLayout>
 

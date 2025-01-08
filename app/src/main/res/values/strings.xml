@@ -86,6 +86,19 @@
     <string name="repository_not_found">Repository not found!</string>
 
 
+    <!--    Sync Dialogs-->
+    <string name="force_push">Force push</string>
+    <string name="force_pushing">Force pushing…</string>
+    <string name="confirm_force_push">Confirm Force Push</string>
+    <string name="confirm_force_push_msg">Are you sure you want to force push these changes? \n\nThis action will overwrite the remote history and cannot be undone.</string>
+
+    <string name="force_pull">Force pull</string>
+    <string name="force_pulling">Force pulling…</string>
+    <string name="confirm_force_pull">Confirm Force Pull</string>
+    <string name="confirm_force_pull_msg">Are you sure you want to force pull these changes? \n\nThis action will overwrite the local history and cannot be undone.</string>
+
+    <string name="force_push_pull_message">Please do not close or exit the app until the process is complete.</string>
+
     <!--    Merge Conflict Dialog-->
     <string name="merge_conflict_item_title">MERGE CONFLICT</string>
     <string name="merge_conflict_item_message">There is a merge conflict! Tap to resolve</string>

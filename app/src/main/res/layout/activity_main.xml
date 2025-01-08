@@ -83,13 +83,51 @@
                 android:foreground="?android:attr/selectableItemBackground"
                 android:clipToOutline="true"
                 app:icon="@drawable/pull"
-                app:iconGravity="end"
+                app:iconGravity="start"
+                app:iconPadding="@dimen/space_sm"
                 app:iconSize="@dimen/text_size_lg"
                 app:iconTint="@color/primary_light"
                 app:layout_constraintEnd_toStartOf="@id/settingsButton"
                 app:layout_constraintHorizontal_chainStyle="packed"
                 app:layout_constraintTop_toBottomOf="@id/emptyCommitsView"
                 app:layout_constraintStart_toStartOf="parent"/>
+
+            <com.viscouspot.gitsync.ui.NDSpinner
+                android:id="@+id/syncMenuSpinner"
+                android:layout_width="0dp"
+                android:backgroundTint="@color/text_secondary"
+                android:spinnerMode="dropdown"
+                tools:listitem="@layout/item_spinner"
+                android:layout_height="wrap_content"
+                android:overlapAnchor="false"
+                android:visibility="invisible"
+                app:layout_constraintBottom_toBottomOf="@id/forceSyncButton"
+                app:layout_constraintStart_toStartOf="@id/forceSyncButton"
+                app:layout_constraintEnd_toEndOf="@id/forceSyncButton"
+                app:layout_constraintTop_toTopOf="@+id/forceSyncButton"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/syncMenuButton"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_gravity="start"
+                android:backgroundTint="@color/card_bg"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                app:icon="@drawable/sync_menu"
+                android:contentDescription="@string/settings"
+                app:iconGravity="textEnd"
+                app:iconPadding="0dp"
+                app:backgroundTint="@null"
+                android:background="@drawable/input_bg_sm"
+                app:iconSize="@dimen/text_size_lg"
+                app:iconTint="@color/primary_light"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:clipToOutline="true"
+                app:layout_constraintBottom_toBottomOf="@+id/forceSyncButton"
+                app:layout_constraintDimensionRatio="w,1:1"
+                app:layout_constraintEnd_toEndOf="@id/forceSyncButton"
+                app:layout_constraintTop_toTopOf="@+id/forceSyncButton"  />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/settingsButton"

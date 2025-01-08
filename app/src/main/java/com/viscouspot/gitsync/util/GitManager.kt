@@ -25,7 +25,6 @@ import org.eclipse.jgit.api.errors.JGitInternalException
 import org.eclipse.jgit.api.errors.WrongRepositoryStateException
 import org.eclipse.jgit.diff.DiffFormatter
 import org.eclipse.jgit.errors.CheckoutConflictException
-import org.eclipse.jgit.api.errors.CheckoutConflictException as ApiCheckoutConflictException
 import org.eclipse.jgit.errors.NotSupportedException
 import org.eclipse.jgit.errors.TransportException
 import org.eclipse.jgit.internal.JGitText
@@ -39,6 +38,7 @@ import org.eclipse.jgit.lib.StoredConfig
 import org.eclipse.jgit.merge.ResolveMerger
 import org.eclipse.jgit.transport.JschConfigSessionFactory
 import org.eclipse.jgit.transport.OpenSshConfig
+import org.eclipse.jgit.transport.RefSpec
 import org.eclipse.jgit.transport.RemoteRefUpdate
 import org.eclipse.jgit.transport.SshSessionFactory
 import org.eclipse.jgit.transport.SshTransport
@@ -51,6 +51,8 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
+import org.eclipse.jgit.api.errors.CheckoutConflictException as ApiCheckoutConflictException
+
 
 class GitManager(private val context: Context, private val settingsManager: SettingsManager) {
     private fun applyCredentials(command: TransportCommand<*, *>) {
@@ -169,6 +171,45 @@ class GitManager(private val context: Context, private val settingsManager: Sett
         }
     }
 
+    fun forcePull(userStorageUri: Uri): Boolean {
+        if (!Helper.isNetworkAvailable(context)) {
+            return false
+        }
+        try {
+            log(LogType.ForcePull, "Getting local directory")
+            val repo = FileRepository("${Helper.getPathFromUri(context, userStorageUri)}/${context.getString(R.string.git_path)}")
+            val git = Git(repo)
+
+            log(LogType.ForcePull, "Fetching changes")
+            git.fetch().apply {
+                applyCredentials(this)
+                setRemote("origin")
+                setRefSpecs(RefSpec("+refs/heads/*:refs/remotes/origin/*"))
+            }.call()
+
+            log(LogType.ForcePull, "Resetting to refs/remotes/origin/${git.repository.branch}")
+            git.reset().apply {
+                setMode(ResetCommand.ResetType.HARD)
+                setRef("refs/remotes/origin/${git.repository.branch}")
+            }.call()
+
+            log(LogType.ForcePull, "Cleaning up")
+            git.clean().apply {
+                setCleanDirectories(true)
+            }.call()
+
+            log(LogType.ForcePull, "Closing repository")
+            closeRepo(repo)
+
+            return true
+        } catch (e: TransportException) {
+            handleTransportException(e) { }
+        } catch (e: Throwable) {
+            log(context, LogType.ForcePull, e)
+        }
+        return false
+    }
+
     fun downloadChanges(userStorageUri: Uri, scheduleNetworkSync: () -> Unit, onSync: () -> Unit): Boolean? {
         if (conditionallyScheduleNetworkSync(scheduleNetworkSync)) {
             return null
@@ -243,7 +284,86 @@ class GitManager(private val context: Context, private val settingsManager: Sett
         return null
     }
 
-    fun uploadChanges(userStorageUri: Uri, syncMessage: String, scheduleNetworkSync: () -> Unit, onSync: () -> Unit): Boolean? {
+    fun forcePush(userStorageUri: Uri): Boolean {
+        if (!Helper.isNetworkAvailable(context)) {
+            return false
+        }
+        try {
+            var returnResult = false
+            log(LogType.ForcePush, "Getting local directory")
+
+            val repo = FileRepository("${Helper.getPathFromUri(context, userStorageUri)}/${context.getString(R.string.git_path)}")
+            val git = Git(repo)
+
+            logStatus(git)
+            val status = git.status().call()
+
+            if (status.uncommittedChanges.isNotEmpty() || status.untracked.isNotEmpty()) {
+                log(LogType.ForcePush, "Adding Files to Stage")
+
+                // Adds all uncommitted and untracked files to the index for staging.
+                git.add().apply {
+                    status.uncommittedChanges.forEach { addFilepattern(it) }
+                    status.untracked.forEach { addFilepattern(it) }
+                }.call()
+
+                // Updates the index to reflect changes in already tracked files, removing deleted files without adding untracked files.
+                git.add().apply {
+                    status.uncommittedChanges.forEach { addFilepattern(it) }
+                    status.untracked.forEach { addFilepattern(it) }
+                    isUpdate = true
+                }.call()
+
+                log(LogType.ForcePush, "Getting current time")
+
+                val formattedDate: String = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).apply {
+                    timeZone = TimeZone.getTimeZone("UTC")
+                }.format(Date())
+
+                log(LogType.ForcePush, "Committing changes")
+                val config: StoredConfig = git.repository.config
+
+                var committerEmail: String? = settingsManager.getAuthorEmail()
+                if (committerEmail == null || committerEmail == "") {
+                    committerEmail = config.getString("user", null, "email")
+                }
+
+                var committerName: String? = settingsManager.getAuthorName()
+                if (committerName == null || committerName == "") {
+                    committerName = config.getString("user", null, "name")
+                }
+                if (committerName == null || committerName == "") {
+                    committerName = settingsManager.getGitAuthCredentials().first
+                }
+
+                git.commit().apply {
+                    setCommitter(committerName ?: "", committerEmail ?: "")
+                    message = settingsManager.getSyncMessage().format(formattedDate)
+                }.call()
+
+                returnResult = true
+            }
+
+            log(LogType.ForcePush, "Force pushing changes")
+            git.push().apply {
+                applyCredentials(this)
+                setForce(true)
+                remote = "origin"
+            }.call()
+
+            logStatus(git)
+
+            log(LogType.PushToRepo, "Closing repository")
+            closeRepo(repo)
+
+            return returnResult
+        } catch (e: Throwable) {
+            log(context, LogType.PushToRepo, e)
+        }
+        return false
+    }
+
+    fun uploadChanges(userStorageUri: Uri, scheduleNetworkSync: () -> Unit, onSync: () -> Unit): Boolean? {
         if (conditionallyScheduleNetworkSync(scheduleNetworkSync)) {
             return null
         }
@@ -299,7 +419,7 @@ class GitManager(private val context: Context, private val settingsManager: Sett
 
                 git.commit().apply {
                     setCommitter(committerName ?: "", committerEmail ?: "")
-                    message = syncMessage.format(formattedDate)
+                    message = settingsManager.getSyncMessage().format(formattedDate)
                 }.call()
 
                 returnResult = true

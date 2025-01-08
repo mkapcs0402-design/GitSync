@@ -33,8 +33,10 @@ enum class LogType(val type: String) {
     AbortMerge("AbortMerge"),
     GetRepos("GetRepos"),
     CloneRepo("CloneRepo"),
+    ForcePull("ForcePull"),
     PullFromRepo("PullFromRepo"),
     PushToRepo("PushToRepo"),
+    ForcePush("ForcePush"),
     GitStatus("GitStatus"),
     RecentCommits("RecentCommits"),
 
