@@ -214,7 +214,7 @@ class MainActivity : AppCompatActivity() {
             settingsManager.setGitAuthCredentials(username, token)
         }
 
-        if (!cloneRepoFragment.isAdded) {
+        if (!cloneRepoFragment.isAdded && !supportFragmentManager.isStateSaved) {
             cloneRepoFragment.show(supportFragmentManager, getString(R.string.clone_repo_title))
         }
 
