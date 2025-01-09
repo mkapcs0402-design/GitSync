@@ -344,9 +344,6 @@ object Helper {
         val privateKey = String(privateKeyStream.toByteArray(), StandardCharsets.UTF_8)
         val publicKey = String(publicKeyStream.toByteArray(), StandardCharsets.UTF_8)
 
-        log(privateKey)
-        log(publicKey)
-
         return Pair(privateKey, publicKey)
     }
 }
