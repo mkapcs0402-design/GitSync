@@ -75,7 +75,7 @@ object Logger {
 
     private fun addToLastLogs(type: LogType, message: String) {
         lastLogs.add(Pair(type, message))
-        while (lastLogs.size > 100) {
+        while (lastLogs.size > 50) {
             lastLogs.removeAt(0)
         }
     }
