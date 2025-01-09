@@ -124,8 +124,8 @@ class AuthDialog(private val context: Context, private val settingsManager: Sett
                 sshContainer.visibility = View.GONE
 
                 oAuthButton.setOnClickListener {
-                    val gitManager = GitProviderManager.getManager(context, settingsManager)
                     settingsManager.setGitProvider(provider)
+                    val gitManager = GitProviderManager.getManager(context, settingsManager)
                     gitManager.launchOAuthFlow()
                     dismiss()
                 }
