@@ -38,33 +38,39 @@ class AuthDialog(private val context: Context, private val settingsManager: Sett
 
     private val keyInput = LayoutInflater.from(context).inflate(R.layout.edittext_key, null) as ConstraintLayout
 
-    private val confirmPrivKeyCopyDialog = BaseDialog(context)
-        .setTitle(context.getString(R.string.confirm_priv_key_copy))
-        .setMessage(context.getString(R.string.confirm_priv_key_copy_msg))
-        .setCancelable(1)
-        .setPositiveButton(R.string.understood) { _, _ ->
-            privKeyButton.icon = AppCompatResources.getDrawable(context, R.drawable.confirm_clipboard)
-            privKeyButton.setIconTintResource(R.color.auth_green)
+    private fun showConfirmPrivKeyCopyDialog() {
+        BaseDialog(context)
+            .setTitle(context.getString(R.string.confirm_priv_key_copy))
+            .setMessage(context.getString(R.string.confirm_priv_key_copy_msg))
+            .setCancelable(1)
+            .setPositiveButton(R.string.understood) { _, _ ->
+                privKeyButton.icon = AppCompatResources.getDrawable(context, R.drawable.confirm_clipboard)
+                privKeyButton.setIconTintResource(R.color.auth_green)
 
-            val clipboard: ClipboardManager? = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?
-            val clip = ClipData.newPlainText(context.getString(R.string.copied_text), privKeyButton.text)
-            clipboard?.setPrimaryClip(clip)
-        }
-        .setNegativeButton(android.R.string.cancel) { _, _ -> }
+                val clipboard: ClipboardManager? = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?
+                val clip = ClipData.newPlainText(context.getString(R.string.copied_text), privKeyButton.text)
+                clipboard?.setPrimaryClip(clip)
+            }
+            .setNegativeButton(android.R.string.cancel) { _, _ -> }
+            .show()
+    }
 
-    private val restoreKeyDialog = BaseDialog(context)
-        .setTitle(context.getString(R.string.import_private_key))
-        .setMessage(context.getString(R.string.import_private_key_msg))
-        .setCancelable(1)
-        .setView(keyInput)
-        .setPositiveButton(R.string.import_key) { _, _ ->
-            val key = keyInput.findViewById<EditText>(R.id.input).text
-            if (key == null || key.isEmpty()) return@setPositiveButton
-            setGitCredentials(null, key.toString())
-            dismiss()
-            this.dismiss()
-        }
-        .setNegativeButton(android.R.string.cancel) { _, _ -> }
+    private fun showRestoreKeyDialog(provider: GitProviderManager.Companion.Provider){
+        BaseDialog(context)
+            .setTitle(context.getString(R.string.import_private_key))
+            .setMessage(context.getString(R.string.import_private_key_msg))
+            .setCancelable(1)
+            .setView(keyInput)
+            .setPositiveButton(R.string.import_key) { _, _ ->
+                val key = keyInput.findViewById<EditText>(R.id.input).text
+                if (key == null || key.isEmpty()) return@setPositiveButton
+                setAuth(provider,null, key.toString())
+                dismiss()
+                this.dismiss()
+            }
+            .setNegativeButton(android.R.string.cancel) { _, _ -> }
+            .show()
+    }
 
     override fun onStart() {
         super.onStart()
@@ -97,12 +103,16 @@ class AuthDialog(private val context: Context, private val settingsManager: Sett
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
                 val provider = providers.keys.toList()[position]
-                settingsManager.setGitProvider(provider)
                 updateInputs(provider)
             }
 
             override fun onNothingSelected(parent: AdapterView<*>) {}
         }
+    }
+
+    private fun setAuth(provider: GitProviderManager.Companion.Provider, username: String?, token: String) {
+        settingsManager.setGitProvider(provider)
+        setGitCredentials(username, token)
     }
 
     private fun updateInputs(provider: GitProviderManager.Companion.Provider) {
@@ -115,6 +125,7 @@ class AuthDialog(private val context: Context, private val settingsManager: Sett
 
                 oAuthButton.setOnClickListener {
                     val gitManager = GitProviderManager.getManager(context, settingsManager)
+                    settingsManager.setGitProvider(provider)
                     gitManager.launchOAuthFlow()
                     dismiss()
                 }
@@ -149,7 +160,7 @@ class AuthDialog(private val context: Context, private val settingsManager: Sett
                 }
 
                 loginButton.setOnClickListener {
-                    setGitCredentials(usernameInput.text.toString(), tokenInput.text.toString())
+                    setAuth(provider, usernameInput.text.toString(), tokenInput.text.toString())
                     dismiss()
                 }
             }
@@ -186,13 +197,13 @@ class AuthDialog(private val context: Context, private val settingsManager: Sett
                         generateKeyButton.isEnabled = false
                         generateKeyButton.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.auth_green_secondary))
                     } else {
-                        setGitCredentials(null, key!!)
+                        setAuth(provider, null, key!!)
                         dismiss()
                     }
                 }
 
                 restoreKeyButton.setOnClickListener {
-                    restoreKeyDialog.show()
+                    showRestoreKeyDialog(provider)
                 }
 
                 pubKeyButton.setOnClickListener {
@@ -207,7 +218,7 @@ class AuthDialog(private val context: Context, private val settingsManager: Sett
                     generateKeyButton.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.auth_green))
                 }
 
-                privKeyButton.setOnClickListener { confirmPrivKeyCopyDialog.show() }
+                privKeyButton.setOnClickListener { showConfirmPrivKeyCopyDialog() }
             }
         }
     }
