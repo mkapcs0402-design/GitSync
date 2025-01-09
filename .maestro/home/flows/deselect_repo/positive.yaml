@@ -4,4 +4,4 @@ appId: com.viscouspot.gitsync
 - runFlow: ./assert.yaml
 - tapOn:
     id: 'deselectDirButton'
-- assertVisible: "NO REPO FOUND…"
+- assertVisible: "NO COMMITS FOUND…"

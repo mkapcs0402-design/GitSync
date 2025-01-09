@@ -46,7 +46,7 @@
 
 
     <!--    Home Screen-->
-    <string name="repo_not_found">No repo found…</string>
+    <string name="repo_not_found">No commits found…</string>
 
     <string name="committed">committed</string>
     <string name="additions">%s ++</string>

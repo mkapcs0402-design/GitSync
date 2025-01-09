@@ -22,6 +22,7 @@ import org.eclipse.jgit.api.TransportCommand
 import org.eclipse.jgit.api.errors.GitAPIException
 import org.eclipse.jgit.api.errors.InvalidRemoteException
 import org.eclipse.jgit.api.errors.JGitInternalException
+import org.eclipse.jgit.api.errors.NoHeadException
 import org.eclipse.jgit.api.errors.WrongRepositoryStateException
 import org.eclipse.jgit.diff.DiffFormatter
 import org.eclipse.jgit.errors.CheckoutConflictException
@@ -602,6 +603,8 @@ class GitManager(private val context: Context, private val settingsManager: Sett
             closeRepo(repo)
 
             return commits
+        } catch (e: NoHeadException) {
+            log(LogType.RecentCommits, e.message.toString())
         } catch (e: Throwable) {
             log(context, LogType.RecentCommits, e)
         }
