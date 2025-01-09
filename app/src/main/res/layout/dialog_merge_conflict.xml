@@ -84,11 +84,11 @@
             android:layout_marginEnd="@dimen/space_xs"
             android:paddingVertical="@dimen/space_xxs"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/filePrev"/>
+            app:layout_constraintEnd_toStartOf="@id/prev"/>
         <com.google.android.material.button.MaterialButton
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:id="@+id/filePrev"
+            android:id="@+id/prev"
             app:layout_constraintTop_toTopOf="@id/fileName"
             android:insetTop="0dp"
             android:backgroundTint="@color/card_bg"
@@ -105,12 +105,12 @@
             android:clipToOutline="true"
             app:backgroundTint="@null"
             android:layout_marginEnd="@dimen/space_xs"
-            app:layout_constraintEnd_toStartOf="@id/fileNext"
+            app:layout_constraintEnd_toStartOf="@id/next"
             app:layout_constraintBottom_toBottomOf="@id/fileName"/>
         <com.google.android.material.button.MaterialButton
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:id="@+id/fileNext"
+            android:id="@+id/next"
             app:backgroundTint="@null"
             app:iconGravity="textEnd"
             app:iconSize="@dimen/text_size_xs"

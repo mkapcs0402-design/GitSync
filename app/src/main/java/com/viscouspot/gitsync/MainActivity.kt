@@ -696,7 +696,6 @@ class MainActivity : AppCompatActivity() {
         val gitDirUri = settingsManager.getGitDirUri()
         gitDirUri?.let {
             val recentCommitsReferences = recentCommits.map { commit -> commit.reference }
-            log(settingsManager.getGitDirUri())
             val newRecentCommits = gitManager.getRecentCommits(Helper.getPathFromUri(this, it))
                 .filter { commit -> !recentCommitsReferences.contains(commit.reference) }
             if (newRecentCommits.isNotEmpty()) {
