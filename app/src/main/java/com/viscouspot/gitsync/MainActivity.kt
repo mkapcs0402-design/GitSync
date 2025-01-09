@@ -315,10 +315,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        if (!settingsManager.isFirstTime()) {
-            checkAndRequestStoragePermission()
-        }
-
         val bManager = LocalBroadcastManager.getInstance(this)
         val intentFilter = IntentFilter()
         intentFilter.addAction(REFRESH)

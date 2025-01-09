@@ -26,23 +26,9 @@ class SettingsManager internal constructor(private val context: Context) {
         }
     }
 
-//    fun resetFirstTime() {
-//        with(settingsSharedPref.edit()) {
-//            putBoolean("isFirstTime", true)
-//            apply()
-//        }
-//    }
-
-    fun isFirstTime(): Boolean {
+    private fun isFirstTime(): Boolean {
         return settingsSharedPref.getBoolean("isFirstTime", true)
     }
-
-//    fun setHadFirstTime() {
-//        with(settingsSharedPref.edit()) {
-//            putBoolean("isFirstTime", false)
-//            apply()
-//        }
-//    }
 
     fun getOnboardingStep(): Int {
         return settingsSharedPref.getInt("onboardingStep", 0)
@@ -183,13 +169,6 @@ class SettingsManager internal constructor(private val context: Context) {
     private fun getApplicationPackage(): String {
         return settingsSharedPref.getString("packageName", "")!!
     }
-
-//    fun setApplicationPackage(packageName: String) {
-//        with(settingsSharedPref.edit()) {
-//            putString("packageName", packageName)
-//            apply()
-//        }
-//    }
 
     fun getApplicationPackages(): Set<String> {
         return settingsSharedPref.getStringSet("packageNames", setOf())!!
