@@ -376,7 +376,7 @@ class MainActivity : AppCompatActivity() {
 
             },
             Pair(getString(R.string.manual_sync)) {
-                showContributeDialog(this, settingsManager) {
+                showContributeDialog(this, repoManager) {
                     ManualSyncDialog(this, settingsManager, gitManager, ::refreshRecentCommits).show()
                 }
             },
