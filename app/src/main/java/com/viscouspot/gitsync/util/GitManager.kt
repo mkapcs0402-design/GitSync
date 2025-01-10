@@ -83,6 +83,9 @@ class GitManager(private val context: Context, private val settingsManager: Sett
             val authCredentials = settingsManager.getGitAuthCredentials()
             command.setCredentialsProvider(UsernamePasswordCredentialsProvider(authCredentials.first, authCredentials.second))
         }
+        command.setTransportConfigCallback { transport ->
+            transport.timeout = 3000
+        }
     }
 
     fun cloneRepository(repoUrl: String, userStorageUri: Uri, taskCallback: (action: String) -> Unit, progressCallback: (progress: Int) -> Unit, failureCallback: (error: String) -> Unit, successCallback: () -> Unit) {
