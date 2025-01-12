@@ -464,8 +464,8 @@ class MainActivity : AppCompatActivity() {
                 .setPositiveButton(R.string.rename, null)
                 .apply {
                     setOnShowListener {
-                        getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
-                            if (input.text.isEmpty()) return@setOnClickListener
+                        getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener listener@{
+                            if (input.text.isEmpty()) return@listener
 
                             val repoNames = repoManager.getRepoNames().toMutableList()
                             SettingsManager.renameSettingsPref(
