@@ -40,7 +40,7 @@ enum class LogType(val type: String) {
     GitStatus("GitStatus"),
     RecentCommits("RecentCommits"),
 
-    TransportException("TransportException"),
+    SyncException("SyncException"),
 
     GithubOAuthFlow("GithubOAuthFlow"),
     GithubAuthCredentials("GithubAuthCredentials"),

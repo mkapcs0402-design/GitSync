@@ -34,7 +34,7 @@
     <string name="select_email_client">Send email using: </string>
 
     <string name="out_of_memory">Application ran out of memory!</string>
-    <string name="invalid_remote">Invalid remote!</string>
+    <string name="invalid_remote">Invalid remote! Modify this in settings</string>
     <string name="large_file">Singular files larger than 50MB not supported!</string>
     <string name="clone_failed">Failed to clone repository!</string>
     <string name="inaccessible_directory_message">Inaccessible directory! Please select a different location.</string>

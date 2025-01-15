@@ -123,6 +123,7 @@ class GitManager(private val context: Context, private val settingsManager: Sett
                     setProgressMonitor(monitor)
                     setDirectory(File(Helper.getPathFromUri(context, userStorageUri)))
                     applyCredentials(this)
+                    setRemote(settingsManager.getRemote())
                 }.call()
 
                 log(LogType.CloneRepo, "Repository cloned successfully")
@@ -186,7 +187,7 @@ class GitManager(private val context: Context, private val settingsManager: Sett
             log(LogType.ForcePull, "Fetching changes")
             git.fetch().apply {
                 applyCredentials(this)
-                setRemote("origin")
+                setRemote(settingsManager.getRemote())
                 setRefSpecs(RefSpec("+refs/heads/*:refs/remotes/origin/*"))
             }.call()
 
@@ -205,6 +206,8 @@ class GitManager(private val context: Context, private val settingsManager: Sett
             closeRepo(repo)
 
             return true
+        }  catch (e: InvalidRemoteException) {
+            handleInvalidRemoteException(e)
         } catch (e: TransportException) {
             handleTransportException(e) { }
         } catch (e: Throwable) {
@@ -226,6 +229,7 @@ class GitManager(private val context: Context, private val settingsManager: Sett
             log(LogType.PullFromRepo, "Fetching changes")
             val fetchResult = git.fetch().apply {
                 applyCredentials(this)
+                setRemote(settingsManager.getRemote())
             }.call()
 
             if (conditionallyScheduleNetworkSync(scheduleNetworkSync)) {
@@ -242,7 +246,7 @@ class GitManager(private val context: Context, private val settingsManager: Sett
                 onSync.invoke()
                 val result = git.pull().apply {
                     applyCredentials(this)
-                    remote = settingsManager.getRemote()
+                    setRemote(settingsManager.getRemote())
                 }.call()
 
                 if (result.mergeResult.failingPaths != null && result.mergeResult.failingPaths.containsValue(
@@ -271,7 +275,7 @@ class GitManager(private val context: Context, private val settingsManager: Sett
         } catch (e: CheckoutConflictException) {
             log(LogType.PullFromRepo, e.stackTraceToString())
             return false
-        }catch (e: ApiCheckoutConflictException) {
+        } catch (e: ApiCheckoutConflictException) {
             log(LogType.PullFromRepo, e.stackTraceToString())
             return false
         }  catch (e: WrongRepositoryStateException) {
@@ -281,6 +285,8 @@ class GitManager(private val context: Context, private val settingsManager: Sett
             }
             log(context, LogType.PullFromRepo, e)
             return null
+        } catch (e: InvalidRemoteException) {
+            handleInvalidRemoteException(e)
         } catch (e: TransportException) {
             handleTransportException(e, scheduleNetworkSync)
         } catch (e: Throwable) {
@@ -362,7 +368,7 @@ class GitManager(private val context: Context, private val settingsManager: Sett
             git.push().apply {
                 applyCredentials(this)
                 setForce(true)
-                remote = "origin"
+                setRemote(settingsManager.getRemote())
             }.call()
 
             logStatus(git)
@@ -371,6 +377,8 @@ class GitManager(private val context: Context, private val settingsManager: Sett
             closeRepo(repo)
 
             return returnResult
+        } catch (e: InvalidRemoteException) {
+            handleInvalidRemoteException(e)
         } catch (e: Throwable) {
             log(context, LogType.PushToRepo, e)
         }
@@ -444,7 +452,7 @@ class GitManager(private val context: Context, private val settingsManager: Sett
             log(LogType.PushToRepo, "Pushing changes")
             val pushResults = git.push().apply {
                 applyCredentials(this)
-                remote = settingsManager.getRemote()
+                setRemote(settingsManager.getRemote())
             }.call()
             for (pushResult in pushResults) {
                 for (remoteUpdate in pushResult.remoteUpdates) {
@@ -508,6 +516,8 @@ class GitManager(private val context: Context, private val settingsManager: Sett
             closeRepo(repo)
 
             return returnResult
+        } catch (e: InvalidRemoteException) {
+            handleInvalidRemoteException(e)
         } catch (e: TransportException) {
             handleTransportException(e, scheduleNetworkSync)
         } catch (e: Throwable) {
@@ -522,6 +532,11 @@ class GitManager(private val context: Context, private val settingsManager: Sett
             return true
         }
         return false
+    }
+
+    private fun handleInvalidRemoteException(e: InvalidRemoteException) {
+        makeToast(context, context.getString(R.string.invalid_remote))
+        log(LogType.SyncException, e.stackTraceToString())
     }
 
     private fun handleTransportException(e: TransportException, scheduleNetworkSync: () -> Unit) {
@@ -543,11 +558,11 @@ class GitManager(private val context: Context, private val settingsManager: Sett
             message = it
             e.message.toString().contains(it)
         }) {
-            log(context, LogType.TransportException, Throwable(message))
+            log(context, LogType.SyncException, Throwable(message))
             return
         }
 
-        log(context, LogType.TransportException, e)
+        log(context, LogType.SyncException, e)
     }
 
     private fun logStatus(git: Git) {
