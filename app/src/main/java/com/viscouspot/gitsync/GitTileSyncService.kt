@@ -12,7 +12,7 @@ class GitTileSyncService: TileService() {
         super.onClick()
         val forceSyncIntent = Intent(this, GitSyncService::class.java)
         forceSyncIntent.setAction(GitSyncService.FORCE_SYNC)
-        // TODO apply repoIndex
+        forceSyncIntent.putExtra("repoIndex", 0)
         startService(forceSyncIntent)
     }
 }
