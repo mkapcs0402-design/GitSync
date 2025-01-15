@@ -950,13 +950,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun refreshRecentCommits() {
-        log("refreshRecentCommits")
-
         val gitDirUri = settingsManager.getGitDirUri()
         gitDirUri?.let {
             val newRecentCommits = gitManager.getRecentCommits(Helper.getPathFromUri(this, it))
             if (recentCommits.map { commit -> commit.reference } != newRecentCommits.map { commit -> commit.reference }) {
-                log("test speed")
                 runOnUiThread {
                     val recentCommitsSize = recentCommits.size
                     recentCommits.clear()
@@ -990,12 +987,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun refreshGitRepo() {
-        log("refreshGitRepo")
         var repoName = ""
         val gitDirUri = settingsManager.getGitDirUri()
-
-        log("gitDirUri")
-        log(gitDirUri)
 
         gitDirUri?.let {
             val gitConfigFile = File("${Helper.getPathFromUri(this, it)}/${getString(R.string.git_config_path)}")
