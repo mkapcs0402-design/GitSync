@@ -15,8 +15,11 @@ import android.net.NetworkCapabilities
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
+import android.os.Handler
+import android.os.Looper
 import android.provider.DocumentsContract
 import android.provider.MediaStore
+import android.text.Html
 import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.result.ActivityResultCaller
@@ -31,12 +34,8 @@ import com.jcraft.jsch.JSch
 import com.jcraft.jsch.KeyPair
 import com.viscouspot.gitsync.MainActivity
 import com.viscouspot.gitsync.R
+import com.viscouspot.gitsync.ui.dialog.BaseDialog
 import com.viscouspot.gitsync.util.Logger.log
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import java.io.BufferedReader
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -51,18 +50,18 @@ object Helper {
 
     fun makeToast(context: Context, message: String, length: Int = Toast.LENGTH_SHORT) {
         if (!NotificationManagerCompat.from(context).areNotificationsEnabled()) return
-        Toast.makeText(context, message, length).show()
+
+        val mainHandler = Handler(Looper.getMainLooper())
+        mainHandler.post { Toast.makeText(context, message, length).show() }
     }
 
-    fun <T> debounced(delayMillis: Long, action: (T) -> Unit): (T) -> Unit {
-        var job: Job? = null
-        return { param: T ->
-            job?.cancel()
-            job = CoroutineScope(Dispatchers.Main).launch {
-                delay(delayMillis)
-                action(param)
-            }
-        }
+    fun networkRequired(context: Context) {
+        log(LogType.Sync, "Network Connection Required!")
+        makeToast(
+            context,
+            context.getString(R.string.network_unavailable),
+            Toast.LENGTH_LONG
+        )
     }
 
     fun extractConflictSections(context: Context, file: File, add: (text: String) -> Unit) {
@@ -344,10 +343,40 @@ object Helper {
         val privateKey = String(privateKeyStream.toByteArray(), StandardCharsets.UTF_8)
         val publicKey = String(publicKeyStream.toByteArray(), StandardCharsets.UTF_8)
 
-        log(privateKey)
-        log(publicKey)
-
         return Pair(privateKey, publicKey)
+    }
+
+    fun showContributeDialog(context: Context, repoManager: RepoManager, callback: () -> Unit) {
+        if (repoManager.hasContributed()) {
+            callback()
+            return
+        }
+
+        BaseDialog(context).apply {
+            setTitle(context.getString(R.string.contribute_title))
+            setMessage(
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    Html.fromHtml(
+                        context.getString(R.string.contribute_msg),
+                        Html.FROM_HTML_MODE_LEGACY
+                    )
+                } else {
+                    Html.fromHtml(
+                        context.getString(R.string.contribute_msg),
+                    )
+                }
+            )
+            setCancelable(0)
+            setPositiveButton(R.string.support_now) { _, _ ->
+                val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(context.getString(R.string.contribute_link)))
+                context.startActivity(browserIntent)
+                repoManager.setHasContributed()
+            }
+            setNegativeButton(R.string.support_promise) { _, _ ->
+                repoManager.setHasContributed()
+                callback()
+            }
+        }.show()
     }
 }
 

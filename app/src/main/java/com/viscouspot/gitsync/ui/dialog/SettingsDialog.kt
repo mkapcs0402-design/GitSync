@@ -1,6 +1,7 @@
 package com.viscouspot.gitsync.ui.dialog
 
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.text.Spannable
 import android.text.style.ForegroundColorSpan
@@ -14,16 +15,17 @@ import com.google.android.material.button.MaterialButton
 import com.viscouspot.gitsync.R
 import com.viscouspot.gitsync.util.GitManager
 import com.viscouspot.gitsync.util.Logger.sendBugReportNotification
+import com.viscouspot.gitsync.util.RepoManager
 import com.viscouspot.gitsync.util.SettingsManager
 
-class SettingsDialog(private val context: Context, private val settingsManager: SettingsManager, private val gitManager: GitManager, private val gitDirPath: String) : BaseDialog(context) {
+class SettingsDialog(private val context: Context, private val repoManager: RepoManager, private val settingsManager: SettingsManager, private val gitManager: GitManager, private val gitDirPath: String) : BaseDialog(context) {
 
     override fun onStart() {
         super.onStart()
         setContentView(R.layout.dialog_settings)
 
         setupSyncMessageSettings()
-        setupRemoteSetings()
+        setupRemoteSettings()
         setupAuthorNameSettings()
         setupAuthorEmailSettings()
         
@@ -31,7 +33,26 @@ class SettingsDialog(private val context: Context, private val settingsManager: 
         setupGitignoreSettings(gitDirUri)
         setupGitInfoExcludeSettings(gitDirUri)
 
+        setupViewDocsButton()
+        setupContributeButton()
         setupReportBugButton()
+    }
+
+    private fun setupViewDocsButton() {
+        val viewDocsButton = findViewById<MaterialButton>(R.id.viewDocsButton) ?: return
+        viewDocsButton.setOnClickListener {
+            val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(context.getString(R.string.docs_link)))
+            context.startActivity(browserIntent)
+        }
+    }
+
+    private fun setupContributeButton() {
+        val contributeButton = findViewById<MaterialButton>(R.id.contributeButton) ?: return
+        contributeButton.setOnClickListener {
+            val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(context.getString(R.string.contribute_link)))
+            context.startActivity(browserIntent)
+            repoManager.setHasContributed()
+        }
     }
 
     private fun setupReportBugButton() {
@@ -63,7 +84,7 @@ class SettingsDialog(private val context: Context, private val settingsManager: 
         }
     }
 
-    private fun setupRemoteSetings() {
+    private fun setupRemoteSettings() {
         val remoteInput = findViewById<EditText>(R.id.remoteInput) ?: return
         remoteInput.setText(settingsManager.getRemote())
         remoteInput.doOnTextChanged { text, _, _, _ ->

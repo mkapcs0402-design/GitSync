@@ -25,7 +25,7 @@ import kotlin.math.max
 import kotlin.math.min
 
 
-class MergeConflictDialog(private val context: Context, private val settingsManager: SettingsManager, private val gitManager: GitManager, private val refreshRecentCommits: () -> Unit) : BaseDialog(context) {
+class MergeConflictDialog(private val context: Context, private val repoIndex: Int, private val settingsManager: SettingsManager, private val gitManager: GitManager, private val refreshRecentCommits: () -> Unit) : BaseDialog(context) {
     private var smoothScrollStart: SmoothScroller = object : LinearSmoothScroller(context) {
         override fun getVerticalSnapPreference(): Int {
             return SNAP_TO_START
@@ -147,6 +147,7 @@ class MergeConflictDialog(private val context: Context, private val settingsMana
 
             val forceSyncIntent = Intent(context, GitSyncService::class.java)
             forceSyncIntent.setAction(GitSyncService.MERGE)
+            forceSyncIntent.putExtra("repoIndex", repoIndex)
             context.startService(forceSyncIntent)
         }
 

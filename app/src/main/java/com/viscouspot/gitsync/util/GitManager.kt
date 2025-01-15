@@ -54,7 +54,6 @@ import java.util.Locale
 import java.util.TimeZone
 import org.eclipse.jgit.api.errors.CheckoutConflictException as ApiCheckoutConflictException
 
-
 class GitManager(private val context: Context, private val settingsManager: SettingsManager) {
     private fun applyCredentials(command: TransportCommand<*, *>) {
         log(settingsManager.getGitProvider())
@@ -82,6 +81,9 @@ class GitManager(private val context: Context, private val settingsManager: Sett
         } else {
             val authCredentials = settingsManager.getGitAuthCredentials()
             command.setCredentialsProvider(UsernamePasswordCredentialsProvider(authCredentials.first, authCredentials.second))
+        }
+        command.setTransportConfigCallback { transport ->
+            transport.timeout = 3000
         }
     }
 
@@ -121,6 +123,7 @@ class GitManager(private val context: Context, private val settingsManager: Sett
                     setProgressMonitor(monitor)
                     setDirectory(File(Helper.getPathFromUri(context, userStorageUri)))
                     applyCredentials(this)
+                    setRemote(settingsManager.getRemote())
                 }.call()
 
                 log(LogType.CloneRepo, "Repository cloned successfully")
@@ -184,7 +187,7 @@ class GitManager(private val context: Context, private val settingsManager: Sett
             log(LogType.ForcePull, "Fetching changes")
             git.fetch().apply {
                 applyCredentials(this)
-                setRemote("origin")
+                setRemote(settingsManager.getRemote())
                 setRefSpecs(RefSpec("+refs/heads/*:refs/remotes/origin/*"))
             }.call()
 
@@ -203,6 +206,8 @@ class GitManager(private val context: Context, private val settingsManager: Sett
             closeRepo(repo)
 
             return true
+        }  catch (e: InvalidRemoteException) {
+            handleInvalidRemoteException(e)
         } catch (e: TransportException) {
             handleTransportException(e) { }
         } catch (e: Throwable) {
@@ -224,11 +229,14 @@ class GitManager(private val context: Context, private val settingsManager: Sett
             log(LogType.PullFromRepo, "Fetching changes")
             val fetchResult = git.fetch().apply {
                 applyCredentials(this)
+                setRemote(settingsManager.getRemote())
             }.call()
 
             if (conditionallyScheduleNetworkSync(scheduleNetworkSync)) {
                 return null
             }
+
+            if (repo.isBare || repo.resolve(Constants.HEAD) == null) return false
 
             val localHead: ObjectId = repo.resolve(Constants.HEAD)
             val remoteHead: ObjectId = repo.resolve(Constants.FETCH_HEAD)
@@ -238,7 +246,7 @@ class GitManager(private val context: Context, private val settingsManager: Sett
                 onSync.invoke()
                 val result = git.pull().apply {
                     applyCredentials(this)
-                    remote = settingsManager.getRemote()
+                    setRemote(settingsManager.getRemote())
                 }.call()
 
                 if (result.mergeResult.failingPaths != null && result.mergeResult.failingPaths.containsValue(
@@ -267,7 +275,7 @@ class GitManager(private val context: Context, private val settingsManager: Sett
         } catch (e: CheckoutConflictException) {
             log(LogType.PullFromRepo, e.stackTraceToString())
             return false
-        }catch (e: ApiCheckoutConflictException) {
+        } catch (e: ApiCheckoutConflictException) {
             log(LogType.PullFromRepo, e.stackTraceToString())
             return false
         }  catch (e: WrongRepositoryStateException) {
@@ -277,12 +285,25 @@ class GitManager(private val context: Context, private val settingsManager: Sett
             }
             log(context, LogType.PullFromRepo, e)
             return null
+        } catch (e: InvalidRemoteException) {
+            handleInvalidRemoteException(e)
         } catch (e: TransportException) {
             handleTransportException(e, scheduleNetworkSync)
         } catch (e: Throwable) {
             log(context, LogType.PullFromRepo, e)
         }
         return null
+    }
+
+    fun getUncommittedFilePaths(userStorageUri: Uri, gitInstance: Git? = null): List<String> {
+        var git = gitInstance
+        if (git == null) {
+            val repo = FileRepository("${Helper.getPathFromUri(context, userStorageUri)}/${context.getString(R.string.git_path)}")
+            git = Git(repo)
+        }
+        val status = git.status().call()
+
+        return (status.uncommittedChanges.plus(status.untracked)).toList()
     }
 
     fun forcePush(userStorageUri: Uri): Boolean {
@@ -297,21 +318,19 @@ class GitManager(private val context: Context, private val settingsManager: Sett
             val git = Git(repo)
 
             logStatus(git)
-            val status = git.status().call()
+            val uncommitted = getUncommittedFilePaths(userStorageUri, git)
 
-            if (status.uncommittedChanges.isNotEmpty() || status.untracked.isNotEmpty()) {
+            if (uncommitted.isNotEmpty()) {
                 log(LogType.ForcePush, "Adding Files to Stage")
 
                 // Adds all uncommitted and untracked files to the index for staging.
                 git.add().apply {
-                    status.uncommittedChanges.forEach { addFilepattern(it) }
-                    status.untracked.forEach { addFilepattern(it) }
+                    uncommitted.forEach { addFilepattern(it) }
                 }.call()
 
                 // Updates the index to reflect changes in already tracked files, removing deleted files without adding untracked files.
                 git.add().apply {
-                    status.uncommittedChanges.forEach { addFilepattern(it) }
-                    status.untracked.forEach { addFilepattern(it) }
+                    uncommitted.forEach { addFilepattern(it) }
                     isUpdate = true
                 }.call()
 
@@ -338,7 +357,7 @@ class GitManager(private val context: Context, private val settingsManager: Sett
                 }
 
                 git.commit().apply {
-                    setCommitter(committerName ?: "", committerEmail ?: "")
+                    setCommitter(committerName, committerEmail ?: "")
                     message = settingsManager.getSyncMessage().format(formattedDate)
                 }.call()
 
@@ -349,7 +368,7 @@ class GitManager(private val context: Context, private val settingsManager: Sett
             git.push().apply {
                 applyCredentials(this)
                 setForce(true)
-                remote = "origin"
+                setRemote(settingsManager.getRemote())
             }.call()
 
             logStatus(git)
@@ -358,13 +377,15 @@ class GitManager(private val context: Context, private val settingsManager: Sett
             closeRepo(repo)
 
             return returnResult
+        } catch (e: InvalidRemoteException) {
+            handleInvalidRemoteException(e)
         } catch (e: Throwable) {
             log(context, LogType.PushToRepo, e)
         }
         return false
     }
 
-    fun uploadChanges(userStorageUri: Uri, scheduleNetworkSync: () -> Unit, onSync: () -> Unit): Boolean? {
+    fun uploadChanges(userStorageUri: Uri, scheduleNetworkSync: () -> Unit, onSync: () -> Unit, filePaths: List<String>? = null, syncMessage: String? = null): Boolean? {
         if (conditionallyScheduleNetworkSync(scheduleNetworkSync)) {
             return null
         }
@@ -376,23 +397,21 @@ class GitManager(private val context: Context, private val settingsManager: Sett
             val git = Git(repo)
 
             logStatus(git)
-            val status = git.status().call()
+            val uncommitted = filePaths ?: getUncommittedFilePaths(userStorageUri, git)
 
-            if (status.uncommittedChanges.isNotEmpty() || status.untracked.isNotEmpty()) {
+            if (uncommitted.isNotEmpty()) {
                 onSync.invoke()
 
                 log(LogType.PushToRepo, "Adding Files to Stage")
 
                 // Adds all uncommitted and untracked files to the index for staging.
                 git.add().apply {
-                    status.uncommittedChanges.forEach { addFilepattern(it) }
-                    status.untracked.forEach { addFilepattern(it) }
+                    uncommitted.forEach { addFilepattern(it) }
                 }.call()
 
                 // Updates the index to reflect changes in already tracked files, removing deleted files without adding untracked files.
                 git.add().apply {
-                    status.uncommittedChanges.forEach { addFilepattern(it) }
-                    status.untracked.forEach { addFilepattern(it) }
+                    uncommitted.forEach { addFilepattern(it) }
                     isUpdate = true
                 }.call()
 
@@ -419,8 +438,8 @@ class GitManager(private val context: Context, private val settingsManager: Sett
                 }
 
                 git.commit().apply {
-                    setCommitter(committerName ?: "", committerEmail ?: "")
-                    message = settingsManager.getSyncMessage().format(formattedDate)
+                    setCommitter(committerName, committerEmail ?: "")
+                    message = if (!syncMessage.isNullOrEmpty()) syncMessage else settingsManager.getSyncMessage().format(formattedDate)
                 }.call()
 
                 returnResult = true
@@ -433,7 +452,7 @@ class GitManager(private val context: Context, private val settingsManager: Sett
             log(LogType.PushToRepo, "Pushing changes")
             val pushResults = git.push().apply {
                 applyCredentials(this)
-                remote = settingsManager.getRemote()
+                setRemote(settingsManager.getRemote())
             }.call()
             for (pushResult in pushResults) {
                 for (remoteUpdate in pushResult.remoteUpdates) {
@@ -497,6 +516,8 @@ class GitManager(private val context: Context, private val settingsManager: Sett
             closeRepo(repo)
 
             return returnResult
+        } catch (e: InvalidRemoteException) {
+            handleInvalidRemoteException(e)
         } catch (e: TransportException) {
             handleTransportException(e, scheduleNetworkSync)
         } catch (e: Throwable) {
@@ -511,6 +532,11 @@ class GitManager(private val context: Context, private val settingsManager: Sett
             return true
         }
         return false
+    }
+
+    private fun handleInvalidRemoteException(e: InvalidRemoteException) {
+        makeToast(context, context.getString(R.string.invalid_remote))
+        log(LogType.SyncException, e.stackTraceToString())
     }
 
     private fun handleTransportException(e: TransportException, scheduleNetworkSync: () -> Unit) {
@@ -532,11 +558,11 @@ class GitManager(private val context: Context, private val settingsManager: Sett
             message = it
             e.message.toString().contains(it)
         }) {
-            log(context, LogType.TransportException, Throwable(message))
+            log(context, LogType.SyncException, Throwable(message))
             return
         }
 
-        log(context, LogType.TransportException, e)
+        log(context, LogType.SyncException, e)
     }
 
     private fun logStatus(git: Git) {

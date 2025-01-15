@@ -2,7 +2,6 @@ package com.viscouspot.gitsync.ui.dialog
 
 import android.content.Context
 import android.widget.ProgressBar
-import android.widget.TextView
 
 class ProgressDialog(context: Context) : BaseDialog(context) {
     fun setView(view: ProgressBar): ProgressDialog {

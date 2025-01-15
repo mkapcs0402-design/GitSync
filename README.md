@@ -5,7 +5,7 @@
   <h4>Android git client for syncing a repository between remote and a local directory</h4>
   
   <p align="center">
-    <img src="https://img.shields.io/github/license/ViscousPot/GitSync" alt="license">
+    <img src="https://img.shields.io/github/license/ViscousPot/GitSync?v=1" alt="license">
     <img src="https://img.shields.io/github/last-commit/ViscousPot/GitSync?v=1" alt="last commit">
     <img src="https://img.shields.io/github/stars/ViscousPot/GitSync?v=1" alt="stars">
     <img src="https://img.shields.io/github/downloads/ViscousPot/GitSync/total" alt="downloads">
