@@ -973,14 +973,12 @@ class MainActivity : AppCompatActivity() {
         }
 
         if (gitManager.getConflicting(settingsManager.getGitDirUri()).isNotEmpty()) {
-            if (recentCommits.firstOrNull { it.reference == RecentCommitsAdapter.MERGE_CONFLICT } == null) {
-                recentCommits.add(0, Commit("", "", 0L, RecentCommitsAdapter.MERGE_CONFLICT, 0, 0))
-            }
-
             runOnUiThread {
                 syncButton.isEnabled = false
 
-                recentCommits.add(0, Commit("", "", 0L, RecentCommitsAdapter.MERGE_CONFLICT, 0, 0))
+                if (recentCommits.firstOrNull { it.reference == RecentCommitsAdapter.MERGE_CONFLICT } == null) {
+                    recentCommits.add(0, Commit("", "", 0L, RecentCommitsAdapter.MERGE_CONFLICT, 0, 0))
+                }
                 recentCommitsAdapter.notifyItemInserted(0)
                 recentCommitsRecycler.smoothScrollToPosition(0)
             }
