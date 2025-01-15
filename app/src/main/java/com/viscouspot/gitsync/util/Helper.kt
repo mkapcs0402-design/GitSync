@@ -34,11 +34,6 @@ import com.viscouspot.gitsync.MainActivity
 import com.viscouspot.gitsync.R
 import com.viscouspot.gitsync.ui.dialog.BaseDialog
 import com.viscouspot.gitsync.util.Logger.log
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import java.io.BufferedReader
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -63,17 +58,6 @@ object Helper {
             context.getString(R.string.network_unavailable),
             Toast.LENGTH_LONG
         )
-    }
-
-    fun <T> debounced(delayMillis: Long, action: (T) -> Unit): (T) -> Unit {
-        var job: Job? = null
-        return { param: T ->
-            job?.cancel()
-            job = CoroutineScope(Dispatchers.Main).launch {
-                delay(delayMillis)
-                action(param)
-            }
-        }
     }
 
     fun extractConflictSections(context: Context, file: File, add: (text: String) -> Unit) {
@@ -358,8 +342,8 @@ object Helper {
         return Pair(privateKey, publicKey)
     }
 
-    fun showContributeDialog(context: Context, settingsManager: SettingsManager, callback: () -> Unit) {
-        if (settingsManager.hasContributed()) {
+    fun showContributeDialog(context: Context, repoManager: RepoManager, callback: () -> Unit) {
+        if (repoManager.hasContributed()) {
             callback()
             return
         }
@@ -382,10 +366,10 @@ object Helper {
             setPositiveButton(R.string.support_now) { _, _ ->
                 val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(context.getString(R.string.contribute_link)))
                 context.startActivity(browserIntent)
-                settingsManager.setHasContributed()
+                repoManager.setHasContributed()
             }
             setNegativeButton(R.string.support_promise) { _, _ ->
-                settingsManager.setHasContributed()
+                repoManager.setHasContributed()
                 callback()
             }
         }.show()

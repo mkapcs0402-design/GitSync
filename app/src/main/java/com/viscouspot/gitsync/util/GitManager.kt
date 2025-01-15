@@ -54,7 +54,6 @@ import java.util.Locale
 import java.util.TimeZone
 import org.eclipse.jgit.api.errors.CheckoutConflictException as ApiCheckoutConflictException
 
-
 class GitManager(private val context: Context, private val settingsManager: SettingsManager) {
     private fun applyCredentials(command: TransportCommand<*, *>) {
         log(settingsManager.getGitProvider())
@@ -232,6 +231,8 @@ class GitManager(private val context: Context, private val settingsManager: Sett
             if (conditionallyScheduleNetworkSync(scheduleNetworkSync)) {
                 return null
             }
+
+            if (repo.isBare || repo.resolve(Constants.HEAD) == null) return false
 
             val localHead: ObjectId = repo.resolve(Constants.HEAD)
             val remoteHead: ObjectId = repo.resolve(Constants.FETCH_HEAD)

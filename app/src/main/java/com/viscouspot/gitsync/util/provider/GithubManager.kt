@@ -161,8 +161,8 @@ class GithubManager(private val context: Context) : GitProviderManager {
             })
         } catch (e: Throwable) {
             nextPageCallback(null)
-            updateCallback.invoke(listOf());
-            log(context, LogType.GetRepos, e);
+            updateCallback.invoke(listOf())
+            log(context, LogType.GetRepos, e)
         }
     }
 }

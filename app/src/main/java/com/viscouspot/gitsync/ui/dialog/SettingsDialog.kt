@@ -15,16 +15,17 @@ import com.google.android.material.button.MaterialButton
 import com.viscouspot.gitsync.R
 import com.viscouspot.gitsync.util.GitManager
 import com.viscouspot.gitsync.util.Logger.sendBugReportNotification
+import com.viscouspot.gitsync.util.RepoManager
 import com.viscouspot.gitsync.util.SettingsManager
 
-class SettingsDialog(private val context: Context, private val settingsManager: SettingsManager, private val gitManager: GitManager, private val gitDirPath: String) : BaseDialog(context) {
+class SettingsDialog(private val context: Context, private val repoManager: RepoManager, private val settingsManager: SettingsManager, private val gitManager: GitManager, private val gitDirPath: String) : BaseDialog(context) {
 
     override fun onStart() {
         super.onStart()
         setContentView(R.layout.dialog_settings)
 
         setupSyncMessageSettings()
-        setupRemoteSetings()
+        setupRemoteSettings()
         setupAuthorNameSettings()
         setupAuthorEmailSettings()
         
@@ -50,7 +51,7 @@ class SettingsDialog(private val context: Context, private val settingsManager: 
         contributeButton.setOnClickListener {
             val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(context.getString(R.string.contribute_link)))
             context.startActivity(browserIntent)
-            settingsManager.setHasContributed()
+            repoManager.setHasContributed()
         }
     }
 
@@ -83,7 +84,7 @@ class SettingsDialog(private val context: Context, private val settingsManager: 
         }
     }
 
-    private fun setupRemoteSetings() {
+    private fun setupRemoteSettings() {
         val remoteInput = findViewById<EditText>(R.id.remoteInput) ?: return
         remoteInput.setText(settingsManager.getRemote())
         remoteInput.doOnTextChanged { text, _, _, _ ->

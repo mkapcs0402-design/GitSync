@@ -1,6 +1,5 @@
 package com.viscouspot.gitsync
 
-import android.app.PendingIntent
 import android.content.Intent
 import android.os.Build
 import android.service.quicksettings.TileService
@@ -12,6 +11,7 @@ class GitTileSyncService: TileService() {
         super.onClick()
         val forceSyncIntent = Intent(this, GitSyncService::class.java)
         forceSyncIntent.setAction(GitSyncService.FORCE_SYNC)
+        forceSyncIntent.putExtra("repoIndex", 0)
         startService(forceSyncIntent)
     }
 }
