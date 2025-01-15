@@ -31,7 +31,6 @@
     <string name="report_bug">&lt;GitSync Error&gt; Tap to send a bug report</string>
     <string name="unknown_error">Unknown Error</string>
     <string name="enable_notifications">Enable notifications permission to see more.</string>
-    <string name="select_email_client">Send email using: </string>
 
     <string name="out_of_memory">Application ran out of memory!</string>
     <string name="invalid_remote">Invalid remote! Modify this in settings</string>
