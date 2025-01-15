@@ -15,6 +15,8 @@ import android.net.NetworkCapabilities
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
+import android.os.Handler
+import android.os.Looper
 import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.text.Html
@@ -48,7 +50,9 @@ object Helper {
 
     fun makeToast(context: Context, message: String, length: Int = Toast.LENGTH_SHORT) {
         if (!NotificationManagerCompat.from(context).areNotificationsEnabled()) return
-        Toast.makeText(context, message, length).show()
+
+        val mainHandler = Handler(Looper.getMainLooper())
+        mainHandler.post { Toast.makeText(context, message, length).show() }
     }
 
     fun networkRequired(context: Context) {
