@@ -25,7 +25,7 @@ class SettingsDialog(private val context: Context, private val repoManager: Repo
         setContentView(R.layout.dialog_settings)
 
         setupSyncMessageSettings()
-        setupRemoteSetings()
+        setupRemoteSettings()
         setupAuthorNameSettings()
         setupAuthorEmailSettings()
         
@@ -84,7 +84,7 @@ class SettingsDialog(private val context: Context, private val repoManager: Repo
         }
     }
 
-    private fun setupRemoteSetings() {
+    private fun setupRemoteSettings() {
         val remoteInput = findViewById<EditText>(R.id.remoteInput) ?: return
         remoteInput.setText(settingsManager.getRemote())
         remoteInput.doOnTextChanged { text, _, _, _ ->

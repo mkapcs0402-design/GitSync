@@ -1,13 +1,10 @@
 package com.viscouspot.gitsync.util
 
 import android.content.Context
-import android.net.Uri
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
-import com.viscouspot.gitsync.R
-import com.viscouspot.gitsync.util.provider.GitProviderManager
 
-class RepoManager internal constructor(private val context: Context) {
+class RepoManager internal constructor(context: Context) {
     private val masterKey = MasterKey.Builder(context, MasterKey.DEFAULT_MASTER_KEY_ALIAS)
         .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
         .build()

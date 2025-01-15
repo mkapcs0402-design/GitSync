@@ -27,7 +27,7 @@ class GiteaManager(private val context: Context) : GitProviderManager {
     private val client = OkHttpClient.Builder()
         .connectTimeout(30, TimeUnit.SECONDS)
         .readTimeout(30, TimeUnit.SECONDS)
-        .build();
+        .build()
     private var codeVerifier: String? = null
     override val oAuthSupport = true
 
@@ -202,8 +202,8 @@ class GiteaManager(private val context: Context) : GitProviderManager {
             })
         } catch (e: Throwable) {
             nextPageCallback(null)
-            updateCallback.invoke(listOf());
-            log(context, LogType.GetRepos, e);
+            updateCallback.invoke(listOf())
+            log(context, LogType.GetRepos, e)
         }
     }
 }

@@ -1,20 +1,15 @@
 package com.viscouspot.gitsync.ui.adapter
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.ColorStateList
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.HorizontalScrollView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.button.MaterialButton
 import com.viscouspot.gitsync.R
-import com.viscouspot.gitsync.ui.adapter.ConflictEditorAdapter.BasicViewHolder
-import java.util.Locale
 
 class ManualSyncItemAdapter (
     private val context: Context,
@@ -29,7 +24,6 @@ class ManualSyncItemAdapter (
         val fileName: TextView = view.findViewById(R.id.fileName)
     }
 
-    @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         holder as BasicViewHolder
         val filePath = filePaths[position]

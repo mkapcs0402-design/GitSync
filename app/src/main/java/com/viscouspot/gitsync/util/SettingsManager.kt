@@ -334,21 +334,6 @@ class SettingsManager internal constructor(private val context: Context, private
         }
     }
 
-    fun hasContributed(): Boolean {
-        reloadSharedPref()
-
-        return settingsSharedPref.getBoolean("hasContributed", false)
-    }
-
-    fun setHasContributed() {
-        reloadSharedPref()
-
-        with(settingsSharedPref.edit()) {
-            putBoolean("hasContributed", true)
-            apply()
-        }
-    }
-
     fun getLastSyncMethod(): String {
         reloadSharedPref()
 

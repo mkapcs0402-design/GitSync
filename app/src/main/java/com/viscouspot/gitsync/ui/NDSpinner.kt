@@ -2,8 +2,6 @@ package com.viscouspot.gitsync.ui
 
 import android.content.Context
 import android.util.AttributeSet
-import android.widget.Spinner
-
 
 /** Spinner extension that calls onItemSelected even when the selection is the same as its previous value  */
 class NDSpinner : androidx.appcompat.widget.AppCompatSpinner {

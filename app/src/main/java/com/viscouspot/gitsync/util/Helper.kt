@@ -34,11 +34,6 @@ import com.viscouspot.gitsync.MainActivity
 import com.viscouspot.gitsync.R
 import com.viscouspot.gitsync.ui.dialog.BaseDialog
 import com.viscouspot.gitsync.util.Logger.log
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import java.io.BufferedReader
 import java.io.ByteArrayOutputStream
 import java.io.File
