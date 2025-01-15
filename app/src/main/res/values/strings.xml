@@ -23,6 +23,7 @@
 
     <string name="enable_accessibility_service">Please enable Git Sync under "Installed apps"</string>
     <string name="network_unavailable">Network unavailable!\nGitSync will retry when reconnected</string>
+    <string name="network_unavailable_retry">Network unavailable!\nGitSync will retry when reconnected</string>
 
     <!--    Bug Notification-->
     <string name="report_a_bug">Report a Bug</string>
@@ -52,8 +53,6 @@
     <string name="additions">%s ++</string>
     <string name="deletions" tools:ignore="TypographyDashes">%s --</string>
 
-    <string name="force_sync">Sync Now</string>
-
     <string name="auth">AUTH</string>
     <string name="git_dir_path_hint">/storage/emulated/0/…</string>
     <string name="deselect_repository_directory">deselect repository directory</string>
@@ -66,9 +65,6 @@
     <string name="save_application">Save</string>
     <string name="sync_on_app_closed">Sync on app(s) closed</string>
     <string name="sync_on_app_opened">Sync on app(s) opened</string>
-
-    <string name="docs_link">https://github.com/ViscousPot/GitSync/blob/master/Documentation.md</string>
-    <string name="documentation_html_link"><![CDATA[<a href=\"%s\">DOCUMENTATION</a>]]></string>
 
     <!--    Clone Screen-->
     <string name="clone_repo">Clone remote repository</string>
@@ -88,17 +84,23 @@
 
 
     <!--    Sync Dialogs-->
-    <string name="force_push">Force push</string>
+    <string name="sync_now">Sync Now</string>
+
+    <string name="force_push">Force Push</string>
     <string name="force_pushing">Force pushing…</string>
     <string name="confirm_force_push">Confirm Force Push</string>
     <string name="confirm_force_push_msg">Are you sure you want to force push these changes? \n\nThis action will overwrite the remote history and cannot be undone.</string>
 
-    <string name="force_pull">Force pull</string>
+    <string name="force_pull">Force Pull</string>
     <string name="force_pulling">Force pulling…</string>
     <string name="confirm_force_pull">Confirm Force Pull</string>
     <string name="confirm_force_pull_msg">Are you sure you want to force pull these changes? \n\nThis action will overwrite the local history and cannot be undone.</string>
 
     <string name="force_push_pull_message">Please do not close or exit the app until the process is complete.</string>
+
+    <string name="manual_sync">Manual Sync</string>
+    <string name="manual_sync_msg">Select the files you would like to sync</string>
+    <string name="no_uncommitted_changes">No uncommitted changes</string>
 
     <!--    Merge Conflict Dialog-->
     <string name="merge_conflict_item_title">MERGE CONFLICT</string>
@@ -143,6 +145,16 @@
     <string name="git_info_exclude">Git/info/exclude</string>
     <string name="git_info_exclude_description">list files or folders to ignore on this device</string>
     <string name="git_info_exclude_hint">.trash/\n./…</string>
+
+    <string name="view_docs">View Documentation</string>
+    <string name="docs_link">https://github.com/ViscousPot/GitSync/blob/master/Documentation.md</string>
+    <string name="documentation_html_link"><![CDATA[<a href=\"%s\">DOCUMENTATION</a>]]></string>
+
+    <string name="support_now">Contribute!</string>
+    <string name="contribute_msg"><![CDATA[<b>Looks like you\'re a bit of a power user!</b><br/><br/>Your support can help keep the app running smoothly and evolving with a contribution as little as <b>$5</b> through GitHub Sponsors.]]></string>
+    <string name="contribute_title">Support Our Work</string>
+    <string name="support_promise">I have</string>
+    <string name="contribute_link"><![CDATA[https://github.com/sponsors/ViscousPot?sponsor=ViscousPot&frequency=one-time&amount=15]]></string>
 
     <!--    Auth Dialogs-->
     <string name="select_your_git_provider_and_authenticate">Select your git provider and authenticate</string>
@@ -206,5 +218,6 @@
 
     <string name="enable_autosync_title">Enable Auto Sync</string>
     <string name="enable_autosync_message">Keep your data up-to-date effortlessly. Turn on Auto Sync to automatically sync in the background whenever apps are opened or closed.</string>
+    <string name="pull_changes">Pull Changes</string>
 
 </resources>

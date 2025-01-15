@@ -47,6 +47,7 @@ import com.viscouspot.gitsync.ui.adapter.RecentCommitsAdapter
 import com.viscouspot.gitsync.ui.dialog.ApplicationSelectDialog
 import com.viscouspot.gitsync.ui.dialog.AuthDialog
 import com.viscouspot.gitsync.ui.dialog.BaseDialog
+import com.viscouspot.gitsync.ui.dialog.ManualSyncDialog
 import com.viscouspot.gitsync.ui.dialog.MergeConflictDialog
 import com.viscouspot.gitsync.ui.dialog.ProgressDialog
 import com.viscouspot.gitsync.ui.dialog.SettingsDialog
@@ -55,6 +56,8 @@ import com.viscouspot.gitsync.util.GitManager
 import com.viscouspot.gitsync.util.provider.GitProviderManager
 import com.viscouspot.gitsync.util.Helper
 import com.viscouspot.gitsync.util.Helper.makeToast
+import com.viscouspot.gitsync.util.Helper.networkRequired
+import com.viscouspot.gitsync.util.Helper.showContributeDialog
 import com.viscouspot.gitsync.util.LogType
 import com.viscouspot.gitsync.util.Logger.log
 import com.viscouspot.gitsync.util.OnboardingController
@@ -80,8 +83,9 @@ class MainActivity : AppCompatActivity() {
 
     private var mergeConflictDialog: Dialog? = null
 
-    private lateinit var forceSyncButton: MaterialButton
+    private lateinit var syncButton: MaterialButton
     private lateinit var syncMenuButton: MaterialButton
+    private lateinit var syncOptionAdapter: SpinnerIconPrefixAdapter
     private lateinit var syncMenuSpinner: NDSpinner
 
     private lateinit var settingsButton: MaterialButton
@@ -94,8 +98,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var gitDirPath: TextView
     private lateinit var deselectDirButton: MaterialButton
     private lateinit var selectDirButton: MaterialButton
-
-    private lateinit var viewDocs: MaterialButton
 
     private lateinit var applicationObserverPanel: ConstraintLayout
     private lateinit var applicationObserverSwitch: Switch
@@ -119,22 +121,12 @@ class MainActivity : AppCompatActivity() {
 
     private var requestedPermission = false
 
-    private val syncOptionIconMap: Map<String, Int> = mapOf(
-        Pair("Force Push", R.drawable.force_push),
-        Pair("Force Pull", R.drawable.force_pull),
-    )
-
-    val syncOptionFnMap: Map<String, () -> Unit> = mapOf(
-        Pair("Force Push") {
-            showConfirmForcePushPullDialog(true)
-        },
-        Pair("Force Pull") {
-            showConfirmForcePushPullDialog(false)
-        },
-    )
+    private lateinit var syncOptionIconMap: Map<String, Int>
+    private lateinit var syncOptionFnMap: Map<String, () -> Unit>
 
     companion object {
         const val REFRESH = "REFRESH"
+        const val MANUAL_SYNC = "MANUAL_SYNC"
         const val MERGE_COMPLETE = "MERGE_COMPLETE"
     }
 
@@ -193,6 +185,11 @@ class MainActivity : AppCompatActivity() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
+        if (intent.action == MANUAL_SYNC) {
+            ManualSyncDialog(this, settingsManager, gitManager, ::refreshRecentCommits).show()
+            return
+        }
+        
         val uri = intent.data ?: return
 
         log(LogType.GithubOAuthFlow, "Flow Ended")
@@ -286,6 +283,64 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        syncOptionIconMap = mapOf(
+            Pair(getString(R.string.sync_now), R.drawable.pull),
+            Pair(getString(R.string.force_push), R.drawable.force_push),
+            Pair(getString(R.string.force_pull), R.drawable.force_pull),
+            Pair(getString(R.string.pull_changes), R.drawable.pull_changes),
+            Pair(getString(R.string.manual_sync), R.drawable.manual_sync),
+        )
+
+        syncOptionFnMap = mapOf(
+            Pair(getString(R.string.sync_now)) {
+                val forceSyncIntent = Intent(this, GitSyncService::class.java)
+                forceSyncIntent.setAction(GitSyncService.FORCE_SYNC)
+                startService(forceSyncIntent)
+                return@Pair
+            },
+            Pair(getString(R.string.force_push)) {
+                showConfirmForcePushPullDialog(true)
+            },
+            Pair(getString(R.string.force_pull)) {
+                showConfirmForcePushPullDialog(false)
+            },
+            Pair(getString(R.string.pull_changes)) {
+                val gitDirUri = settingsManager.getGitDirUri()
+                if (gitDirUri == null) {
+                    runOnUiThread {
+                        log(LogType.Sync, "Repository Not Found")
+                        makeToast(
+                            applicationContext,
+                            getString(R.string.repository_not_found),
+                            Toast.LENGTH_LONG
+                        )
+                    }
+                    return@Pair
+                }
+                val job = CoroutineScope(Dispatchers.Default).launch {
+                    gitManager.downloadChanges(
+                        gitDirUri,
+                        {
+                            networkRequired(applicationContext)
+                        },
+                    ) { }
+
+                }
+
+                job.invokeOnCompletion {
+                    runOnUiThread {
+                        refreshRecentCommits()
+                    }
+                }
+
+            },
+            Pair(getString(R.string.manual_sync)) {
+                showContributeDialog(this, settingsManager) {
+                    ManualSyncDialog(this, settingsManager, gitManager, ::refreshRecentCommits).show()
+                }
+            },
+        )
+
         System.setProperty("org.eclipse.jgit.util.Debug", "true")
         System.setProperty("org.apache.sshd.common.util.logging.level", "DEBUG")
 
@@ -295,6 +350,11 @@ class MainActivity : AppCompatActivity() {
 
         settingsManager = SettingsManager(this)
         settingsManager.runMigrations()
+
+        val packageInfo = packageManager.getPackageInfo(packageName, 0)
+        if (System.currentTimeMillis() - packageInfo.firstInstallTime >= 30L * 24 * 60 * 60 * 1000) {
+            showContributeDialog(this, settingsManager) {}
+        }
 
         requestLegacyStoragePermission = this.registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { isGrantedMap ->
             if (isGrantedMap.values.all { it }) {
@@ -329,7 +389,7 @@ class MainActivity : AppCompatActivity() {
 
         recentCommitsAdapter = RecentCommitsAdapter(this, recentCommits, ::openMergeConflictDialog)
 
-        forceSyncButton = findViewById(R.id.forceSyncButton)
+        syncButton = findViewById(R.id.syncButton)
         syncMenuButton = findViewById(R.id.syncMenuButton)
         syncMenuSpinner = findViewById(R.id.syncMenuSpinner)
 
@@ -343,8 +403,6 @@ class MainActivity : AppCompatActivity() {
         gitDirPath = findViewById(R.id.gitDirPath)
         deselectDirButton = findViewById(R.id.deselectDirButton)
         selectDirButton = findViewById(R.id.selectDirButton)
-
-        viewDocs = findViewById(R.id.viewDocs)
 
         applicationObserverPanel = findViewById(R.id.applicationObserverPanel)
         applicationObserverSwitch = applicationObserverPanel.findViewById(R.id.enableApplicationObserver)
@@ -370,15 +428,9 @@ class MainActivity : AppCompatActivity() {
         val emptyCommitsView = findViewById<TextView>(R.id.emptyCommitsView)
         recentCommitsRecycler.setEmptyView(emptyCommitsView)
 
-        forceSyncButton.setOnClickListener {
-            val forceSyncIntent = Intent(this, GitSyncService::class.java)
-            forceSyncIntent.setAction(GitSyncService.FORCE_SYNC)
-            startService(forceSyncIntent)
-        }
+        syncOptionAdapter = SpinnerIconPrefixAdapter(this, syncOptionIconMap.filter { (key, _) -> settingsManager.getLastSyncMethod() != key }.toList())
 
-        val adapter = SpinnerIconPrefixAdapter(this, syncOptionIconMap.toList())
-
-        syncMenuSpinner.adapter = adapter
+        syncMenuSpinner.adapter = syncOptionAdapter
         syncMenuSpinner.post{
             syncMenuSpinner.dropDownWidth = syncMenuSpinner.width
         }
@@ -391,8 +443,12 @@ class MainActivity : AppCompatActivity() {
                     return
                 }
 
-                val syncOption = syncOptionFnMap.keys.toList()[position]
-                syncOptionFnMap[syncOption]?.invoke()
+                val filteredSyncOptions = syncOptionFnMap.filter { (key, _) -> settingsManager.getLastSyncMethod() != key }
+                val syncOption = filteredSyncOptions.keys.toList()[position]
+
+                settingsManager.setLastSyncMethod(syncOption)
+                filteredSyncOptions[syncOption]?.invoke()
+                updateSyncOptions()
             }
 
             override fun onNothingSelected(parent: AdapterView<*>) {}
@@ -459,9 +515,8 @@ class MainActivity : AppCompatActivity() {
             settingsManager.setSyncOnAppClosed(isChecked)
         }
 
-        viewDocs.setOnClickListener {
-            val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.docs_link)))
-            startActivity(browserIntent)
+        if (intent.action == MANUAL_SYNC) {
+            ManualSyncDialog(this, settingsManager, gitManager, ::refreshRecentCommits).show()
         }
     }
 
@@ -590,7 +645,24 @@ class MainActivity : AppCompatActivity() {
         applicationSelectDialog?.show()
     }
 
+    private fun updateSyncOptions() {
+        runOnUiThread {
+            syncOptionAdapter.clear()
+            syncOptionAdapter.addAll(syncOptionIconMap.filter { (key, _) -> settingsManager.getLastSyncMethod() != key }.toList())
+            syncOptionAdapter.notifyDataSetChanged()
+
+            syncButton.text = settingsManager.getLastSyncMethod()
+            syncButton.icon = ContextCompat.getDrawable(this, syncOptionIconMap[settingsManager.getLastSyncMethod()] ?: R.drawable.pull)?.mutate()
+            syncButton.setOnClickListener {
+                val syncFn = syncOptionFnMap[settingsManager.getLastSyncMethod()] ?: {}
+                syncFn.invoke()
+            }
+        }
+    }
+
     private fun refreshAll() {
+        updateSyncOptions()
+
         refreshRecentCommits()
 
         runOnUiThread {
@@ -710,7 +782,7 @@ class MainActivity : AppCompatActivity() {
 
         if (gitManager.getConflicting(settingsManager.getGitDirUri()).isNotEmpty()) {
             runOnUiThread {
-                forceSyncButton.isEnabled = false
+                syncButton.isEnabled = false
 
                 recentCommits.add(0, Commit("", "", 0L, RecentCommitsAdapter.MERGE_CONFLICT, 0, 0))
                 recentCommitsAdapter.notifyItemInserted(0)
@@ -718,7 +790,7 @@ class MainActivity : AppCompatActivity() {
             }
         } else {
             runOnUiThread {
-                forceSyncButton.isEnabled = true
+                syncButton.isEnabled = true
             }
         }
     }

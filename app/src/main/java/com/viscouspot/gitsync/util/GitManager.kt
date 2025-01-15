@@ -288,6 +288,17 @@ class GitManager(private val context: Context, private val settingsManager: Sett
         return null
     }
 
+    fun getUncommittedFilePaths(userStorageUri: Uri, gitInstance: Git? = null): List<String> {
+        var git = gitInstance
+        if (git == null) {
+            val repo = FileRepository("${Helper.getPathFromUri(context, userStorageUri)}/${context.getString(R.string.git_path)}")
+            git = Git(repo)
+        }
+        val status = git.status().call()
+
+        return (status.uncommittedChanges.plus(status.untracked)).toList()
+    }
+
     fun forcePush(userStorageUri: Uri): Boolean {
         if (!Helper.isNetworkAvailable(context)) {
             return false
@@ -300,21 +311,19 @@ class GitManager(private val context: Context, private val settingsManager: Sett
             val git = Git(repo)
 
             logStatus(git)
-            val status = git.status().call()
+            val uncommitted = getUncommittedFilePaths(userStorageUri, git)
 
-            if (status.uncommittedChanges.isNotEmpty() || status.untracked.isNotEmpty()) {
+            if (uncommitted.isNotEmpty()) {
                 log(LogType.ForcePush, "Adding Files to Stage")
 
                 // Adds all uncommitted and untracked files to the index for staging.
                 git.add().apply {
-                    status.uncommittedChanges.forEach { addFilepattern(it) }
-                    status.untracked.forEach { addFilepattern(it) }
+                    uncommitted.forEach { addFilepattern(it) }
                 }.call()
 
                 // Updates the index to reflect changes in already tracked files, removing deleted files without adding untracked files.
                 git.add().apply {
-                    status.uncommittedChanges.forEach { addFilepattern(it) }
-                    status.untracked.forEach { addFilepattern(it) }
+                    uncommitted.forEach { addFilepattern(it) }
                     isUpdate = true
                 }.call()
 
@@ -341,7 +350,7 @@ class GitManager(private val context: Context, private val settingsManager: Sett
                 }
 
                 git.commit().apply {
-                    setCommitter(committerName ?: "", committerEmail ?: "")
+                    setCommitter(committerName, committerEmail ?: "")
                     message = settingsManager.getSyncMessage().format(formattedDate)
                 }.call()
 
@@ -367,7 +376,7 @@ class GitManager(private val context: Context, private val settingsManager: Sett
         return false
     }
 
-    fun uploadChanges(userStorageUri: Uri, scheduleNetworkSync: () -> Unit, onSync: () -> Unit): Boolean? {
+    fun uploadChanges(userStorageUri: Uri, scheduleNetworkSync: () -> Unit, onSync: () -> Unit, filePaths: List<String>? = null, syncMessage: String? = null): Boolean? {
         if (conditionallyScheduleNetworkSync(scheduleNetworkSync)) {
             return null
         }
@@ -379,23 +388,21 @@ class GitManager(private val context: Context, private val settingsManager: Sett
             val git = Git(repo)
 
             logStatus(git)
-            val status = git.status().call()
+            val uncommitted = filePaths ?: getUncommittedFilePaths(userStorageUri, git)
 
-            if (status.uncommittedChanges.isNotEmpty() || status.untracked.isNotEmpty()) {
+            if (uncommitted.isNotEmpty()) {
                 onSync.invoke()
 
                 log(LogType.PushToRepo, "Adding Files to Stage")
 
                 // Adds all uncommitted and untracked files to the index for staging.
                 git.add().apply {
-                    status.uncommittedChanges.forEach { addFilepattern(it) }
-                    status.untracked.forEach { addFilepattern(it) }
+                    uncommitted.forEach { addFilepattern(it) }
                 }.call()
 
                 // Updates the index to reflect changes in already tracked files, removing deleted files without adding untracked files.
                 git.add().apply {
-                    status.uncommittedChanges.forEach { addFilepattern(it) }
-                    status.untracked.forEach { addFilepattern(it) }
+                    uncommitted.forEach { addFilepattern(it) }
                     isUpdate = true
                 }.call()
 
@@ -422,8 +429,8 @@ class GitManager(private val context: Context, private val settingsManager: Sett
                 }
 
                 git.commit().apply {
-                    setCommitter(committerName ?: "", committerEmail ?: "")
-                    message = settingsManager.getSyncMessage().format(formattedDate)
+                    setCommitter(committerName, committerEmail ?: "")
+                    message = if (!syncMessage.isNullOrEmpty()) syncMessage else settingsManager.getSyncMessage().format(formattedDate)
                 }.call()
 
                 returnResult = true

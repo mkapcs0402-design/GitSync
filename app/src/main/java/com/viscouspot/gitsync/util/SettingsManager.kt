@@ -203,6 +203,28 @@ class SettingsManager internal constructor(private val context: Context) {
         }
     }
 
+    fun hasContributed(): Boolean {
+        return settingsSharedPref.getBoolean("hasContributed", false)
+    }
+
+    fun setHasContributed() {
+        with(settingsSharedPref.edit()) {
+            putBoolean("hasContributed", true)
+            apply()
+        }
+    }
+
+    fun getLastSyncMethod(): String {
+        return settingsSharedPref.getString("lastSyncMethod", context.getString(R.string.sync_now)).toString()
+    }
+
+    fun setLastSyncMethod(lastSyncMethod: String) {
+        with(settingsSharedPref.edit()) {
+            putString("lastSyncMethod", lastSyncMethod)
+            apply()
+        }
+    }
+
     fun runMigrations() {
         val oldApplicationPackage = getApplicationPackage()
         if (oldApplicationPackage != "" && getApplicationPackages().isEmpty()) {
