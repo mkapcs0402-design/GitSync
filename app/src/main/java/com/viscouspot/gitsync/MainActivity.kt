@@ -334,6 +334,7 @@ class MainActivity : AppCompatActivity() {
             Pair(getString(R.string.sync_now)) {
                 val forceSyncIntent = Intent(this, GitSyncService::class.java)
                 forceSyncIntent.setAction(GitSyncService.FORCE_SYNC)
+                forceSyncIntent.putExtra("repoIndex", repoManager.getRepoIndex())
                 startService(forceSyncIntent)
                 return@Pair
             },
