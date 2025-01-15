@@ -99,6 +99,7 @@
 
     <!--    Sync Dialogs-->
     <string name="sync_now">Sync Now</string>
+    <string name="pull_changes">Pull Changes</string>
 
     <string name="force_push">Force Push</string>
     <string name="force_pushing">Force pushing…</string>
