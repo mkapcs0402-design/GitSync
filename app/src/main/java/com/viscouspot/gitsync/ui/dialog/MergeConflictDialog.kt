@@ -9,14 +9,16 @@ import android.webkit.MimeTypeMap
 import android.widget.HorizontalScrollView
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.SmoothScroller
 import com.google.android.material.button.MaterialButton
 import com.viscouspot.gitsync.GitSyncService
 import com.viscouspot.gitsync.R
 import com.viscouspot.gitsync.ui.adapter.ConflictEditorAdapter
 import com.viscouspot.gitsync.util.GitManager
 import com.viscouspot.gitsync.util.Helper
-import com.viscouspot.gitsync.util.Logger.log
 import com.viscouspot.gitsync.util.SettingsManager
 import java.io.File
 import kotlin.math.max
@@ -24,6 +26,11 @@ import kotlin.math.min
 
 
 class MergeConflictDialog(private val context: Context, private val repoIndex: Int, private val settingsManager: SettingsManager, private val gitManager: GitManager, private val refreshRecentCommits: () -> Unit) : BaseDialog(context) {
+    private var smoothScrollStart: SmoothScroller = object : LinearSmoothScroller(context) {
+        override fun getVerticalSnapPreference(): Int {
+            return SNAP_TO_START
+        }
+    }
 
     override fun onStart() {
         super.onStart()
@@ -35,8 +42,8 @@ class MergeConflictDialog(private val context: Context, private val repoIndex: I
         val conflictEditor = findViewById<HorizontalScrollView>(R.id.conflictEditor) ?: return
         val conflictEditorInput = findViewById<RecyclerView>(R.id.conflictEditorInput) ?: return
         val fileName = findViewById<MaterialButton>(R.id.fileName) ?: return
-        val filePrev = findViewById<MaterialButton>(R.id.filePrev) ?: return
-        val fileNext = findViewById<MaterialButton>(R.id.fileNext) ?: return
+        val prev = findViewById<MaterialButton>(R.id.prev) ?: return
+        val next = findViewById<MaterialButton>(R.id.next) ?: return
         val merge = findViewById<MaterialButton>(R.id.merge) ?: return
         val abortMerge = findViewById<MaterialButton>(R.id.abortMerge) ?: return
 
@@ -72,18 +79,49 @@ class MergeConflictDialog(private val context: Context, private val repoIndex: I
 
         }
 
-        filePrev.setOnClickListener {
-            conflictIndex = max(conflictIndex - 1, 0)
-            refreshMergeConflictDialog(conflicts, conflictSections, conflictIndex, merge, fileName, filePrev, fileNext, conflictEditorInput)
+        conflictEditorInput.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                    refreshArrowKeys(conflicts, conflictSections, conflictIndex, prev, next, conflictEditorInput)
+                }
+            }
+        })
+
+        prev.setOnClickListener {
+            val firstConflictIndex = conflictSections.indexOfFirst{ it.contains(context.getString(R.string.conflict_start)) }
+            if ((conflictEditorInput.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition() <= firstConflictIndex || firstConflictIndex == -1) {
+                conflictIndex = max(conflictIndex - 1, 0)
+                refreshMergeConflictDialog(conflicts, conflictSections, conflictIndex, merge, fileName, prev, next, conflictEditorInput)
+            } else {
+                val currentIndex = (conflictEditorInput.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
+                val lastConflictIndex = conflictSections.indexOfLast{ it.contains(context.getString(R.string.conflict_start)) }
+                val endIndex = if (currentIndex < 0) lastConflictIndex else currentIndex - 1
+                val prevConflictIndex = conflictSections.subList(0, endIndex).indexOfLast{ it.contains(context.getString(R.string.conflict_start)) }
+                smoothScrollStart.targetPosition = if (prevConflictIndex < 0) 0 else prevConflictIndex
+                (conflictEditorInput.layoutManager as LinearLayoutManager).startSmoothScroll(smoothScrollStart)
+                (conflictEditorInput.adapter as ConflictEditorAdapter).notifyItemChanged(prevConflictIndex)
+            }
         }
 
-        fileNext.setOnClickListener {
-            conflictIndex = min(conflictIndex + 1, conflicts.size - 1)
-            refreshMergeConflictDialog(conflicts, conflictSections, conflictIndex, merge, fileName, filePrev, fileNext, conflictEditorInput)
+        next.setOnClickListener {
+            val lastConflictIndex = conflictSections.indexOfLast{ it.contains(context.getString(R.string.conflict_start)) }
+            if ((conflictEditorInput.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition() >= lastConflictIndex || conflictSections.isEmpty() || conflictSections.firstOrNull { it.contains(context.getString(R.string.conflict_start)) } == null) {
+                conflictIndex = min(conflictIndex + 1, conflicts.size - 1)
+                refreshMergeConflictDialog(conflicts, conflictSections, conflictIndex, merge, fileName, prev, next, conflictEditorInput)
+            } else {
+                val currentIndex = (conflictEditorInput.layoutManager as LinearLayoutManager).findLastVisibleItemPosition()
+                val startIndex = if (currentIndex < 0) 1 else currentIndex + 1
+                val nextConflictIndex = conflictSections.subList(startIndex, conflictSections.size).indexOfFirst{ it.contains(context.getString(R.string.conflict_start)) } + startIndex
+                smoothScrollStart.targetPosition = if (nextConflictIndex < 0) conflictSections.size else nextConflictIndex
+                (conflictEditorInput.layoutManager as LinearLayoutManager).startSmoothScroll(smoothScrollStart)
+                (conflictEditorInput.adapter as ConflictEditorAdapter).notifyItemChanged(nextConflictIndex)
+            }
+
         }
 
         merge.post {
-            refreshMergeConflictDialog(conflicts, conflictSections, conflictIndex, merge, fileName, filePrev, fileNext, conflictEditorInput)
+            refreshMergeConflictDialog(conflicts, conflictSections, conflictIndex, merge, fileName, prev, next, conflictEditorInput)
         }
 
         merge.setOnClickListener{
@@ -97,7 +135,7 @@ class MergeConflictDialog(private val context: Context, private val repoIndex: I
             if (conflicts.size > 1) {
                 conflicts.removeAt(conflictIndex)
                 conflictIndex = min(conflictIndex, conflicts.size - 1)
-                refreshMergeConflictDialog(conflicts, conflictSections, conflictIndex, merge, fileName, filePrev, fileNext, conflictEditorInput)
+                refreshMergeConflictDialog(conflicts, conflictSections, conflictIndex, merge, fileName, prev, next, conflictEditorInput)
                 return@setOnClickListener
             }
 
@@ -120,9 +158,18 @@ class MergeConflictDialog(private val context: Context, private val repoIndex: I
         }
     }
 
-    private fun refreshMergeConflictDialog(conflicts: MutableList<String>, conflictSections: MutableList<String>, conflictIndex: Int, merge: MaterialButton, fileName: MaterialButton, filePrev: MaterialButton, fileNext: MaterialButton, conflictEditorInput: RecyclerView) {
-        filePrev.isEnabled = conflictIndex > 0
-        fileNext.isEnabled = conflictIndex < conflicts.size - 1
+    private fun refreshArrowKeys(conflicts: MutableList<String>, conflictSections: MutableList<String>, conflictIndex: Int, prev: MaterialButton, next: MaterialButton, conflictEditorInput: RecyclerView) {
+        val firstConflictIndex = conflictSections.indexOfFirst{ it.contains(context.getString(R.string.conflict_start)) }
+        val lastConflictIndex = conflictSections.indexOfLast{ it.contains(context.getString(R.string.conflict_start)) }
+
+        prev.isEnabled = (conflictEditorInput.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition() > firstConflictIndex
+                || conflictIndex > 0
+        next.isEnabled = (conflictEditorInput.layoutManager as LinearLayoutManager).findLastVisibleItemPosition() < lastConflictIndex
+                || conflictIndex < conflicts.size - 1
+    }
+
+    private fun refreshMergeConflictDialog(conflicts: MutableList<String>, conflictSections: MutableList<String>, conflictIndex: Int, merge: MaterialButton, fileName: MaterialButton, prev: MaterialButton, next: MaterialButton, conflictEditorInput: RecyclerView) {
+        refreshArrowKeys(conflicts, conflictSections, conflictIndex, prev, next, conflictEditorInput)
 
         fileName.text = conflicts.elementAt(conflictIndex).substringAfterLast("/")
 
@@ -139,8 +186,6 @@ class MergeConflictDialog(private val context: Context, private val repoIndex: I
                 conflictSections.add(it)
                 conflictEditorInput.adapter?.notifyItemInserted(conflictSections.size)
             }
-
-            log(conflictSections.toString())
         } else {
             conflictSections.add("File not found.")
             conflictEditorInput.adapter?.notifyItemInserted(conflictSections.size)
