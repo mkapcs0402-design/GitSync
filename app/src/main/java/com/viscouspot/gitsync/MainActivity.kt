@@ -972,7 +972,9 @@ class MainActivity : AppCompatActivity() {
         }
 
         if (gitManager.getConflicting(settingsManager.getGitDirUri()).isNotEmpty()) {
-            recentCommits.add(0, Commit("", "", 0L, RecentCommitsAdapter.MERGE_CONFLICT, 0, 0))
+            if (recentCommits.firstOrNull { it.reference == RecentCommitsAdapter.MERGE_CONFLICT } == null) {
+                recentCommits.add(0, Commit("", "", 0L, RecentCommitsAdapter.MERGE_CONFLICT, 0, 0))
+            }
 
             runOnUiThread {
                 syncButton.isEnabled = false
@@ -986,7 +988,6 @@ class MainActivity : AppCompatActivity() {
                 syncButton.isEnabled = true
             }
         }
-        log("done here")
     }
 
     private fun refreshGitRepo() {
