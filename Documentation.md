@@ -41,12 +41,31 @@ Manual arbitrary authentication methods for more advanced/self-hosting users
     - Class: `com.viscouspot.gitsync.GitSyncService`
     - Action: `INTENT_SYNC`
 
-## Settings
-![Settings dialog](https://github.com/user-attachments/assets/2c9cf282-335f-42cd-9bc3-aec5d5398ffa)
+## Resolve Merge Conflicts
 
+### When a merge conflict occurs in your repository
+- A notification is sent to the device
+- Sync methods other than `Force Push` and `Force Pull` are disabled
+- A `MERGE CONFLICT` entry is added to the recent commits
+
+### Clicking on the `MERGE CONFLICT` entry will
+- Take you to the resolution dialog
+- Allow you to navigate between conflicts using the arrows
+- Allow you to decide which changes to keep and discard
+- Allow you to open any conflicting file in an editor for more control
+
+![Merge conflict dialog](https://github.com/user-attachments/assets/37b8c5d3-27fe-434f-8a98-816a39c47763)
+
+## Settings
 ### Sync Message
 - Customise the commit message template that is used on sync
 - Use `%s` to have the date and time inserted in the format `yyyy-MM-dd HH:mm:ss` (`1997-01-01 12:00:00`)
+
+### Author Name & Email
+- Customise the name and email of the author used for commits
+
+### Default Remote
+- Modify the default remote used for operations
 
 ### Gitignore
 - Allows editing of the repository's gitignore file
@@ -57,6 +76,8 @@ Manual arbitrary authentication methods for more advanced/self-hosting users
 - Allows editing of the repository's local gitignore file
 - A list of files and folder paths that should not be synced
 - [See here for more](https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files#excluding-local-files-without-creating-a-gitignore-file)
+
+![Settings dialog](https://github.com/user-attachments/assets/50218268-9fa5-40ea-8229-f73aa60dea3d)
 
 ## Extra Settings
 
