@@ -137,6 +137,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var syncOptionIconMap: Map<String, Int>
     private lateinit var syncOptionFnMap: Map<String, () -> Unit>
+    private lateinit var baseSyncOptionIconMap: Map<String, Int>
 
     companion object {
         const val REFRESH = "REFRESH"
@@ -322,13 +323,15 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        syncOptionIconMap = mapOf(
+        baseSyncOptionIconMap = mapOf(
             Pair(getString(R.string.sync_now), R.drawable.pull),
             Pair(getString(R.string.force_push), R.drawable.force_push),
             Pair(getString(R.string.force_pull), R.drawable.force_pull),
             Pair(getString(R.string.pull_changes), R.drawable.pull_changes),
             Pair(getString(R.string.manual_sync), R.drawable.manual_sync),
         )
+
+        syncOptionIconMap = baseSyncOptionIconMap
 
         syncOptionFnMap = mapOf(
             Pair(getString(R.string.sync_now)) {
@@ -837,14 +840,15 @@ class MainActivity : AppCompatActivity() {
 
     private fun updateSyncOptions() {
         runOnUiThread {
+            val mainSyncMethodKey = syncOptionIconMap.keys.firstOrNull { it == settingsManager.getLastSyncMethod() } ?: syncOptionIconMap.keys.first()
             syncOptionAdapter.clear()
-            syncOptionAdapter.addAll(syncOptionIconMap.filter { (key, _) -> settingsManager.getLastSyncMethod() != key }.toList())
+            syncOptionAdapter.addAll(syncOptionIconMap.filter { (key, _) -> mainSyncMethodKey != key }.toList())
             syncOptionAdapter.notifyDataSetChanged()
 
-            syncButton.text = settingsManager.getLastSyncMethod()
-            syncButton.icon = ContextCompat.getDrawable(this, syncOptionIconMap[settingsManager.getLastSyncMethod()] ?: R.drawable.pull)?.mutate()
+            syncButton.text = mainSyncMethodKey
+            syncButton.icon = ContextCompat.getDrawable(this, syncOptionIconMap[mainSyncMethodKey] ?: R.drawable.pull)?.mutate()
             syncButton.setOnClickListener {
-                val syncFn = syncOptionFnMap[settingsManager.getLastSyncMethod()] ?: {}
+                val syncFn = syncOptionFnMap[mainSyncMethodKey] ?: {}
                 syncFn.invoke()
             }
         }
@@ -971,7 +975,7 @@ class MainActivity : AppCompatActivity() {
 
         if (gitManager.getConflicting(settingsManager.getGitDirUri()).isNotEmpty()) {
             runOnUiThread {
-                syncButton.isEnabled = false
+                syncOptionIconMap = baseSyncOptionIconMap.filter { listOf(getString(R.string.force_push), getString(R.string.force_pull)).contains(it.key) }
 
                 if (recentCommits.firstOrNull { it.reference == RecentCommitsAdapter.MERGE_CONFLICT } == null) {
                     recentCommits.add(0, Commit("", "", 0L, RecentCommitsAdapter.MERGE_CONFLICT, 0, 0))
@@ -980,10 +984,13 @@ class MainActivity : AppCompatActivity() {
                 recentCommitsRecycler.smoothScrollToPosition(0)
             }
         } else {
+            syncOptionIconMap = baseSyncOptionIconMap
             runOnUiThread {
                 syncButton.isEnabled = true
             }
         }
+
+        updateSyncOptions()
     }
 
     private fun refreshGitRepo() {
