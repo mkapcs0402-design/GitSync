@@ -499,17 +499,28 @@ class MainActivity : AppCompatActivity() {
                     .setTitle(getString(R.string.add_repository))
                     .setCancelable(1)
                     .setView(keyInput)
-                    .setPositiveButton(R.string.add) { _, _ ->
-                        val repoNames = repoManager.getRepoNames().toMutableList()
-                        repoNames.add(input.text.toString())
-
-                        repoManager.setRepoNames(repoNames)
-                        repoManager.setRepoIndex(repoNames.indexOf(input.text.toString()))
-
-                        updateRepoButtons()
-                        refreshAll()
-                    }
+                    .setPositiveButton(R.string.add) { _, _ -> }
                     .setNegativeButton(android.R.string.cancel) { _, _ -> }
+                    .apply {
+                        setOnShowListener {
+                            getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener listener@{
+                                val repoNames = repoManager.getRepoNames().toMutableList()
+                                if (repoNames.contains(input.text.toString())) {
+                                    input.setText("${input.text}2")
+                                    return@listener
+                                }
+
+                                repoNames.add(input.text.toString())
+
+                                repoManager.setRepoNames(repoNames)
+                                repoManager.setRepoIndex(repoNames.indexOf(input.text.toString()))
+
+                                updateRepoButtons()
+                                refreshAll()
+                                dismiss()
+                            }
+                        }
+                    }
                     .show()
             }
         }
