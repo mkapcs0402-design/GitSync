@@ -68,7 +68,8 @@ class GitSyncService : Service() {
         when (intent.action) {
             MERGE -> {
                 log(LogType.ToServiceCommand, "Merge")
-                merge(repoIndex)
+                val commitMessage = intent.getStringExtra("commitMessage") ?: ""
+                merge(repoIndex, commitMessage)
             }
             FORCE_SYNC -> {
                 log(LogType.ToServiceCommand, "Force Sync")
@@ -233,7 +234,7 @@ class GitSyncService : Service() {
         }
     }
 
-    private fun merge(repoIndex: Int) {
+    private fun merge(repoIndex: Int, commitMessage: String) {
         val settingsManager = SettingsManager(this, repoIndex)
         val gitManager = GitManager(this, settingsManager)
 
@@ -251,7 +252,9 @@ class GitSyncService : Service() {
                             getString(R.string.resolving_merge),
                         )
                     }
-                }
+                },
+                null,
+                commitMessage
             )
 
             when (pushResult) {

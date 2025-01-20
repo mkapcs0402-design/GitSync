@@ -26,9 +26,6 @@ class SpinnerIconPrefixAdapter(private val context: Context, private val items: 
         val textView = view.findViewById<TextView>(R.id.gitProviderName)
         val item = items[position]
         textView.text = item.first
-        if (listOf("HTTP/S", "SSH").contains(item.first)) {
-            textView.text = context.getString(R.string.beta).format(item.first)
-        }
         textView.gravity = Gravity.CENTER_VERTICAL
 
         if (item.second == null) {

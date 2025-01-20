@@ -6,6 +6,7 @@ import android.content.res.ColorStateList
 import android.net.Uri
 import android.view.View
 import android.webkit.MimeTypeMap
+import android.widget.EditText
 import android.widget.HorizontalScrollView
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
@@ -31,6 +32,7 @@ class MergeConflictDialog(private val context: Context, private val repoIndex: I
             return SNAP_TO_START
         }
     }
+    private lateinit var syncMessageInput: EditText
 
     override fun onStart() {
         super.onStart()
@@ -38,7 +40,8 @@ class MergeConflictDialog(private val context: Context, private val repoIndex: I
 
         val conflicts = gitManager.getConflicting(settingsManager.getGitDirUri())
         if (conflicts.isEmpty()) return
-        
+
+        syncMessageInput = findViewById(R.id.syncMessageInput) ?: return
         val conflictEditor = findViewById<HorizontalScrollView>(R.id.conflictEditor) ?: return
         val conflictEditorInput = findViewById<RecyclerView>(R.id.conflictEditorInput) ?: return
         val fileName = findViewById<MaterialButton>(R.id.fileName) ?: return
@@ -148,6 +151,7 @@ class MergeConflictDialog(private val context: Context, private val repoIndex: I
             val forceSyncIntent = Intent(context, GitSyncService::class.java)
             forceSyncIntent.setAction(GitSyncService.MERGE)
             forceSyncIntent.putExtra("repoIndex", repoIndex)
+            forceSyncIntent.putExtra("commitMessage", syncMessageInput.text.toString())
             context.startService(forceSyncIntent)
         }
 

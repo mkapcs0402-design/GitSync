@@ -176,8 +176,6 @@
 
     <string name="oauth">oauth</string>
 
-    <string name="beta">%s (beta)</string>
-
     <string name="ensure_token_scope">Ensure your token includes the \"repo\" scope for full functionality.</string>
     <string name="user">user</string>
     <string name="example_user">JohnSmith12</string>
