@@ -25,6 +25,7 @@
     <string name="enable_accessibility_service">Please enable Git Sync under "Installed apps"</string>
     <string name="network_unavailable">Network unavailable!\nGitSync will retry when reconnected</string>
     <string name="network_unavailable_retry">Network unavailable!\nGitSync will retry when reconnected</string>
+    <string name="pull_failed">Pull failed! Please check for uncommitted changes and try again.</string>
 
     <!--    Bug Notification-->
     <string name="report_a_bug">Report a Bug</string>
