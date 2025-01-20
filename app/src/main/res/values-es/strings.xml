@@ -25,6 +25,7 @@
     <string name="enable_accessibility_service">Por favor habilita Git Sync en "Aplicaciones instaladas"</string>
     <string name="network_unavailable">¡Red no disponible!\nGitSync reintentará cuando se reconecte</string>
     <string name="network_unavailable_retry">¡Red no disponible!\nGitSync reintentará cuando se reconecte</string>
+    <string name="pull_failed">¡Falló la extracción! Verifica si hay cambios no confirmados e inténtalo de nuevo.</string>
 
     <!--    Bug Notification-->
     <string name="report_a_bug">Informar un error</string>
