@@ -439,7 +439,7 @@ class GitManager(private val context: Context, private val settingsManager: Sett
 
                 git.commit().apply {
                     setCommitter(committerName, committerEmail ?: "")
-                    message = if (!syncMessage.isNullOrEmpty()) syncMessage else settingsManager.getSyncMessage().format(formattedDate)
+                    message = if (!syncMessage.isNullOrEmpty()) syncMessage.format(formattedDate) else settingsManager.getSyncMessage().format(formattedDate)
                 }.call()
 
                 returnResult = true

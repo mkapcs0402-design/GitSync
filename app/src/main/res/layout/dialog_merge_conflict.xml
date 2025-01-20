@@ -32,7 +32,7 @@
         android:layout_marginTop="@dimen/space_xs"
         android:textColor="@color/text_secondary"
         android:textAlignment="center"
-        app:layout_constraintBottom_toTopOf="@id/conflictEditorContainer"
+        app:layout_constraintBottom_toTopOf="@id/syncMessageInput"
         android:layout_marginHorizontal="@dimen/space_xxs"
         android:textStyle="bold"
         app:layout_constraintTop_toBottomOf="@id/mergeConflict"
@@ -40,9 +40,33 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:text="@string/merge_dialog_message"/>
 
+    <EditText
+        android:id="@+id/syncMessageInput"
+        style="@style/SingleLineEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_md"
+        android:background="@drawable/input_bg_md"
+        android:backgroundTint="@color/card_secondary_bg"
+        android:hint="@string/sync_message"
+        android:importantForAutofill="no"
+        android:inputType="text"
+        android:paddingHorizontal="@dimen/space_md"
+        android:paddingVertical="@dimen/space_md"
+        android:text=""
+        android:textColor="@color/primary_light"
+        android:textColorHint="@color/text_secondary"
+        android:textSize="@dimen/text_size_md"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/conflictEditorContainer"
+        app:layout_constraintTop_toBottomOf="@+id/mergeConflictMessage" />
+
     <androidx.constraintlayout.widget.ConstraintLayout
         app:layout_constraintBottom_toTopOf="@id/merge"
-        app:layout_constraintTop_toBottomOf="@+id/mergeConflictMessage"
+        app:layout_constraintTop_toBottomOf="@+id/syncMessageInput"
         android:layout_width="match_parent"
         android:id="@+id/conflictEditorContainer"
         app:layout_constraintEnd_toEndOf="parent"
