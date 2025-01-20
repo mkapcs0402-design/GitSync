@@ -6,5 +6,5 @@ appId: com.viscouspot.gitsync
 - assertVisible: "ssh-rsa.*"
 - tapOn: "ssh-rsa.*"
 - runFlow: ./save_key.yaml
-- assertVisible: "CONFIRM KEY SAVED"
-- tapOn: "CONFIRM KEY SAVED"
+- assertVisible: "CONFIRM PUB KEY SAVED"
+- tapOn: "CONFIRM PUB KEY SAVED"

@@ -17,7 +17,7 @@ pub fn get_input() -> Input {
                     "notifications_dialog/assert",
                 ]],
                 vec![vec![
-                    "notifications_dialog/positive",
+                    "notifications_dialog/positive_secondary",
                     "notifications_permission/enable",
                     "back",
                     "notifications_dialog/positive_secondary",

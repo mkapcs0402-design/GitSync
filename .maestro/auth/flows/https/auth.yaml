@@ -6,4 +6,5 @@ appId: com.viscouspot.gitsync
 - inputText: ${MAESTRO_HTTPS_USERNAME}
 - tapOn: ghp_1234abcd5678efgh
 - inputText: ${MAESTRO_HTTPS_TOKEN}
+- hideKeyboard
 - tapOn: "LOGIN"

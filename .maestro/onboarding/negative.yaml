@@ -31,7 +31,7 @@ appId: com.viscouspot.gitsync
 - runFlow: flows/notifications_permission/assert.yaml
 - runFlow: ../common/back.yaml
 - runFlow: flows/notifications_dialog/assert.yaml
-- runFlow: flows/notifications_dialog/positive.yaml
+- runFlow: flows/notifications_dialog/positive_secondary.yaml
 - runFlow: flows/notifications_permission/enable.yaml
 - runFlow: ../common/back.yaml
 - runFlow: flows/notifications_dialog/positive_secondary.yaml

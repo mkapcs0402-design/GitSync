@@ -1,4 +1,4 @@
 appId: com.viscouspot.gitsync
 ---
 
-- assertVisible: "KEY"
+- assertVisible: "GENERATE KEY"
