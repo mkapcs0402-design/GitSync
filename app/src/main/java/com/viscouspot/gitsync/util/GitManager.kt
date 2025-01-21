@@ -77,13 +77,14 @@ class GitManager(private val context: Context, private val settingsManager: Sett
                 if (transport is SshTransport) {
                     transport.sshSessionFactory = sshSessionFactory
                 }
+                transport.timeout = 3000
             }
         } else {
             val authCredentials = settingsManager.getGitAuthCredentials()
             command.setCredentialsProvider(UsernamePasswordCredentialsProvider(authCredentials.first, authCredentials.second))
-        }
-        command.setTransportConfigCallback { transport ->
-            transport.timeout = 3000
+            command.setTransportConfigCallback { transport ->
+                transport.timeout = 3000
+            }
         }
     }
 
