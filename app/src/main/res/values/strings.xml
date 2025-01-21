@@ -68,17 +68,18 @@
     <string name="sync_on_app_opened">Sync on app(s) opened</string>
 
     <!-- Multi Repo -->
-    <string name="default_repo_name">main</string>
+    <string name="default_container_name">alias</string>
 
     <string name="rename">Rename</string>
-    <string name="rename_repository">Rename Repository</string>
-    <string name="rename_repository_msg">Enter a new name for the repository</string>
+    <string name="rename_container">Rename Container</string>
+    <string name="rename_container_msg">Enter a new name for the container</string>
 
     <string name="add">Add</string>
-    <string name="add_repository">Add Repository</string>
-    
-    <string name="confirm_repo_delete_msg">Are you sure you want to delete the repository \"%1$s\"? \n\nThis action cannot be undone.</string>
-    <string name="confirm_repo_delete">Confirm Repository Deletion</string>
+    <string name="add_container">Add Container</string>
+    <string name="add_container_msg">Give your new container a unique name! This alias will help you easily identify it later.</string>
+
+    <string name="confirm_container_delete">Confirm Container Deletion</string>
+    <string name="confirm_container_delete_msg">Are you sure you want to delete the container \"%1$s\"? \n\nThis action cannot be undone.</string>
 
     <!--    Clone Screen-->
     <string name="clone_repo">Clone remote repository</string>
