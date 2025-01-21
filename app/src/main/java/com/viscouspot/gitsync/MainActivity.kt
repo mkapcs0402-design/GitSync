@@ -361,13 +361,16 @@ class MainActivity : AppCompatActivity() {
                     return@Pair
                 }
                 val job = CoroutineScope(Dispatchers.Default).launch {
-                    gitManager.downloadChanges(
+                    val result = gitManager.downloadChanges(
                         gitDirUri,
                         {
                             networkRequired(applicationContext)
                         },
                     ) { }
 
+                    if (result == false) {
+                        makeToast(applicationContext, getString(R.string.pull_failed))
+                    }
                 }
 
                 job.invokeOnCompletion {

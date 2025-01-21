@@ -236,7 +236,7 @@ class GitManager(private val context: Context, private val settingsManager: Sett
                 return null
             }
 
-            if (repo.isBare || repo.resolve(Constants.HEAD) == null) return false
+            if (repo.resolve(Constants.HEAD) == null) return false
 
             val localHead: ObjectId = repo.resolve(Constants.HEAD)
             val remoteHead: ObjectId = repo.resolve(Constants.FETCH_HEAD)
@@ -399,51 +399,55 @@ class GitManager(private val context: Context, private val settingsManager: Sett
             logStatus(git)
             val uncommitted = filePaths ?: getUncommittedFilePaths(userStorageUri, git)
 
-            if (uncommitted.isNotEmpty()) {
-                onSync.invoke()
-
-                log(LogType.PushToRepo, "Adding Files to Stage")
-
-                // Adds all uncommitted and untracked files to the index for staging.
-                git.add().apply {
-                    uncommitted.forEach { addFilepattern(it) }
-                }.call()
-
-                // Updates the index to reflect changes in already tracked files, removing deleted files without adding untracked files.
-                git.add().apply {
-                    uncommitted.forEach { addFilepattern(it) }
-                    isUpdate = true
-                }.call()
-
-                log(LogType.PushToRepo, "Getting current time")
-
-                val formattedDate: String = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).apply {
-                    timeZone = TimeZone.getTimeZone("UTC")
-                }.format(Date())
-
-                log(LogType.PushToRepo, "Committing changes")
-                val config: StoredConfig = git.repository.config
-
-                var committerEmail: String? = settingsManager.getAuthorEmail()
-                if (committerEmail == null || committerEmail == "") {
-                    committerEmail = config.getString("user", null, "email")
-                }
-
-                var committerName: String? = settingsManager.getAuthorName()
-                if (committerName == null || committerName == "") {
-                    committerName = config.getString("user", null, "name")
-                }
-                if (committerName == null || committerName == "") {
-                    committerName = settingsManager.getGitAuthCredentials().first
-                }
-
-                git.commit().apply {
-                    setCommitter(committerName, committerEmail ?: "")
-                    message = if (!syncMessage.isNullOrEmpty()) syncMessage else settingsManager.getSyncMessage().format(formattedDate)
-                }.call()
-
-                returnResult = true
+            if (uncommitted.isEmpty()) {
+                log(LogType.PushToRepo, "Closing repository")
+                closeRepo(repo)
+                return false
             }
+
+            onSync.invoke()
+
+            log(LogType.PushToRepo, "Adding Files to Stage")
+
+            // Adds all uncommitted and untracked files to the index for staging.
+            git.add().apply {
+                uncommitted.forEach { addFilepattern(it) }
+            }.call()
+
+            // Updates the index to reflect changes in already tracked files, removing deleted files without adding untracked files.
+            git.add().apply {
+                uncommitted.forEach { addFilepattern(it) }
+                isUpdate = true
+            }.call()
+
+            log(LogType.PushToRepo, "Getting current time")
+
+            val formattedDate: String = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).apply {
+                timeZone = TimeZone.getTimeZone("UTC")
+            }.format(Date())
+
+            log(LogType.PushToRepo, "Committing changes")
+            val config: StoredConfig = git.repository.config
+
+            var committerEmail: String? = settingsManager.getAuthorEmail()
+            if (committerEmail == null || committerEmail == "") {
+                committerEmail = config.getString("user", null, "email")
+            }
+
+            var committerName: String? = settingsManager.getAuthorName()
+            if (committerName == null || committerName == "") {
+                committerName = config.getString("user", null, "name")
+            }
+            if (committerName == null || committerName == "") {
+                committerName = settingsManager.getGitAuthCredentials().first
+            }
+
+            git.commit().apply {
+                setCommitter(committerName, committerEmail ?: "")
+                message = if (!syncMessage.isNullOrEmpty()) syncMessage else settingsManager.getSyncMessage().format(formattedDate)
+            }.call()
+
+            returnResult = true
 
             if (conditionallyScheduleNetworkSync(scheduleNetworkSync)) {
                 return null

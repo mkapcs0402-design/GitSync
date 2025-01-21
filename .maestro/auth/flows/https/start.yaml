@@ -4,9 +4,9 @@ appId: com.viscouspot.gitsync
 - runFlow: ../assert.yaml
 - runFlow:
     when: 
-      notVisible: "HTTP/S (BETA)"
+      notVisible: "HTTP/S"
     commands:
       - tapOn: 
           id: "gitProviderSpinner"
-      - assertVisible: "HTTP/S (BETA)"
-      - tapOn: "HTTP/S (BETA)"
+      - assertVisible: "HTTP/S"
+      - tapOn: "HTTP/S"

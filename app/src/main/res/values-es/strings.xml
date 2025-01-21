@@ -25,6 +25,7 @@
     <string name="enable_accessibility_service">Por favor habilita Git Sync en "Aplicaciones instaladas"</string>
     <string name="network_unavailable">¡Red no disponible!\nGitSync reintentará cuando se reconecte</string>
     <string name="network_unavailable_retry">¡Red no disponible!\nGitSync reintentará cuando se reconecte</string>
+    <string name="pull_failed">¡Falló la extracción! Verifica si hay cambios no confirmados e inténtalo de nuevo.</string>
 
     <!--    Bug Notification-->
     <string name="report_a_bug">Informar un error</string>
@@ -173,8 +174,6 @@
     <string name="select_your_git_provider_and_authenticate">Selecciona tu proveedor de Git y autentícate</string>
 
     <string name="oauth">oauth</string>
-
-    <string name="beta">%s (beta)</string>
 
     <string name="ensure_token_scope">Asegúrate de que tu token incluya el alcance "repo" para funcionalidad completa.</string>
     <string name="user">usuario</string>
