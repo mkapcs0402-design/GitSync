@@ -22,7 +22,7 @@
 
   <br />
   <p align="center">
-    <a href="https://github.com/ViscousPot/GitSync/blob/master/Documentation.md">Documentation</a>
+    <a href="https://github.com/ViscousPot/GitSync/wiki">Documentation</a>
   </p>
   <br />
 
