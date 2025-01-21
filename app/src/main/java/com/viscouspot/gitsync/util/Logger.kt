@@ -75,7 +75,7 @@ object Logger {
 
     private fun addToLastLogs(type: LogType, message: String) {
         lastLogs.add(Pair(type, message))
-        while (lastLogs.size > 10) {
+        while (lastLogs.size > 20) {
             lastLogs.removeAt(0)
         }
     }
@@ -123,13 +123,25 @@ object Logger {
     }
 
     private fun createGitHubIssueIntent(): Intent {
-        val lastLogsString = lastLogs.joinToString(separator = "\n") { (first, second) -> "$first: $second" }
+        val lastLogsString = lastLogs.reversed().joinToString(separator = "\n") { (first, second) -> "$first: $second" }
         var url = "https://github.com/ViscousPot/GitSync/issues/new?"
         url += "body="
         url += urlEncode("""
+<!-- Fill out the error details below -->
 
+#### Have you looked at the wiki?
+<!-- e.g. N -->
 
-<!-- PROVIDE ERROR REPRO STEPS -->
+#### Can you reproduce this issue reliably?
+<!-- e.g. N -->
+
+#### Which feature is affected?
+<!-- e.g. auth -->
+
+#### What auth method are you using?
+<!-- e.g. oauth -->
+
+<!--    -------- STOP HERE --------    -->
 
 ---
 
