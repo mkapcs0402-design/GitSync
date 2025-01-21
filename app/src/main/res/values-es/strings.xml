@@ -68,17 +68,18 @@
     <string name="sync_on_app_opened">Sincronizar al abrir la(s) aplicación(es)</string>
 
     <!-- Multi Repo -->
-    <string name="default_repo_name">origin</string>
+    <string name="default_container_name">alias</string>
 
     <string name="rename">Renombrar</string>
-    <string name="rename_repository">Renombrar Repositorio</string>
-    <string name="rename_repository_msg">Introduce un nuevo nombre para el repositorio</string>
+    <string name="rename_container">Renombrar Repositorio</string>
+    <string name="rename_container_msg">Introduce un nuevo nombre para el repositorio</string>
 
     <string name="add">Añadir</string>
-    <string name="add_repository">Añadir Repositorio</string>
+    <string name="add_container">Añadir Repositorio</string>
+    <string name="add_container_msg">¡Dale a tu nuevo contenedor un nombre único! Este alias te ayudará a identificarlo fácilmente más tarde.</string>
 
-    <string name="confirm_repo_delete_msg">¿Estás seguro de que quieres eliminar el repositorio \"%1$s\"? \n\nEsta acción no se puede deshacer.</string>
-    <string name="confirm_repo_delete">Confirmar Eliminación del Repositorio</string>
+    <string name="confirm_container_delete_msg">¿Estás seguro de que quieres eliminar el repositorio \"%1$s\"? \n\nEsta acción no se puede deshacer.</string>
+    <string name="confirm_container_delete">Confirmar Eliminación del Repositorio</string>
 
     <!--    Clone Screen-->
     <string name="clone_repo">Clonar repositorio remoto</string>
