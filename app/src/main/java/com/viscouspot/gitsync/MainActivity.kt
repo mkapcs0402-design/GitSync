@@ -433,10 +433,10 @@ class MainActivity : AppCompatActivity() {
 
         removeRepoButton.setOnClickListener {
             BaseDialog(this)
-                .setTitle(getString(R.string.confirm_repo_delete))
+                .setTitle(getString(R.string.confirm_container_delete))
                 .setMessage(
                     getString(
-                        R.string.confirm_repo_delete_msg,
+                        R.string.confirm_container_delete_msg,
                         repoManager.getRepoNames().elementAt(repoManager.getRepoIndex())
                     )
                 )
@@ -461,10 +461,10 @@ class MainActivity : AppCompatActivity() {
         renameRepoButton.setOnClickListener {
             val keyInput = LayoutInflater.from(this).inflate(R.layout.edittext_key, null) as ConstraintLayout
             val input = keyInput.findViewById<EditText>(R.id.input)
-            input.hint = getString(R.string.default_repo_name)
+            input.hint = getString(R.string.default_container_name)
             input.setText(repoManager.getRepoNames().elementAt(repoManager.getRepoIndex()))
             BaseDialog(this)
-                .setTitle(getString(R.string.rename_repository))
+                .setTitle(getString(R.string.rename_container))
                 .setCancelable(1)
                 .setView(keyInput)
                 .setNegativeButton(android.R.string.cancel) { _, _ -> }
@@ -497,9 +497,10 @@ class MainActivity : AppCompatActivity() {
             showContributeDialog(this, repoManager) {
                 val keyInput = LayoutInflater.from(this).inflate(R.layout.edittext_key, null) as ConstraintLayout
                 val input = keyInput.findViewById<EditText>(R.id.input)
-                input.hint = getString(R.string.default_repo_name)
+                input.hint = getString(R.string.default_container_name)
                 BaseDialog(this)
-                    .setTitle(getString(R.string.add_repository))
+                    .setTitle(getString(R.string.add_container))
+                    .setMessage(getString(R.string.add_container_msg))
                     .setCancelable(1)
                     .setView(keyInput)
                     .setPositiveButton(R.string.add) { _, _ -> }
