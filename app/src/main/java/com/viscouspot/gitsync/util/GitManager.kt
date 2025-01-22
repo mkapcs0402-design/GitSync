@@ -62,7 +62,7 @@ class GitManager(private val context: Context, private val settingsManager: Sett
                 override fun configure(host: OpenSshConfig.Host, session: Session) {
                     session.setConfig("StrictHostKeyChecking", "no")
                     session.setConfig("PreferredAuthentications", "publickey,password")
-                    session.setConfig("kex", "diffie-hellman-group-exchange-sha256")
+                    session.setConfig("kex", "diffie-hellman-group-exchange-sha256,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group14-sha256")
                 }
 
                 override fun createDefaultJSch(fs: org.eclipse.jgit.util.FS?): JSch {
