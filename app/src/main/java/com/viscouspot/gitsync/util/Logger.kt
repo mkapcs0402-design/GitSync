@@ -4,6 +4,8 @@ import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -118,12 +120,17 @@ object Logger {
         }
     }
 
+    fun copyLogsToClipboard(context: Context) {
+        val clipboard: ClipboardManager? = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?
+        val clip = ClipData.newPlainText(context.getString(R.string.copied_text), generateLogs())
+        clipboard?.setPrimaryClip(clip)
+    }
+
     private fun urlEncode(str: String): String{
         return URLEncoder.encode(str, StandardCharsets.UTF_8.toString())
     }
 
     private fun createGitHubIssueIntent(): Intent {
-        val lastLogsString = lastLogs.reversed().joinToString(separator = "\n") { (first, second) -> "$first: $second" }
         var url = "https://github.com/ViscousPot/GitSync/issues/new?"
         url += "body="
         url += urlEncode("""
@@ -145,15 +152,22 @@ object Logger {
 
 ---
 
-**Android Version:** ${Build.VERSION.RELEASE} (SDK ${Build.VERSION.SDK_INT})
-**Device Model:** ${Build.MANUFACTURER} ${Build.MODEL}
-**App Version:** ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})
-
-$lastLogsString
+${generateLogs()}
         """.trimIndent())
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
 
         return intent
+    }
+
+    private fun generateLogs(): String {
+        val lastLogsString = lastLogs.reversed().joinToString(separator = "\n") { (first, second) -> "$first: $second" }
+        return """
+**Android Version:** ${Build.VERSION.RELEASE} (SDK ${Build.VERSION.SDK_INT})
+**Device Model:** ${Build.MANUFACTURER} ${Build.MODEL}
+**App Version:** ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})
+
+$lastLogsString
+        """.trimIndent()
     }
 }
