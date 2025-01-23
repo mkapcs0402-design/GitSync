@@ -14,6 +14,7 @@ import androidx.core.widget.doOnTextChanged
 import com.google.android.material.button.MaterialButton
 import com.viscouspot.gitsync.R
 import com.viscouspot.gitsync.util.GitManager
+import com.viscouspot.gitsync.util.Logger.copyLogsToClipboard
 import com.viscouspot.gitsync.util.Logger.sendBugReportNotification
 import com.viscouspot.gitsync.util.RepoManager
 import com.viscouspot.gitsync.util.SettingsManager
@@ -57,8 +58,13 @@ class SettingsDialog(private val context: Context, private val repoManager: Repo
 
     private fun setupReportBugButton() {
         val reportBugButton = findViewById<MaterialButton>(R.id.reportBugButton) ?: return
+        val copyLogsButton = findViewById<MaterialButton>(R.id.copyLogsButton) ?: return
+
         reportBugButton.setOnClickListener {
             sendBugReportNotification(context)
+        }
+        copyLogsButton.setOnClickListener {
+            copyLogsToClipboard(context)
         }
     }
 
