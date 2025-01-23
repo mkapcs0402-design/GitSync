@@ -237,7 +237,7 @@ class GitManager(private val context: Context, private val settingsManager: Sett
                 return null
             }
 
-            if (repo.resolve(Constants.HEAD) == null) return false
+            if (repo.resolve(Constants.HEAD) == null || repo.resolve(Constants.FETCH_HEAD) == null) return false
 
             val localHead: ObjectId = repo.resolve(Constants.HEAD)
             val remoteHead: ObjectId = repo.resolve(Constants.FETCH_HEAD)
