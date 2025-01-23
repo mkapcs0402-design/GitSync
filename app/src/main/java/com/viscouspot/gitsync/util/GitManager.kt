@@ -28,6 +28,7 @@ import org.eclipse.jgit.diff.DiffFormatter
 import org.eclipse.jgit.errors.CheckoutConflictException
 import org.eclipse.jgit.errors.NotSupportedException
 import org.eclipse.jgit.errors.TransportException
+import org.eclipse.jgit.api.errors.TransportException as ApiTransportException
 import org.eclipse.jgit.internal.JGitText
 import org.eclipse.jgit.internal.storage.file.FileRepository
 import org.eclipse.jgit.lib.BatchingProgressMonitor
@@ -141,6 +142,21 @@ class GitManager(private val context: Context, private val settingsManager: Sett
                 log(e)
                 log(e.localizedMessage)
                 log(e.cause)
+                if (e.stackTraceToString().contains("Cleartext HTTP traffic")) {
+                    failureCallback("Git repositories must use SSL to work with this application")
+                    return@launch
+                }
+                failureCallback(e.localizedMessage ?: context.getString(R.string.clone_failed))
+                return@launch
+            } catch (e: ApiTransportException) {
+                e.printStackTrace()
+                log(e)
+                log(e.localizedMessage)
+                log(e.cause)
+                if (e.stackTraceToString().contains("Cleartext HTTP traffic")) {
+                    failureCallback("Git repositories must use SSL to work with this application")
+                    return@launch
+                }
                 failureCallback(e.localizedMessage ?: context.getString(R.string.clone_failed))
                 return@launch
             } catch (e: GitAPIException) {
@@ -210,6 +226,8 @@ class GitManager(private val context: Context, private val settingsManager: Sett
         }  catch (e: InvalidRemoteException) {
             handleInvalidRemoteException(e)
         } catch (e: TransportException) {
+            handleTransportException(e) { }
+        } catch (e: ApiTransportException) {
             handleTransportException(e) { }
         } catch (e: Throwable) {
             log(context, LogType.ForcePull, e)
@@ -290,6 +308,8 @@ class GitManager(private val context: Context, private val settingsManager: Sett
             handleInvalidRemoteException(e)
         } catch (e: TransportException) {
             handleTransportException(e, scheduleNetworkSync)
+        } catch (e: ApiTransportException) {
+            handleTransportException(e) { }
         } catch (e: Throwable) {
             log(context, LogType.PullFromRepo, e)
         }
@@ -525,6 +545,8 @@ class GitManager(private val context: Context, private val settingsManager: Sett
             handleInvalidRemoteException(e)
         } catch (e: TransportException) {
             handleTransportException(e, scheduleNetworkSync)
+        } catch (e: ApiTransportException) {
+            handleTransportException(e) { }
         } catch (e: Throwable) {
             log(context, LogType.PushToRepo, e)
         }
@@ -544,7 +566,7 @@ class GitManager(private val context: Context, private val settingsManager: Sett
         log(LogType.SyncException, e.stackTraceToString())
     }
 
-    private fun handleTransportException(e: TransportException, scheduleNetworkSync: () -> Unit) {
+    private fun handleTransportException(e: Exception, scheduleNetworkSync: () -> Unit) {
         if (listOf(
             JGitText.get().connectionFailed,
             JGitText.get().connectionTimeOut,
