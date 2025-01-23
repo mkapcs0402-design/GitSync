@@ -226,9 +226,9 @@ class GitManager(private val context: Context, private val settingsManager: Sett
         }  catch (e: InvalidRemoteException) {
             handleInvalidRemoteException(e)
         } catch (e: TransportException) {
-            handleTransportException(e) { }
+            handleTransportException(e)
         } catch (e: ApiTransportException) {
-            handleTransportException(e) { }
+            handleTransportException(e)
         } catch (e: Throwable) {
             log(context, LogType.ForcePull, e)
         }
@@ -307,12 +307,13 @@ class GitManager(private val context: Context, private val settingsManager: Sett
         } catch (e: InvalidRemoteException) {
             handleInvalidRemoteException(e)
         } catch (e: TransportException) {
-            handleTransportException(e, scheduleNetworkSync)
+            handleTransportException(e)
         } catch (e: ApiTransportException) {
-            handleTransportException(e) { }
+            handleTransportException(e)
         } catch (e: Throwable) {
             log(context, LogType.PullFromRepo, e)
         }
+        conditionallyScheduleNetworkSync(scheduleNetworkSync)
         return null
     }
 
@@ -544,12 +545,13 @@ class GitManager(private val context: Context, private val settingsManager: Sett
         } catch (e: InvalidRemoteException) {
             handleInvalidRemoteException(e)
         } catch (e: TransportException) {
-            handleTransportException(e, scheduleNetworkSync)
+            handleTransportException(e)
         } catch (e: ApiTransportException) {
-            handleTransportException(e) { }
+            handleTransportException(e)
         } catch (e: Throwable) {
             log(context, LogType.PushToRepo, e)
         }
+        conditionallyScheduleNetworkSync(scheduleNetworkSync)
         return null
     }
 
@@ -566,14 +568,13 @@ class GitManager(private val context: Context, private val settingsManager: Sett
         log(LogType.SyncException, e.stackTraceToString())
     }
 
-    private fun handleTransportException(e: Exception, scheduleNetworkSync: () -> Unit) {
+    private fun handleTransportException(e: Exception) {
         if (listOf(
             JGitText.get().connectionFailed,
             JGitText.get().connectionTimeOut,
             JGitText.get().transactionAborted,
             JGitText.get().cannotOpenService
         ).any{ e.message.toString().contains(it) } ) {
-            scheduleNetworkSync.invoke()
             return
         }
 
