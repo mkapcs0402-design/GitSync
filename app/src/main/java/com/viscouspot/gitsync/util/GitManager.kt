@@ -235,12 +235,12 @@ class GitManager(private val context: Context, private val settingsManager: Sett
         return false
     }
 
-    fun downloadChanges(userStorageUri: Uri, scheduleNetworkSync: () -> Unit, onSync: () -> Unit): Boolean? {
+    fun downloadChanges(userStorageUri: Uri, scheduleNetworkSync: () -> Unit, onSync: (() -> Unit)?): Boolean? {
         if (conditionallyScheduleNetworkSync(scheduleNetworkSync)) {
             return null
         }
         try {
-            var returnResult: Boolean? = false
+            var returnResult: Boolean? = onSync == null
             log(LogType.PullFromRepo, "Getting local directory")
             val repo = FileRepository("${Helper.getPathFromUri(context, userStorageUri)}/${context.getString(R.string.git_path)}")
             val git = Git(repo)
@@ -262,7 +262,7 @@ class GitManager(private val context: Context, private val settingsManager: Sett
 
             if (!fetchResult.trackingRefUpdates.isEmpty() || !localHead.equals(remoteHead)) {
                 log(LogType.PullFromRepo, "Pulling changes")
-                onSync.invoke()
+                onSync?.invoke()
                 val result = git.pull().apply {
                     applyCredentials(this)
                     setRemote(settingsManager.getRemote())

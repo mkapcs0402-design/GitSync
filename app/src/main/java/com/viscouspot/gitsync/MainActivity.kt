@@ -366,7 +366,8 @@ class MainActivity : AppCompatActivity() {
                         {
                             networkRequired(applicationContext)
                         },
-                    ) { }
+                        null
+                    )
 
                     if (result == false) {
                         makeToast(applicationContext, getString(R.string.pull_failed))
