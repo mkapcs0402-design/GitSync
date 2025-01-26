@@ -131,29 +131,10 @@ object Logger {
     }
 
     private fun createGitHubIssueIntent(): Intent {
-        var url = "https://github.com/ViscousPot/GitSync/issues/new?"
-        url += "body="
-        url += urlEncode("""
-<!-- Fill out the error details below -->
-
-#### Have you looked at the wiki?
-<!-- e.g. N -->
-
-#### Can you reproduce this issue reliably?
-<!-- e.g. N -->
-
-#### Which feature is affected?
-<!-- e.g. auth -->
-
-#### What auth method are you using?
-<!-- e.g. oauth -->
-
-<!--    -------- STOP HERE --------    -->
-
----
-
-${generateLogs()}
-        """.trimIndent())
+        var url = "https://issue-wrapper.netlify.app/?q=*{%22appIconUrl%22:%22https://raw.githubusercontent.com/ViscousPot/GitSync/master/app/src/main/res/mipmap-xxxhdpi/ic*_launcher*_round.webp%22,%22appName%22:%22GitSync%22,%22repoPath%22:%22ViscousPot/GitSync%22,%22questions%22:[%22Do_you_have_steps_to_reproduce_this_issue_reliably*Q%22,%22Which_app_feature_is_affected*Q%22,%22Which_auth_method_are_you_attempting_to_use*Q%22,%22Is_there_anything_that_may_be_non-standard_in_your_setup_or_config*Q%22]}~"
+        url += "&logs="
+        url += urlEncode(generateLogs())
+        url.take(2048)
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
 
