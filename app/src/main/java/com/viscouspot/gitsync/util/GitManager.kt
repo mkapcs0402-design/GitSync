@@ -563,7 +563,7 @@ class GitManager(private val context: Context, private val settingsManager: Sett
         return false
     }
 
-    private fun handleInvalidRemoteException(e: InvalidRemoteException) {
+    private fun handleInvalidRemoteException(e: Exception) {
         makeToast(context, context.getString(R.string.invalid_remote))
         log(LogType.SyncException, e.stackTraceToString())
     }
@@ -575,6 +575,11 @@ class GitManager(private val context: Context, private val settingsManager: Sett
             JGitText.get().transactionAborted,
             JGitText.get().cannotOpenService
         ).any{ e.message.toString().contains(it) } ) {
+            return
+        }
+
+        if (e.message.toString() == JGitText.get().notFound) {
+            handleInvalidRemoteException(e)
             return
         }
 
