@@ -5,13 +5,13 @@
   <h4>Android git client for syncing a repository between remote and a local directory</h4>
   
   <p align="center">
-    <img src="https://img.shields.io/github/license/ViscousPot/GitSync?v=1" alt="license">
-    <img src="https://img.shields.io/github/last-commit/ViscousPot/GitSync?v=1" alt="last commit">
-    <img src="https://img.shields.io/github/downloads/ViscousPot/GitSync/total" alt="downloads">
+    <a href="#"><img src="https://img.shields.io/github/license/ViscousPot/GitSync?v=1" alt="license"></a>
+    <a href="#"><img src="https://img.shields.io/github/last-commit/ViscousPot/GitSync?v=1" alt="last commit"></a>
+    <a href="#"><img src="https://img.shields.io/github/downloads/ViscousPot/GitSync/total" alt="downloads"></a>
     <a href="https://github.com/sponsors/ViscousPot"><img src="https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86" alt="sponsor"></a>
-    <img src="https://img.shields.io/github/stars/ViscousPot/GitSync?v=1" alt="stars">
+    <a href="#"><img src="https://img.shields.io/github/stars/ViscousPot/GitSync?v=1" alt="stars"></a>
   </p>
-    <img alt="2024 Gem of the Year (Obsidian Tools)" src="https://img.shields.io/badge/2024%20Gem%20of%20the%20Year%20(Obsidian%20Tools)-grey?style=for-the-badge&logo=obsidian&logoColor=pink">
+    <a href="#"><img alt="2024 Gem of the Year (Obsidian Tools)" src="https://img.shields.io/badge/2024%20Gem%20of%20the%20Year%20(Obsidian%20Tools)-grey?style=for-the-badge&logo=obsidian&logoColor=pink"></a>
 
   <br />
   <br />
