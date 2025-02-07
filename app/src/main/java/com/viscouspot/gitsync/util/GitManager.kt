@@ -28,7 +28,6 @@ import org.eclipse.jgit.diff.DiffFormatter
 import org.eclipse.jgit.errors.CheckoutConflictException
 import org.eclipse.jgit.errors.NotSupportedException
 import org.eclipse.jgit.errors.TransportException
-import org.eclipse.jgit.api.errors.TransportException as ApiTransportException
 import org.eclipse.jgit.internal.JGitText
 import org.eclipse.jgit.internal.storage.file.FileRepository
 import org.eclipse.jgit.lib.BatchingProgressMonitor
@@ -54,6 +53,7 @@ import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
 import org.eclipse.jgit.api.errors.CheckoutConflictException as ApiCheckoutConflictException
+import org.eclipse.jgit.api.errors.TransportException as ApiTransportException
 
 class GitManager(private val context: Context, private val settingsManager: SettingsManager) {
     private fun applyCredentials(command: TransportCommand<*, *>) {
@@ -86,6 +86,17 @@ class GitManager(private val context: Context, private val settingsManager: Sett
             command.setTransportConfigCallback { transport ->
                 transport.timeout = 3000
             }
+        }
+    }
+
+    fun discardFileChanges(userStorageUri: Uri, filePath: String) {
+        try {
+            val repo = FileRepository("${Helper.getPathFromUri(context, userStorageUri)}/${context.getString(R.string.git_path)}")
+            val git = Git(repo)
+
+            git.checkout().addPath(filePath).call()
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace()
         }
     }
 

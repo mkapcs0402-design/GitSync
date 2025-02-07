@@ -118,6 +118,10 @@
     <string name="manual_sync_msg">Select the files you would like to sync</string>
     <string name="no_uncommitted_changes">No uncommitted changes</string>
 
+    <string name="discard_changes_title">Discard Changes?</string>
+    <string name="discard_changes_msg">Are you sure you want to discard all changes to \"%s\"? \n\nThis action cannot be undone.</string>
+    <string name="discard_changes">Discard Changes</string>
+
     <!--    Merge Conflict Dialog-->
     <string name="merge_conflict_item_title">MERGE CONFLICT</string>
     <string name="merge_conflict_item_message">There is a merge conflict! Tap to resolve</string>

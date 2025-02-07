@@ -21,6 +21,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 
 class ManualSyncDialog(private val context: Context, private val settingsManager: SettingsManager, private val gitManager: GitManager, private val refreshRecentCommits: () -> Unit) : BaseDialog(context) {
@@ -40,18 +41,30 @@ class ManualSyncDialog(private val context: Context, private val settingsManager
         syncMessageInput = findViewById(R.id.syncMessageInput) ?: return
 
         val gitDirUri = settingsManager.getGitDirUri() ?: return
+        val files = mutableListOf<String>()
+        manualSyncItems.adapter =
+            ManualSyncItemAdapter(context, files, selectedFiles, { filePath ->
+                if (selectedFiles.contains(filePath)) {
+                    selectedFiles.remove(filePath)
+                } else {
+                    selectedFiles.add(filePath)
+                }
+                updateSyncButton()
+            }, { filePath ->
+                settingsManager.getGitDirUri()
+                    ?.let { gitDirUri -> gitManager.discardFileChanges(gitDirUri, filePath) }
+                manualSyncItems.adapter?.notifyItemRemoved(files.indexOf(filePath))
+                files.remove(filePath)
+            })
 
-        val files = gitManager.getUncommittedFilePaths(gitDirUri)
-        manualSyncItems.adapter = ManualSyncItemAdapter(context, files, selectedFiles) { filePath ->
-            if (selectedFiles.contains(filePath)) {
-                selectedFiles.remove(filePath)
-            } else {
-                selectedFiles.add(filePath)
+        CoroutineScope(Dispatchers.Default).launch {
+            val filePaths = gitManager.getUncommittedFilePaths(gitDirUri)
+            files.addAll(filePaths)
+            withContext(Dispatchers.Main) {
+                updateSyncButton()
+                manualSyncItems.adapter?.notifyItemRangeInserted(0, filePaths.size)
             }
-            updateSyncButton()
         }
-
-        updateSyncButton()
 
         syncButton.setOnClickListener {
             syncButton.isEnabled = false
