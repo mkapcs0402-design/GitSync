@@ -1,4 +1,4 @@
 appId: com.viscouspot.gitsync
 ---
 
-- assertVisible: "SYNC NOW"
+- assertVisible: "SYNC CHANGES"

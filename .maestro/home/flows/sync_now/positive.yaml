@@ -2,4 +2,4 @@ appId: com.viscouspot.gitsync
 ---
 
 - runFlow: ./assert.yaml
-- tapOn: "SYNC NOW"
+- tapOn: "SYNC CHANGES"
