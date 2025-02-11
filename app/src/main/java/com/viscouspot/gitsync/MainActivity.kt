@@ -1035,10 +1035,12 @@ class MainActivity : AppCompatActivity() {
                 cloneRepoButton.visibility = View.VISIBLE
                 deselectDirButton.visibility = View.GONE
                 cloneRepoButton.setOnClickListener {
-                    CloneRepoFragment(settingsManager, gitManager, ::dirSelectionCallback).show(
-                        supportFragmentManager,
-                        getString(R.string.clone_repo)
-                    )
+                    if (!cloneRepoFragment.isAdded) {
+                        cloneRepoFragment.show(
+                            supportFragmentManager,
+                            getString(R.string.clone_repo)
+                        )
+                    }
                 }
 
                 applicationObserverSwitch.isChecked = false
