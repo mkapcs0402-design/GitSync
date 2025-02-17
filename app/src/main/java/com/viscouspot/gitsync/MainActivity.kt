@@ -325,10 +325,10 @@ class MainActivity : AppCompatActivity() {
 
         baseSyncOptionIconMap = mapOf(
             Pair(getString(R.string.sync_now), R.drawable.pull),
+            Pair(getString(R.string.manual_sync), R.drawable.manual_sync),
+            Pair(getString(R.string.pull_changes), R.drawable.pull_changes),
             Pair(getString(R.string.force_push), R.drawable.force_push),
             Pair(getString(R.string.force_pull), R.drawable.force_pull),
-            Pair(getString(R.string.pull_changes), R.drawable.pull_changes),
-            Pair(getString(R.string.manual_sync), R.drawable.manual_sync),
         )
 
         syncOptionIconMap = baseSyncOptionIconMap
