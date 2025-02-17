@@ -377,9 +377,9 @@ object Helper {
             )
             setCancelable(0)
             setPositiveButton(R.string.support_now) { _, _ ->
+                repoManager.setHasContributed()
                 val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(context.getString(R.string.contribute_link)))
                 context.startActivity(browserIntent)
-                repoManager.setHasContributed()
             }
             setNegativeButton(R.string.support_promise) { _, _ ->
                 repoManager.setHasContributed()

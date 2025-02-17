@@ -50,9 +50,9 @@ class SettingsDialog(private val context: Context, private val repoManager: Repo
     private fun setupContributeButton() {
         val contributeButton = findViewById<MaterialButton>(R.id.contributeButton) ?: return
         contributeButton.setOnClickListener {
+            repoManager.setHasContributed()
             val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(context.getString(R.string.contribute_link)))
             context.startActivity(browserIntent)
-            repoManager.setHasContributed()
         }
     }
 
