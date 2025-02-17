@@ -35,6 +35,7 @@ enum class LogType(val type: String) {
     AbortMerge("AbortMerge"),
     GetRepos("GetRepos"),
     CloneRepo("CloneRepo"),
+    SelectDirectory("SelectDirectory"),
     ForcePull("ForcePull"),
     PullFromRepo("PullFromRepo"),
     PushToRepo("PushToRepo"),

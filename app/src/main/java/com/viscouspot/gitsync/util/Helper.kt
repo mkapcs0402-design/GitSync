@@ -164,10 +164,13 @@ object Helper {
     fun getDirSelectionLauncher(activityResultLauncher: ActivityResultCaller, context: Context, callback: ((dirUri: Uri?) -> Unit)): ActivityResultLauncher<Uri?> {
         return activityResultLauncher.registerForActivityResult(ActivityResultContracts.OpenDocumentTree()) { uri ->
             uri?.let {
+                log(LogType.SelectDirectory, "Uri received")
                 val uriPath = getPathFromUri(context, it)
                 val directory = File(uriPath)
+                log(LogType.SelectDirectory, "Path selected: $uriPath")
 
                 if (!directory.exists() || !directory.isDirectory) {
+                    log(LogType.SelectDirectory, "Directory does not exist!")
                     callback.invoke(null)
                     return@let
                 }
@@ -175,8 +178,11 @@ object Helper {
                 try {
                     val testFile = File(directory, "test${System.currentTimeMillis()}.txt")
                     testFile.createNewFile()
+                    log(LogType.SelectDirectory, "Test file created: ${testFile.absolutePath}")
                     testFile.delete()
+                    log(LogType.SelectDirectory, "Test file deleted: ${testFile.absolutePath}")
                 } catch (e: IOException) {
+                    log(context, LogType.SelectDirectory, e)
                     e.printStackTrace()
                     callback.invoke(null)
                     return@let
@@ -185,16 +191,19 @@ object Helper {
                 try {
                     val configFile = File(directory, context.getString(R.string.git_config_path))
                     if (configFile.exists()) {
+                        log(LogType.SelectDirectory, "Config file exists: ${configFile.absolutePath}")
                         configFile.readText()
                     }
                 } catch (e: IOException) {
                     e.printStackTrace()
+                    log(context, LogType.SelectDirectory, e)
                     callback.invoke(null)
                     return@let
                 }
 
                 context.contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION or Intent.FLAG_GRANT_READ_URI_PERMISSION)
 
+                log(LogType.SelectDirectory, "Directory selected successfully")
                 callback.invoke(uri)
             }
         }
