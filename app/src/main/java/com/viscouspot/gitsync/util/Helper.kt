@@ -164,7 +164,7 @@ object Helper {
     fun getDirSelectionLauncher(activityResultLauncher: ActivityResultCaller, context: Context, callback: ((dirUri: Uri?) -> Unit)): ActivityResultLauncher<Uri?> {
         return activityResultLauncher.registerForActivityResult(ActivityResultContracts.OpenDocumentTree()) { uri ->
             uri?.let {
-                log(LogType.SelectDirectory, "Uri received")
+                log(LogType.SelectDirectory, "Uri received $uri")
                 val uriPath = getPathFromUri(context, it)
                 val directory = File(uriPath)
                 log(LogType.SelectDirectory, "Path selected: $uriPath")
