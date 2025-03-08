@@ -1,7 +1,7 @@
 <div align="center">
   <h4>⚠️ Disclaimer</h4>
   <h4>GitSync is currently undergoing a rework.<br/>The latest release remains functional but won’t receive major updates until the rework is complete.<br/>Thanks for your patience! </h4>
-  
+  <br/>
   <img src="app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.webp" width="140" />
 
   <h3>GitSync</h3>
