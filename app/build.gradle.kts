@@ -59,6 +59,10 @@ configurations.all {
 }
 
 dependencies {
+    val billing_version = "7.1.1"
+
+    implementation("com.android.billingclient:billing:$billing_version")
+
     implementation(libs.security.crypto)
     implementation(libs.squareup.okhttp3)
     implementation(libs.jgit) {
