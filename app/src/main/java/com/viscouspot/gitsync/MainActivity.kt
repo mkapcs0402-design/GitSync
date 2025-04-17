@@ -73,6 +73,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Date
 
 class MainActivity : AppCompatActivity() {
     private lateinit var applicationObserverMax: ConstraintSet
@@ -117,6 +119,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var applicationObserverSwitch: Switch
 
     private lateinit var selectApplication: MaterialButton
+
+    private lateinit var sunsetBanner: MaterialButton
 
     private val applicationList: MutableList<Drawable> = mutableListOf()
     private lateinit var applicationRecycler: RecyclerView
@@ -322,6 +326,25 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        val sunsetDate = SimpleDateFormat("dd-MM-yyyy").parse("25-04-2025")
+
+        sunsetBanner = findViewById(R.id.sunsetBanner)
+
+        if (Date().after(sunsetDate)) {
+            sunsetBanner.text = getString(R.string.sunset_banner_post_deprecation_text)
+            sunsetBanner.setOnClickListener {
+                val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/apps/testing/com.viscouspot.gitsync"))
+                startActivity(browserIntent)
+            }
+        } else {
+            sunsetBanner.text = getString(R.string.sunset_banner_pre_deprecation_text).format(SimpleDateFormat("dd-MM-yyyy").format(sunsetDate))
+            sunsetBanner.setOnClickListener {
+                val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.viscouspot.gitsync"))
+                startActivity(browserIntent)
+            }
+        }
+
 
         baseSyncOptionIconMap = mapOf(
             Pair(getString(R.string.sync_now), R.drawable.pull),

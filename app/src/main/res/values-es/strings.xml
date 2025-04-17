@@ -231,5 +231,7 @@
 
     <string name="enable_autosync_title">Habilitar sincronización automática</string>
     <string name="enable_autosync_message">Mantén tus datos actualizados sin esfuerzo. Activa la sincronización automática para sincronizar en segundo plano cada vez que se abran o cierren aplicaciones.</string>
-    
+
+    <string name="sunset_banner_pre_deprecation_text">GitSync (Android) dejará de estar disponible el 25 de mayo de 2025.\nHay una nueva versión, reconstruida desde cero. Tendrás que configurarlo de nuevo (¡lo sentimos!), pero vale la pena.\nPrueba la beta (se esperan errores).</string>
+    <string name="sunset_banner_post_deprecation_text">Esta versión de GitSync ha sido retirada. Hay una aplicación nueva y mejorada disponible. ¡Actualiza y sigue sincronizando!</string>
 </resources>
