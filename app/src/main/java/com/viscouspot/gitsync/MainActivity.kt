@@ -40,6 +40,7 @@ import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.core.widget.TextViewCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
@@ -72,6 +73,9 @@ import com.viscouspot.gitsync.util.rightDrawable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import okhttp3.OkHttpClient
+import okhttp3.Request
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -327,21 +331,45 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val sunsetDate = SimpleDateFormat("dd-MM-yyyy").parse("25-04-2025")
+        lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+                val client = OkHttpClient()
+                val request = Request.Builder()
+                    .url("https://pastebin.com/raw/aHCYBYqv")
+                    .build()
+                client.newCall(request).execute().use { response ->
+                    if (response.isSuccessful) {
+                        val sunsetDate =
+                            SimpleDateFormat("dd-MM-yyyy").parse(response.body?.string())
 
-        sunsetBanner = findViewById(R.id.sunsetBanner)
+                        sunsetBanner = findViewById(R.id.sunsetBanner)
 
-        if (Date().after(sunsetDate)) {
-            sunsetBanner.text = getString(R.string.sunset_banner_post_deprecation_text)
-            sunsetBanner.setOnClickListener {
-                val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/apps/testing/com.viscouspot.gitsync"))
-                startActivity(browserIntent)
-            }
-        } else {
-            sunsetBanner.text = getString(R.string.sunset_banner_pre_deprecation_text).format(SimpleDateFormat("dd-MM-yyyy").format(sunsetDate))
-            sunsetBanner.setOnClickListener {
-                val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.viscouspot.gitsync"))
-                startActivity(browserIntent)
+                        if (Date().after(sunsetDate)) {
+                            sunsetBanner.text =
+                                getString(R.string.sunset_banner_post_deprecation_text)
+                            sunsetBanner.setOnClickListener {
+                                val browserIntent = Intent(
+                                    Intent.ACTION_VIEW,
+                                    Uri.parse("https://play.google.com/apps/testing/com.viscouspot.gitsync")
+                                )
+                                startActivity(browserIntent)
+                            }
+                        } else {
+                            sunsetBanner.text =
+                                getString(R.string.sunset_banner_pre_deprecation_text).format(
+                                    SimpleDateFormat("dd-MM-yyyy").format(sunsetDate)
+                                )
+                            sunsetBanner.setOnClickListener {
+                                val browserIntent = Intent(
+                                    Intent.ACTION_VIEW,
+                                    Uri.parse("https://play.google.com/store/apps/details?id=com.viscouspot.gitsync")
+                                )
+                                startActivity(browserIntent)
+                            }
+                        }
+//                response.body?.string()
+                    }
+                }
             }
         }
 
