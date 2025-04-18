@@ -238,6 +238,6 @@
     <string name="enable_autosync_message">Keep your data up-to-date effortlessly. Turn on Auto Sync to automatically sync in the background whenever apps are opened or closed.</string>
 
 
-    <string name="sunset_banner_pre_deprecation_text">GitSync (Android) deprecates %s\n\nA new version is here, rebuilt from scratch. You will need to set things up again (sorry!)\nTry the beta here (bugs expected).</string>
+    <string name="sunset_banner_pre_deprecation_text">GitSync (Android) deprecates %s\n\nA new version is here, rebuilt from scratch, but you will need to set things up again (sorry!)\nTry the beta here (bugs expected).</string>
     <string name="sunset_banner_post_deprecation_text">This version of Gitsync has been deprecated. A new and improved app is available. Please update and continue syncing!</string>
 </resources>
