@@ -152,7 +152,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:fillViewport="true"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/sunsetBanner"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/toolbar">
@@ -498,4 +498,24 @@
                 app:layout_constraintTop_toBottomOf="@id/gitRepoPath" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/sunsetBanner"
+        android:layout_width="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        android:paddingHorizontal="@dimen/space_xs"
+        android:paddingVertical="@dimen/space_sm"
+        app:icon="@drawable/open_external"
+        app:iconSize="@dimen/text_size_sm"
+        app:iconTint="@color/app_bg"
+        app:iconGravity="top"
+        android:textColor="@color/app_bg"
+        android:textAllCaps="false"
+        android:backgroundTint="@color/deletions"
+        android:text=""
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_height="wrap_content" />
 </androidx.constraintlayout.widget.ConstraintLayout>
