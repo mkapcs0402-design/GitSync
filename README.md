@@ -26,7 +26,7 @@
   </p>
 
   <p align="center">
-    <a href="https://github.com/ViscousPot/GitSync/wiki">Documentation</a>
+    <a href="https://gitsync.viscouspotenti.al/wiki/">Documentation</a>
   </p>
   <br />
 
