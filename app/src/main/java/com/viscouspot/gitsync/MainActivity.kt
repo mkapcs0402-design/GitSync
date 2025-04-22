@@ -350,7 +350,7 @@ class MainActivity : AppCompatActivity() {
                             sunsetBanner.setOnClickListener {
                                 val browserIntent = Intent(
                                     Intent.ACTION_VIEW,
-                                    Uri.parse("https://play.google.com/apps/testing/com.viscouspot.gitsync")
+                                    Uri.parse("https://play.google.com/store/apps/details?id=com.viscouspot.gitsync")
                                 )
                                 startActivity(browserIntent)
                             }
@@ -362,7 +362,7 @@ class MainActivity : AppCompatActivity() {
                             sunsetBanner.setOnClickListener {
                                 val browserIntent = Intent(
                                     Intent.ACTION_VIEW,
-                                    Uri.parse("https://play.google.com/store/apps/details?id=com.viscouspot.gitsync")
+                                    Uri.parse("https://play.google.com/apps/testing/com.viscouspot.gitsync")
                                 )
                                 startActivity(browserIntent)
                             }
