@@ -2,6 +2,21 @@
   <h4>⚠️ Disclaimer</h4>
   <h4>GitSync is currently undergoing a rework.<br/>The latest release remains functional but won’t receive major updates until the rework is complete.<br/>Thanks for your patience! </h4>
   <br/>
+
+  <h4>🛣️ Roadmap</h4>
+  <p><em>optimistic estimates - subject to change</em></p>
+  <div align="center">
+    <strong>26 Jun 2025 - </strong> Official release of the rewrite<br/>
+    <div align="center"><strong>|</strong></div>
+    <strong>TBD - </strong> Open source release of the rewritten codebase
+    <div align="center"><strong>|</strong></div>
+  </div>
+
+
+  
+  <br/>
+  <br/>
+  <br/>
   <img src="app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.webp" width="140" />
 
   <h3>GitSync</h3>
