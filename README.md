@@ -19,8 +19,7 @@
   <p align="center">
   <a href="https://play.google.com/store/apps/details?id=com.viscouspot.gitsync" target="_blank"><img src="https://github.com/user-attachments/assets/168cb841-392d-493a-bc47-a9e3e8a61a62" alt="Get it on Google Play" style="height: 51px !important;" ></a>
   &nbsp;&nbsp;
-  <a href="https://apps.apple.com/us/app/gitsync/id6744980427?platform=iphone" target="_blank"><img src="
-    https://gitsync.viscouspotenti.al/static/download_on_the_app_store.f85805a0.svg" alt="Download on the App Store" style="height: 51px !important;"  ></a>
+  <a href="https://apps.apple.com/us/app/gitsync/id6744980427?platform=iphone" target="_blank"><img src="https://github.com/user-attachments/assets/ece58c2a-3e14-4f6a-b244-074ca38b4167" alt="Download on the App Store" style="height: 51px !important;"  ></a>
   &nbsp;&nbsp;
   <a href="https://apt.izzysoft.de/fdroid/index/apk/com.viscouspot.gitsync" target="_blank"><img src="https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroidButtonGreyBorder_nofont.png" alt="Get it on Izzy On Droid"style="height: 51px !important;"  ></a>
   </p>
@@ -31,6 +30,9 @@
   <br />
 
 </div>
+
+
+
 
 
 GitSync is a cross-platform git client that aims to simplify the process of syncing a folder between a git remote and a local directory. It works in the background to keep your files synced with a simple one-time setup and numerous options for activating manual syncs.
